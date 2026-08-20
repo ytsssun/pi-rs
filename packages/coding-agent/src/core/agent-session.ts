@@ -1510,6 +1510,15 @@ export class AgentSession {
 		});
 	}
 
+	/** Clear queued steering messages and return their text. */
+	clearSteeringQueue(): string[] {
+		const steering = [...this._steeringMessages];
+		this._steeringMessages = [];
+		this.agent.clearSteeringQueue();
+		this._emitQueueUpdate();
+		return steering;
+	}
+
 	/**
 	 * Clear all queued messages and return them.
 	 * Useful for restoring to editor when user aborts.

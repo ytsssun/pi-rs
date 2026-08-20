@@ -63,8 +63,8 @@ Type `/` in the editor to open command completion. Extensions can register custo
 
 You can submit messages while the agent is still working:
 
-- **Enter** queues a steering message, delivered after the current assistant turn finishes executing its tool calls.
-- **Alt+Enter** queues a follow-up message, delivered after the agent finishes all work.
+- **Enter** interrupts the current turn and delivers a steering message before work resumes.
+- **Alt+Enter** queues soft steering after the current tool batch; press **Escape** to interrupt and send it immediately.
 - **Escape** aborts and restores queued messages to the editor.
 - **Alt+Up** retrieves queued messages back to the editor.
 

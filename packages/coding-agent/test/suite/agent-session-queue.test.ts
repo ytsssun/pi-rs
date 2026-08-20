@@ -420,6 +420,27 @@ describe("AgentSession queue characterization", () => {
 		);
 	});
 
+	it("clears only steering messages for immediate delivery", async () => {
+		const waiting = await createWaitingHarness();
+		const { harness, waitForToolStart, promptPromise, releaseToolExecution } = waiting;
+		harnesses.push(harness);
+		harness.setResponses([
+			fauxAssistantMessage(fauxToolCall("wait", {}), { stopReason: "toolUse" }),
+			fauxAssistantMessage("follow-up handled"),
+		]);
+
+		await waitForToolStart;
+		await harness.session.steer("send now");
+		await harness.session.followUp("send later");
+
+		expect(harness.session.clearSteeringQueue()).toEqual(["send now"]);
+		expect(harness.session.getSteeringMessages()).toEqual([]);
+		expect(harness.session.getFollowUpMessages()).toEqual(["send later"]);
+
+		releaseToolExecution();
+		await promptPromise;
+	});
+
 	it("delivers follow-ups queued during agent_end", async () => {
 		let sent = false;
 		const harness = await createHarness({

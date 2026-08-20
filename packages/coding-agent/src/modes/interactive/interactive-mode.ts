@@ -2790,7 +2790,14 @@ export class InteractiveMode {
 		// so they work correctly regardless of which editor is active
 		this.defaultEditor.onEscape = () => {
 			if (this.session.isStreaming) {
-				this.restoreQueuedMessagesToEditor({ abort: true });
+				const steering = this.session.clearSteeringQueue();
+				if (steering.length > 0) {
+					const text = steering.join("\n\n");
+					this.updatePendingMessagesDisplay();
+					void this.session.abort().then(() => this.session.prompt(text));
+				} else {
+					this.restoreQueuedMessagesToEditor({ abort: true });
+				}
 			} else if (this.session.isBashRunning) {
 				this.session.abortBash();
 			} else if (this.isBashMode) {
@@ -3062,12 +3069,12 @@ export class InteractiveMode {
 				return;
 			}
 
-			// If streaming, use prompt() with steer behavior
-			// This handles extension commands (execute immediately), prompt template expansion, and queueing
+			// Enter redirects active work; Alt+Enter is the non-interrupting follow-up queue.
 			if (this.session.isStreaming) {
 				this.editor.addToHistory?.(text);
 				this.editor.setText("");
-				await this.session.prompt(text, { streamingBehavior: "steer" });
+				await this.session.abort();
+				await this.session.prompt(text);
 				this.updatePendingMessagesDisplay();
 				this.ui.requestRender();
 				return;
@@ -4004,12 +4011,11 @@ export class InteractiveMode {
 			return;
 		}
 
-		// Alt+Enter queues a follow-up message (waits until agent finishes)
-		// This handles extension commands (execute immediately), prompt template expansion, and queueing
+		// Alt+Enter queues soft steering after the current tool batch.
 		if (this.session.isStreaming) {
 			this.editor.addToHistory?.(text);
 			this.editor.setText("");
-			await this.session.prompt(text, { streamingBehavior: "followUp" });
+			await this.session.prompt(text, { streamingBehavior: "steer" });
 			this.updatePendingMessagesDisplay();
 			this.ui.requestRender();
 		}
@@ -4237,7 +4243,7 @@ export class InteractiveMode {
 		if (steeringMessages.length > 0 || followUpMessages.length > 0) {
 			this.pendingMessagesContainer.addChild(new Spacer(1));
 			for (const message of steeringMessages) {
-				const text = theme.fg("dim", `Steering: ${message}`);
+				const text = theme.fg("dim", `Messages to be submitted after the current tool batch (press Esc to interrupt and send immediately)\n  ↳ ${message}`);
 				this.pendingMessagesContainer.addChild(new TruncatedText(text, 1, 0));
 			}
 			for (const message of followUpMessages) {
@@ -6224,7 +6230,7 @@ export class InteractiveMode {
 | \`${toggleThinking}\` | Toggle thinking block visibility |
 | \`${externalEditor}\` | Edit message in external editor |
 | \`${copyMessage}\` | Copy last assistant message |
-| \`${followUp}\` | Queue follow-up message |
+| \`${followUp}\` | Queue soft steering after current tool batch |
 | \`${dequeue}\` | Restore queued messages |
 | \`${pasteImage}\` | Paste image or text from clipboard |
 | \`/\` | Slash commands |
