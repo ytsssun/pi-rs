@@ -234,7 +234,9 @@ export function estimateContextTokens(messages: AgentMessage[]): ContextUsageEst
  */
 export function shouldCompact(contextTokens: number, contextWindow: number, settings: CompactionSettings): boolean {
 	if (!settings.enabled) return false;
-	return contextTokens > contextWindow - settings.reserveTokens;
+	// pi-context gets first refusal at 50% for selective pruning/range compaction.
+	// Core compaction remains a fallback instead of racing the extension trigger.
+	return contextTokens > contextWindow * 0.6;
 }
 
 // ============================================================================

@@ -272,15 +272,16 @@ describe("estimateContextTokens", () => {
 });
 
 describe("shouldCompact", () => {
-	it("should return true when context exceeds threshold", () => {
+	it("should leave 50% cleanup to extensions and compact at 60%", () => {
 		const settings: CompactionSettings = {
 			enabled: true,
 			reserveTokens: 10000,
 			keepRecentTokens: 20000,
 		};
 
-		expect(shouldCompact(95000, 100000, settings)).toBe(true);
-		expect(shouldCompact(89000, 100000, settings)).toBe(false);
+		expect(shouldCompact(50001, 100000, settings)).toBe(false);
+		expect(shouldCompact(60001, 100000, settings)).toBe(true);
+		expect(shouldCompact(60000, 100000, settings)).toBe(false);
 	});
 
 	it("should return false when disabled", () => {
