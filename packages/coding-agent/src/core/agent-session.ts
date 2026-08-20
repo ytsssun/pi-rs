@@ -596,7 +596,7 @@ export class AgentSession {
 	private async _emitAgentSettled(): Promise<void> {
 		this._isAgentRunActive = false;
 		try {
-			await this._extensionRunner.emit({ type: "agent_settled" });
+			await this._extensionRunner.emitSettled({ type: "agent_settled" });
 			this._emit({ type: "agent_settled" });
 		} finally {
 			this._resolveIdleWaitIfIdle();

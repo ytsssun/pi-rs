@@ -17,6 +17,7 @@ import type {
 	BeforeAgentStartEventResult,
 	BeforeProviderHeadersEvent,
 	BeforeProviderRequestEvent,
+	AgentSettledEvent,
 	CompactOptions,
 	ContextEvent,
 	ContextEventResult,
@@ -796,6 +797,26 @@ export class ExtensionRunner {
 			event.type === "session_before_compact" ||
 			event.type === "session_before_tree"
 		);
+	}
+
+	async emitSettled(event: AgentSettledEvent): Promise<void> {
+		const ctx = this.createCommandContext();
+		for (const ext of this.extensions) {
+			const handlers = ext.handlers.get(event.type);
+			if (!handlers) continue;
+			for (const handler of handlers) {
+				try {
+					await handler(event, ctx);
+				} catch (err) {
+					this.emitError({
+						extensionPath: ext.path,
+						event: event.type,
+						error: err instanceof Error ? err.message : String(err),
+						stack: err instanceof Error ? err.stack : undefined,
+					});
+				}
+			}
+		}
 	}
 
 	async emit<TEvent extends RunnerEmitEvent>(event: TEvent): Promise<RunnerEmitResult<TEvent>> {
