@@ -43,3 +43,7 @@ Rust 1.98.1 pinned in rust-toolchain.toml, installed with minimal rustup profile
 Created and read back heartbeat `pi-rs-first-48-hour-cycle`, attached to this task, every 2 hours until 2026-09-08 22:53 UTC (15:53 PDT). Status ACTIVE. First creation rejected missing destination; retried with destination=thread and succeeded; no duplicate created. Saved automation config confirms cutoff. Actual later wakeup/host restart recovery has not yet occurred and is **unverified**. Local host and app must remain running; see official source in coordination.md. If a scheduled run cannot happen, these commands and records suffice for a new session; do not claim background progress.
 
 On each wakeup select one bounded useful task, respect max 4 total agents and file ownership, save evidence and new checkpoint. Stop no-progress loops after two identical failures. Routine milestone reports at most twice per day; only notify on meaningful results or decisions/failure. Cycle endpoint is bounded by scheduler; if last scheduled run precedes cutoff, leave final handoff then rather than assume an extra cutoff wakeup. No pending user decision at M1.
+
+## GitHub authorization (2026-09-06)
+
+User authorized creating ytsssun/pi-rs and future autonomous pushes of suitable verified changes. Initial visibility is private; making it public is a separate decision. Commit and push integrated milestones after relevant checks; never include credentials or private session artifacts.

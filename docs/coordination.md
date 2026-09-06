@@ -2,7 +2,7 @@
 
 Started 2026-09-06; first cycle ends 2026-09-08 at the corresponding local start time (approximately 16:00 America/Los_Angeles). This is an experiment window, not a full-rewrite promise.
 
-Core goals: Rust is fixed; preserve explicitly tested Pi ecosystem profiles; independent runtime evolution including context editing; measure startup, memory, concurrency and model/tool latency separately. Eventual open source and cross-model multiplayer remain future goals. Multiplayer experiments need not await full compatibility. No publication or external communication without user authorization. No internal systems; no global memory changes.
+Core goals: Rust is fixed; preserve explicitly tested Pi ecosystem profiles; independent runtime evolution including context editing; measure startup, memory, concurrency and model/tool latency separately. Eventual open source and cross-model multiplayer remain future goals. Multiplayer experiments need not await full compatibility. User authorized creating the private GitHub repository ytsssun/pi-rs and autonomously committing/pushing suitable verified changes on 2026-09-06. Pushes to this project remote do not require repeated approval. Public visibility changes, releases and unrelated external communication still require authorization. No internal systems; no global memory changes.
 
 ## Durable board
 
