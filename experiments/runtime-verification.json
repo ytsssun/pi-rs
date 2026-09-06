@@ -1,0 +1,20 @@
+{
+  "status": "verified",
+  "provider": "local HTTP test double; no live model",
+  "checks": [
+    "explicit round bound returns failure",
+    "round-bound checkpoint includes tool result",
+    "resume carries actual tool result to HTTP model",
+    "correlated tool call retained",
+    "provider usage saved",
+    "completed resume makes no new model request",
+    "existing session cannot be overwritten",
+    "corrupted session remains unchanged",
+    "unknown schema version rejected without overwrite",
+    "unknown tool produces correlated error result",
+    "incomplete provider finish rejected without assistant save",
+    "context view trims provider-visible tool result",
+    "context edit retains canonical tool result"
+  ],
+  "passed": 13
+}

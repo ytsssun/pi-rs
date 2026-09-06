@@ -1,0 +1,4 @@
+[
+  {"role":"assistant","content":null,"tool_calls":[{"id":"read-1","type":"function","function":{"name":"read","arguments":"{\"path\":\"fixtures/hello.txt\"}"}}]},
+  {"role":"assistant","content":"Fixture complete: read result persisted. This is scripted output, not a live model verification."}
+]
