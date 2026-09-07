@@ -1,4 +1,4 @@
-# Checkpoint M2 — coding/test/follow-up candidate
+# Checkpoint M2 — deterministic coding/test/follow-up verified
 
 Current work branch: `work/coding-loop`, forked from `main` at `00766dc`. Do not merge main or force-push. User authorizes suitable verified project commits/pushes. See git log for implementation and verification commits. M1 checkpoint retained in checkpoint-m1.md as historical evidence; its read-only limitations and priority order are superseded here.
 
@@ -16,13 +16,13 @@ python3 scripts/demo-coding.py
 python3 experiments/round2-coding.py
 ```
 
-Full verification including previous profiles is in README.md. Clean M1 reproduction and counterexamples are in experiments/round2-baseline.md. Candidate clean-checkout M2 result belongs in experiments/round2-verification.md; do not infer it from this checklist. Frozen acceptance is docs/milestone2.md; **real model criterion is still unverified**, not waived.
+Full verification including previous profiles is in README.md. Clean M1 reproduction and counterexamples are in experiments/round2-baseline.md. Independent clean-checkout M2 execution at implementation commit `89b4796537f159abd76758535d8678d3d888cd17` passed build, all 17 Rust tests, strict clippy, demo and both HTTP suites. Exact compatibility rerun results and commands are recorded in experiments/round2-verification.md. Subsequent handoff commits only change records, not executable source. Frozen acceptance is docs/milestone2.md; **real model criterion is still unverified**, not waived.
 
 ## What works in local tests
 
 Actual write/bash plus existing read; small repository's test fails, source changes, test passes; separate process appends another user turn using `--resume --input`. Canonical history and context projection survive resume. Mutation opt-in applies per invocation. In-flight intent saves before effect; uncertain result refuses replay and requires inspected outcome via `--resolve-in-flight`. Unix flock releases on process death, lock file stays. Do not remove active/permanent lock inodes. `.tmp` may require manual crash inspection. Keep runtime state outside the repository being modified.
 
-17 Rust tests; 28 M2 independent local HTTP/fixture checks (verify final report), 13 M1 HTTP regression checks, 36 original truncation comparisons, 7 Node extension cases and 4 original write execution comparisons. Counts express narrow test scopes, not complete Pi compatibility. The new write comparison runs actual original filesystem code with documented schema/rendering/import shims. Bash result/timeout behavior is intentionally narrower than Pi. No live inference or speed claim.
+17 Rust tests; 28 M2 independent local HTTP/fixture checks, 13 M1 HTTP regression checks, 36 original truncation comparisons, 7 Node extension cases and 4 original write execution comparisons. Counts express narrow test scopes, not complete Pi compatibility. The new write comparison runs actual original filesystem code with documented schema/rendering/import shims. Bash result/timeout behavior is intentionally narrower than Pi. No live inference or speed claim.
 
 ## Next valuable tasks
 
