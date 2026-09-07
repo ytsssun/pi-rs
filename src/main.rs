@@ -5,7 +5,7 @@ use std::{env, fs, path::Path, time::Duration};
 fn main() -> Result<()> {
     let args: Vec<String> = env::args().skip(1).collect();
     if args.is_empty() || args.iter().any(|a| a == "--help") {
-        println!("pi-rs (--input TEXT | --resume) --session FILE [--workspace DIR] (--fixture FILE | --model NAME) [--max-rounds N] [--context-tool-chars N]\nReal calls use OPENAI_API_KEY and optional OPENAI_BASE_URL (default https://api.openai.com/v1). Default tool: paginated UTF-8 workspace read; write, edit and bash require --allow-mutations. Resume with --input TEXT appends a turn only after completion. --allow-mutations enables write/edit/bash for this invocation. --resolve-in-flight TEXT records an inspected uncertain outcome without replay. Fixtures use the full-session assistant message index, including previous turns. Context-tool-chars persists.");
+        println!("pi-rs (--input TEXT | --resume) --session FILE [--workspace DIR] (--fixture FILE | --model NAME) [--max-rounds N] [--context-tool-chars N|none]\nReal calls use OPENAI_API_KEY and optional OPENAI_BASE_URL (default https://api.openai.com/v1). Default tool: paginated UTF-8 workspace read; write, edit and bash require --allow-mutations. Resume with --input TEXT appends a turn only after completion. --allow-mutations enables write/edit/bash for this invocation. --resolve-in-flight TEXT records an inspected uncertain outcome without replay. Fixtures use the full-session assistant message index, including previous turns. Context-tool-chars persists; use none to restore full canonical tool results in the model view.");
         return Ok(());
     }
     let mut options = std::collections::HashMap::new();
@@ -62,10 +62,17 @@ fn main() -> Result<()> {
     if !(1..=100).contains(&rounds) {
         bail!("rounds must be 1..100");
     }
-    let trim = options
+    let context_policy = options
         .get("--context-tool-chars")
-        .map(|s| s.parse::<usize>())
+        .map(|s| -> Result<Option<usize>> {
+            if s == "none" {
+                Ok(None)
+            } else {
+                Ok(Some(s.parse::<usize>()?))
+            }
+        })
         .transpose()?;
+    let trim = context_policy.flatten();
     if options.contains_key("--resolve-in-flight") && (!resume || options.contains_key("--input")) {
         bail!("--resolve-in-flight requires --resume without --input");
     }
@@ -139,6 +146,17 @@ fn main() -> Result<()> {
         .timeout(Duration::from_secs(120))
         .redirect(reqwest::redirect::Policy::none())
         .build()?;
+    if context_policy == Some(None) {
+        if session.in_flight.is_some() {
+            bail!(
+                "cannot change context policy while a tool outcome is uncertain; resolve it first"
+            );
+        }
+        if session.context_tool_chars.is_some() {
+            session.context_tool_chars = None;
+            session.save(path)?;
+        }
+    }
     let answer = run_with_options(
         &mut session,
         path,
