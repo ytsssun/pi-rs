@@ -1,49 +1,39 @@
-# Checkpoint M1 — runnable fixture vertical slice
+# Checkpoint M2 — coding/test/follow-up candidate
 
-2026-09-06. Project is newly initialized from an empty directory. Coordinator integrated disjoint native-worker artifacts; no existing work overwritten. No global memory settings changed. See git log for the integration commit.
+Current work branch: `work/coding-loop`, forked from `main` at `00766dc`. Do not merge main or force-push. User authorizes suitable verified project commits/pushes. See git log for implementation and verification commits. M1 checkpoint retained in checkpoint-m1.md as historical evidence; its read-only limitations and priority order are superseded here.
 
-## Resume engineering work
+## Start here
 
 ```sh
 cd /Users/stevensun/repos/pi-rs
 export PATH="$HOME/.cargo/bin:$PATH"
 git status --short
 python3 scripts/board.py list
-cargo test --locked
 cargo build --locked
-python3 experiments/verify-runtime.py
-sh scripts/bootstrap-upstream.sh
-cargo build --locked --manifest-path compatibility/Cargo.toml
-node experiments/compare-truncate.mjs
-node prototype/test-extension-sidecar.mjs
+cargo test --locked
+cargo clippy --locked --all-targets -- -D warnings
+python3 scripts/demo-coding.py
+python3 experiments/round2-coding.py
 ```
 
-Rust 1.98.1 pinned in rust-toolchain.toml, installed with minimal rustup profile; shell startup files were not changed. Node 22.18.0 used. Upstream ignored clone lives in vendor/pi-mono; bootstrap restores exact reference, refuses an existing different HEAD. Dependencies have Cargo.lock. Root license is MIT; adapted truncation source retains upstream MIT in compatibility/NOTICE. Full transitive license audit before distribution remains open.
+Full verification including previous profiles is in README.md. Clean M1 reproduction and counterexamples are in experiments/round2-baseline.md. Candidate clean-checkout M2 result belongs in experiments/round2-verification.md; do not infer it from this checklist. Frozen acceptance is docs/milestone2.md; **real model criterion is still unverified**, not waived.
 
-## Current capability and evidence
+## What works in local tests
 
-- Rust input → fixture or HTTP-shaped model response → actual read tool → next response → final, with atomic versioned JSON session save/resume. CLI reproduction in README.md.
-- 6 Rust tests cover interrupted/pending tool recovery, malformed/corrupt inputs, errors, confinement/read limit/UTF-8 and FIFO. Strict clippy passes after two style fixes.
-- 13 independent CLI checks use separate processes and a local HTTP model double: see experiments/runtime-verification.json and verification.md. Actual tool output reaches the second request. No live model inference.
-- 36 fixed upstream/Rust truncation cases match all output fields. This independent compatibility binary is not yet integrated into runtime read.
-- One unchanged upstream protected-paths.ts extension runs in a Node JSONL sidecar; 7 cases pass. It is not yet connected to Rust or the full Pi loader.
-- Context view truncation retains canonical tool results; editing policy is currently a CLI parameter, not a durable audit record.
+Actual write/bash plus existing read; small repository's test fails, source changes, test passes; separate process appends another user turn using `--resume --input`. Canonical history and context projection survive resume. Mutation opt-in applies per invocation. In-flight intent saves before effect; uncertain result refuses replay and requires inspected outcome via `--resolve-in-flight`. Unix flock releases on process death, lock file stays. Do not remove active/permanent lock inodes. `.tmp` may require manual crash inspection. Keep runtime state outside the repository being modified.
 
-## Important gaps and next tasks
+17 Rust tests; 28 M2 independent local HTTP/fixture checks (verify final report), 13 M1 HTTP regression checks, 36 original truncation comparisons, 7 Node extension cases and 4 original write execution comparisons. Counts express narrow test scopes, not complete Pi compatibility. The new write comparison runs actual original filesystem code with documented schema/rendering/import shims. Bash result/timeout behavior is intentionally narrower than Pi. No live inference or speed claim.
 
-1. T005: connect the proven Node extension bridge to Rust behind an explicit option; check real hook result, timeout, child death and malformed messages. Add a meaningful tool registration/context-hook probe before committing to general extension ABI. No WASM-only substitution.
-2. T006: implement follow-up user turns and persistent context-projection decisions, then a narrow Pi v3 session import/context projection fixture (branch/compaction counterexamples). Keep native format distinct until tested.
-3. T007: exact agent-loop conformance. Current HTTP length finish rejects before saving/executing assistant; upstream emits correlated error results and may continue. Safe no-execution is verified, exact behavior compatibility is not. Error flags currently encoded in tool text, sequential execution only.
-4. T008: real provider access. No standard API keys were present; Codex auth exists but was not inspected/reused. Live adapter success, model quality, streaming, cancellation and failed-request usage are unknown. Continue independent fixture work without requesting credentials repeatedly.
-5. Recovery hardening: crash injection around write/rename/fsync, session lock ownership/stale recovery, provider identity/fixture binding and concurrent access tests. Current read may replay after crash; adding mutating tools requires an explicit effect journal. Path confinement is not a malicious concurrent-filesystem sandbox.
-6. Measure release startup/RSS separately from model/tool latency only after repeatable benchmark; do not claim Rust accelerates end-to-end tasks. TUI/all providers/full extension compatibility/multiplayer not M1 scope; multiplayer spike may proceed without waiting for full compatibility.
+## Next valuable tasks
 
-## Scheduler and human attention
+1. Real-model validation T008: no common API credentials found in current environment. User asked which provider/config location to use (never ask for secrets in chat); answer pending. Use a disposable repo and exact M2 scenario, inspect files/tests, record provider/model/version/usage, not exact answer text. Preserve honest live-unverified state until execution succeeds.
+2. Add Pi `edit` current `edits[]` profile plus original deterministic differential; write currently performs full replacement only. Improve read offset/limit and integrate already verified truncation implementation.
+3. T007 exact agent-loop semantics: length refusal is safe but differs from Pi correlated tool-error continuation; native error text is not Pi `isError` structure; sequential tools only.
+4. T005 extension integration remains pending, tested Node sidecar is not wired to Rust. Preserve ecosystem ambition; no claim of extension compatibility from one prototype. T006 Pi session import/branch/compaction still pending despite native followup now working.
+5. Runtime robustness: provider/fixture identity binding; explicit context-policy reset and audit log; broader crash injection around fsync/rename; tests for malicious filesystem races only if deciding to promise a sandbox. Bash can leave descendants after abrupt runtime death and cannot contain escaped process groups; inspect before resolving uncertain effects.
 
-Created and read back heartbeat `pi-rs-first-48-hour-cycle`, attached to this task, every 2 hours until 2026-09-08 22:53 UTC (15:53 PDT). Status ACTIVE. First creation rejected missing destination; retried with destination=thread and succeeded; no duplicate created. Saved automation config confirms cutoff. Actual later wakeup/host restart recovery has not yet occurred and is **unverified**. Local host and app must remain running; see official source in coordination.md. If a scheduled run cannot happen, these commands and records suffice for a new session; do not claim background progress.
+## Coordination and continuation
 
-On each wakeup select one bounded useful task, respect max 4 total agents and file ownership, save evidence and new checkpoint. Stop no-progress loops after two identical failures. Routine milestone reports at most twice per day; only notify on meaningful results or decisions/failure. Cycle endpoint is bounded by scheduler; if last scheduled run precedes cutoff, leave final handoff then rather than assume an extra cutoff wakeup. No pending user decision at M1.
+Max four simultaneous agents total. Evidence-based retrospective: docs/retrospective-m2.md. M2 files had disjoint ownership; coordinator integrates. Worker quota outage interrupted initial M2 turns; the tools partial files were preserved and existing workers resumed after external-state change. Heartbeat messages on 2026-09-07 confirm scheduler dispatch, not autonomous progress during outage. No usage reset consumed and no model tokens/cost invented; counters unavailable.
 
-## GitHub authorization (2026-09-06)
-
-User authorized creating ytsssun/pi-rs and future autonomous pushes of suitable verified changes. Initial visibility is private; making it public is a separate decision. Commit and push integrated milestones after relevant checks; never include credentials or private session artifacts.
+Heartbeat `pi-rs-first-48-hour-cycle` remains bounded to 2026-09-08 22:53 UTC; max two routine milestone reports per local day. Continue current work branch. Local machine/app must run. At final scheduled run before cutoff, leave final handoff/pause rather than extending automatically. No public visibility changes/releases/internal access or unrelated external messages. User authorization permits pushes to this repository; review tracked changes for secrets and unrelated material before pushing.

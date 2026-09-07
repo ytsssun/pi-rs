@@ -1,32 +1,66 @@
 # pi-rs
 
-Experimental Rust runtime inspired by Pi, started from scratch. First milestone is a deterministic resumable model/tool loop, not a full coding agent or a drop-in Pi replacement.
+An experimental Rust coding-agent runtime with narrowly tested Pi compatibility. It can change files, execute tests, save a session, exit and continue a new user turn. Deterministic scenarios pass with fixtures/local HTTP doubles; **real model coding has not been verified**. This is not yet a drop-in Pi replacement.
+
+## Run the coding scenario
+
+Requirements: Unix, Rust (pinned by rust-toolchain.toml), Python 3, Git; Bash for command tools. Add the installed Cargo directory to PATH.
 
 ```sh
 export PATH="$HOME/.cargo/bin:$PATH"
+cargo build --locked
 cargo test --locked
+python3 scripts/demo-coding.py
+```
+
+The demo creates a fresh tiny repository under `.runs/`, runs its failing test, repairs the source through the Rust `write` tool, runs the passing test, exits, and launches a separate CLI process with a follow-up request. It checks actual test output and files. Artifacts and the session are retained in the printed directory. The model decisions are scripted, not real inference.
+
+For a simple read-only fixture:
+
+```sh
 mkdir -p .runs
 cargo run --locked -- --input 'Read fixtures/hello.txt' --session .runs/demo.json --fixture fixtures/read.json
 cargo run --locked -- --resume --session .runs/demo.json --fixture fixtures/read.json
 ```
 
-Use a fresh session path for another run. `--resume` continues an interrupted model/tool round or returns the saved final answer; adding a follow-up user turn is not implemented yet. Fixture responses are scripted: they verify control flow and actual tool output persistence, not model intelligence or real provider availability.
+Use a fresh session path for a new run. Fixtures index responses by **all historical assistant messages**, including earlier turns; a follow-up fixture must include that history's response prefix.
 
-The path restriction assumes a trusted local workspace; it is not a sandbox against concurrent directory replacement. The only runtime tool is bounded UTF-8 file `read` inside the workspace. It rejects oversized files rather than implementing Pi read pagination/truncation. Native sessions are versioned JSON snapshots; they are **not** Pi v3 JSONL sessions. Writes use temporary file + fsync + rename with one process owner. After an unclean exit, inspect `.lock` and `.tmp` siblings and confirm the owner process is gone before removing stale files and resuming. Read-only tool replay is permitted; this is not exactly-once execution for future write tools.
+## Real provider interface (not live-verified)
 
-Optional provider path (not live-verified): set `OPENAI_API_KEY`, optionally `OPENAI_BASE_URL`, then replace `--fixture ...` with `--model MODEL_ID`. Uses a non-streaming Chat Completions-shaped endpoint. Codex login is not assumed to be a generic API key. Never commit credentials or real session content.
+Set `OPENAI_API_KEY`, optionally `OPENAI_BASE_URL` (default `https://api.openai.com/v1`), and use a tool-capable model ID:
 
-`--context-tool-chars N` derives a trimmed model context without replacing canonical tool results. It is an initial context projection experiment, not a durable edit/branch protocol.
+```sh
+mkdir -p .runs
+cargo run --locked -- --input 'Fix the failing tests' --workspace /absolute/path/to/small-repo --session .runs/coding.json --model MODEL_ID --allow-mutations
+cargo run --locked -- --resume --input 'Add a regression test and run it' --session .runs/coding.json --model MODEL_ID --allow-mutations
+```
 
-## Deterministic compatibility probes
+Without `--allow-mutations`, only read is advertised and fabricated write/bash calls return errors. With it, **bash runs with your host user's authority**, in the saved workspace. It is not a sandbox. Use a trusted disposable repository for experiments, and keep session state outside that repository. Codex login is not assumed to be a generic provider API key. Never commit credentials or real session content.
+
+## Behavior and recovery
+
+- `read`: UTF-8 regular file, maximum 64 KiB; rejects oversized files. Pi pagination/truncation is not integrated.
+- `write`: `{path,content}`, creates parents and atomically replaces files, maximum 1 MiB. Workspace traversal/symlink restrictions assume no hostile concurrent filesystem mutation.
+- `bash`: `{command,timeout?}`, integer seconds, default 30/max 300; retains at most 32 KiB per stdout/stderr stream. Nonzero exit/timeout becomes an error tool result. Normal shell exit/timeout kills ordinary background descendants in its process group. Detached processes or abrupt runtime death are not contained.
+- `--resume` continues unfinished work or returns the saved final result. `--resume --input TEXT` appends only after the prior turn completed. A mismatched explicit workspace is rejected.
+- `--context-tool-chars N` persists a model-view truncation policy across resumes. Canonical tool results remain intact. This is not yet an append-only context-edit audit or branch system.
+- Native v1 JSON snapshots use fsync/rename and an appended `.lock` file with Unix flock. Old v1 sessions load with default new fields. Leave the permanent lock file in place; ownership releases on process death. A leftover `.tmp` from interrupted save requires inspection before removal; no automatic promotion of incomplete snapshots.
+- Before a write/bash effect, an `in_flight` marker is saved. If the process dies before the result is saved, resume refuses automatic replay. Inspect files and surviving processes, then use `--resume --resolve-in-flight 'observed outcome'` with the normal model/fixture arguments. This records an operator-supplied result and continues; it does not re-run that call or prove exactly-once effects. Do not resolve while the original process is still changing files.
+
+## Verify the bounded compatibility profiles
 
 ```sh
 sh scripts/bootstrap-upstream.sh
 cargo build --locked --manifest-path compatibility/Cargo.toml
 node experiments/compare-truncate.mjs
 node prototype/test-extension-sidecar.mjs
+node --experimental-vm-modules experiments/write-differential.mjs
+python3 experiments/verify-runtime.py
+python3 experiments/round2-coding.py
 ```
 
-The upstream commit is fixed in [docs/upstream.md](docs/upstream.md). The separate truncation probe compares complete results with original upstream code. The Node extension spike loads one unchanged upstream extension; the Rust runtime does not yet invoke it. Node 22.18+ is used for native TypeScript stripping. No TUI, complete providers/extensions, Pi session import/export or multiplayer claim.
+Node 22.18+ is used for TypeScript stripping. Fixed Pi reference: `9767ba275f3e9a5ee0f5c5342249b629ab1b2282`, MIT. Truncation probe compares 36 full results. Instrumented original write execution compares four filesystem/result cases; see [scope and shims](experiments/write-differential.md). The Node extension spike loads one unchanged extension and is not connected to Rust. No exact bash output, full agent-loop, Pi session import/export, TUI, complete extension/provider or multiplayer claim. No speed/memory advantage has been measured.
 
-Start/resume engineering work from [docs/checkpoint.md](docs/checkpoint.md). Durable tasks and evidence: [docs/board.jsonl](docs/board.jsonl); query with `python3 scripts/board.py list`. Ownership and scheduling limits: [docs/coordination.md](docs/coordination.md). No performance advantage has been measured.
+[Checkpoint](docs/checkpoint.md) · [Frozen M2 acceptance](docs/milestone2.md) · [Independent baseline](experiments/round2-baseline.md) · [Coordination retrospective](docs/retrospective-m2.md) · [Board](docs/board.jsonl)
+
+Query durable tasks with `python3 scripts/board.py list`. Root and adapted-source licensing are recorded in LICENSE and compatibility/NOTICE. Full transitive distribution audit remains open before public release.

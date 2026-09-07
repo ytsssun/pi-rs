@@ -1,0 +1,65 @@
+{
+  "upstreamCommit": "9767ba275f3e9a5ee0f5c5342249b629ab1b2282",
+  "node": "v22.18.0",
+  "loadedOriginalModules": [
+    {
+      "path": "packages/coding-agent/src/core/tools/write.ts",
+      "sha256": "2ee0a438c24cf83fefd733e349d55a21aa5b633c18934b2c80759fcf14b6f297",
+      "gitStatus": "clean"
+    },
+    {
+      "path": "packages/coding-agent/src/core/tools/file-mutation-queue.ts",
+      "sha256": "33cb06ac9bcdf32c8b84d9d12e33be44c503a7670f668e003a3262cd34294d11",
+      "gitStatus": "clean"
+    },
+    {
+      "path": "packages/coding-agent/src/core/tools/path-utils.ts",
+      "sha256": "ab6f420d2388a41366113c17a25e356867820b87b02a169d044cfcf83e1997d3",
+      "gitStatus": "clean"
+    },
+    {
+      "path": "packages/coding-agent/src/utils/paths.ts",
+      "sha256": "a687cdb54b82216673fea5be1210c48e64ffa8398d64cfabf2bd7dba5c9d4210",
+      "gitStatus": "clean"
+    },
+    {
+      "path": "packages/coding-agent/src/utils/child-process.ts",
+      "sha256": "cd324f5b9a1abadd85ab5a331750d475c8bd51ec65cae091ad9b416245ec85d4",
+      "gitStatus": "clean"
+    }
+  ],
+  "stubbedModules": [
+    "typebox",
+    "cross-spawn",
+    "renderers/write.ts",
+    "tool-definition-wrapper.ts"
+  ],
+  "forbiddenStubCalls": 0,
+  "validation": "scripted fixture; real filesystem writes; no model calls",
+  "results": [
+    {
+      "id": "nested",
+      "passed": true,
+      "bytes": 8,
+      "result": "Successfully wrote to nested/deep/a.txt"
+    },
+    {
+      "id": "overwrite",
+      "passed": true,
+      "bytes": 12,
+      "result": "Successfully wrote to existing.txt"
+    },
+    {
+      "id": "utf8",
+      "passed": true,
+      "bytes": 18,
+      "result": "Successfully wrote to unicode.txt"
+    },
+    {
+      "id": "empty",
+      "passed": true,
+      "bytes": 0,
+      "result": "Successfully wrote to empty.txt"
+    }
+  ]
+}

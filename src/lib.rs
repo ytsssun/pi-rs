@@ -1,3 +1,4 @@
+pub mod tools;
 use anyhow::{bail, Context, Result};
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
@@ -15,12 +16,18 @@ pub struct Session {
     pub messages: Vec<Value>,
     #[serde(default)]
     pub usage: Vec<Value>,
+    #[serde(default)]
+    pub context_tool_chars: Option<usize>,
+    #[serde(default)]
+    pub in_flight: Option<String>,
 }
 impl Session {
     pub fn new(workspace: &Path, input: &str) -> Result<Self> {
         Ok(Self {
             version: 1,
             usage: vec![],
+            context_tool_chars: None,
+            in_flight: None,
             workspace: workspace.canonicalize()?,
             messages: vec![json!({"role":"user","content":input})],
         })
@@ -35,15 +42,20 @@ impl Session {
             bail!("invalid session header");
         }
         let mut pending = Vec::<String>::new();
+        let mut expects_user = true;
         for (i, m) in self.messages.iter().enumerate() {
             match m["role"].as_str() {
-                Some("user") if i == 0 && m["content"].is_string() => {}
-                Some("assistant") if i > 0 && pending.is_empty() => {
+                Some("user") if expects_user && pending.is_empty() && m["content"].is_string() => {
+                    expects_user = false;
+                }
+                Some("assistant") if i > 0 && !expects_user && pending.is_empty() => {
                     validate_assistant(m)?;
                     if let Some(calls) = m["tool_calls"].as_array() {
                         for c in calls {
                             pending.push(c["id"].as_str().unwrap().to_owned());
                         }
+                    } else {
+                        expects_user = true;
                     }
                 }
                 Some("tool")
@@ -55,20 +67,31 @@ impl Session {
                 }
                 _ => bail!("invalid message sequence at {i}"),
             }
-            if i + 1 < self.messages.len()
-                && m["role"] == "assistant"
-                && m.get("tool_calls")
-                    .and_then(Value::as_array)
-                    .is_none_or(|a| a.is_empty())
-            {
-                bail!("messages after final response");
+        }
+        if let Some(id) = &self.in_flight {
+            if pending.first() != Some(id) {
+                bail!("in-flight marker does not match next pending tool");
+            }
+            let assistant = self
+                .messages
+                .iter()
+                .rfind(|m| m["role"] == "assistant")
+                .context("missing in-flight assistant")?;
+            let call = assistant["tool_calls"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .find(|c| c["id"] == *id)
+                .context("missing in-flight call")?;
+            if !matches!(call["function"]["name"].as_str(), Some("write" | "bash")) {
+                bail!("in-flight marker must reference a mutation");
             }
         }
         Ok(())
     }
     pub fn save(&self, path: &Path) -> Result<()> {
         self.validate()?;
-        let tmp = path.with_extension("tmp");
+        let tmp = appended_path(path, ".tmp");
         let mut file = fs::OpenOptions::new()
             .write(true)
             .create_new(true)
@@ -84,6 +107,30 @@ impl Session {
         )?
         .sync_all()?;
         Ok(())
+    }
+    pub fn append_user(&mut self, input: &str) -> Result<()> {
+        self.validate()?;
+        let last = self.messages.last().unwrap();
+        if self.in_flight.is_some()
+            || last["role"] != "assistant"
+            || last.get("tool_calls").is_some()
+        {
+            bail!("follow-up requires a completed turn; resume pending work first");
+        }
+        self.messages.push(json!({"role":"user","content":input}));
+        Ok(())
+    }
+    pub fn resolve_in_flight(&mut self, outcome: &str) -> Result<()> {
+        self.validate()?;
+        if outcome.trim().is_empty() {
+            bail!("provide the inspected outcome, not an empty resolution");
+        }
+        let id = self
+            .in_flight
+            .take()
+            .context("no in-flight tool to resolve")?;
+        self.messages.push(json!({"role":"tool","tool_call_id":id,"content":format!("Operator resolved uncertain tool outcome: {outcome}")}));
+        self.validate()
     }
     pub fn context(&self, tool_chars: Option<usize>) -> Vec<Value> {
         let mut messages = self.messages.clone();
@@ -170,28 +217,70 @@ pub fn run<F>(
     path: &Path,
     max_rounds: usize,
     trim: Option<usize>,
+    model: F,
+) -> Result<String>
+where
+    F: FnMut(&[Value], usize) -> Result<Value>,
+{
+    run_with_options(s, path, max_rounds, trim, false, model)
+}
+
+pub fn appended_path(path: &Path, suffix: &str) -> PathBuf {
+    let mut name = path.as_os_str().to_owned();
+    name.push(suffix);
+    PathBuf::from(name)
+}
+
+pub fn run_with_options<F>(
+    s: &mut Session,
+    path: &Path,
+    max_rounds: usize,
+    trim: Option<usize>,
+    allow_mutations: bool,
     mut model: F,
 ) -> Result<String>
 where
     F: FnMut(&[Value], usize) -> Result<Value>,
 {
     s.validate()?;
+    if let Some(id) = &s.in_flight {
+        bail!("tool {id} has an uncertain outcome; inspect workspace and any surviving processes, then resume with --resolve-in-flight TEXT to record the observed outcome; it will not be replayed");
+    }
+    if let Some(limit) = trim {
+        s.context_tool_chars = Some(limit);
+        s.save(path)?;
+    }
     let mut rounds = 0;
     loop {
-        // Persisted tool calls are replayable because the sole tool is read-only.
-        if let Some(index) = s.messages.iter().rposition(|m| m["role"] == "assistant") {
+        // Only read-only calls can be automatically replayed after interruption.
+        if let Some(index) = s
+            .messages
+            .iter()
+            .rposition(|m| m["role"] == "assistant")
+            .filter(|i| s.messages[*i + 1..].iter().all(|m| m["role"] == "tool"))
+        {
             let message = s.messages[index].clone();
             if let Some(calls) = message["tool_calls"].as_array() {
                 let done = s.messages.len() - index - 1;
                 for call in calls.iter().skip(done) {
-                    let result = if call["function"]["name"] == "read" {
-                        read_tool(
+                    let name = call["function"]["name"].as_str().unwrap();
+                    let mutation = matches!(name, "write" | "bash");
+                    if mutation && allow_mutations {
+                        s.in_flight = Some(call["id"].as_str().unwrap().to_owned());
+                        s.save(path)?;
+                    }
+                    let result = if mutation && !allow_mutations {
+                        Err(anyhow::anyhow!(
+                            "tool {name} requires --allow-mutations for this invocation"
+                        ))
+                    } else {
+                        tools::execute(
                             &s.workspace,
+                            name,
                             call["function"]["arguments"].as_str().unwrap(),
                         )
-                    } else {
-                        Err(anyhow::anyhow!("unknown tool"))
                     };
+                    s.in_flight = None;
                     let content = match result {
                         Ok(s) => s,
                         Err(e) => format!("ERROR: {e:#}"),
@@ -212,7 +301,7 @@ where
             .iter()
             .filter(|m| m["role"] == "assistant")
             .count();
-        let mut response = model(&s.context(trim), cursor)?;
+        let mut response = model(&s.context(s.context_tool_chars), cursor)?;
         validate_assistant(&response)?;
         if let Some(usage) = response
             .as_object_mut()

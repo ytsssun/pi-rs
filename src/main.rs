@@ -1,17 +1,23 @@
 use anyhow::{bail, Context, Result};
-use pi_rs::{run, Session};
+use pi_rs::{appended_path, run_with_options, Session};
 use serde_json::{json, Value};
 use std::{env, fs, path::Path, time::Duration};
 fn main() -> Result<()> {
     let args: Vec<String> = env::args().skip(1).collect();
     if args.is_empty() || args.iter().any(|a| a == "--help") {
-        println!("pi-rs (--input TEXT | --resume) --session FILE [--workspace DIR] (--fixture FILE | --model NAME) [--max-rounds N] [--context-tool-chars N]\nReal calls use OPENAI_API_KEY and optional OPENAI_BASE_URL (default https://api.openai.com/v1). Sole tool: bounded UTF-8 workspace read. Resume preserves completed sessions; it does not add a new user turn.");
+        println!("pi-rs (--input TEXT | --resume) --session FILE [--workspace DIR] (--fixture FILE | --model NAME) [--max-rounds N] [--context-tool-chars N]\nReal calls use OPENAI_API_KEY and optional OPENAI_BASE_URL (default https://api.openai.com/v1). Default tool: bounded UTF-8 workspace read; write and bash require --allow-mutations. Resume with --input TEXT appends a turn only after completion. --allow-mutations enables write/bash for this invocation. --resolve-in-flight TEXT records an inspected uncertain outcome without replay. Fixtures use the full-session assistant message index, including previous turns. Context-tool-chars persists.");
         return Ok(());
     }
     let mut options = std::collections::HashMap::new();
     let mut resume = false;
+    let mut allow_mutations = false;
     let mut i = 0;
     while i < args.len() {
+        if args[i] == "--allow-mutations" {
+            allow_mutations = true;
+            i += 1;
+            continue;
+        }
         if args[i] == "--resume" {
             if resume {
                 bail!("duplicate resume");
@@ -29,6 +35,7 @@ fn main() -> Result<()> {
             "--model",
             "--max-rounds",
             "--context-tool-chars",
+            "--resolve-in-flight",
         ]
         .contains(&key)
         {
@@ -41,8 +48,8 @@ fn main() -> Result<()> {
         i += 2;
     }
     let path = Path::new(options.get("--session").context("--session required")?);
-    if resume == options.contains_key("--input") {
-        bail!("provide exactly one of --input or --resume");
+    if !resume && !options.contains_key("--input") {
+        bail!("provide --input or --resume");
     }
     if options.contains_key("--fixture") == options.contains_key("--model") {
         bail!("provide exactly one of --fixture or --model");
@@ -59,20 +66,29 @@ fn main() -> Result<()> {
         .get("--context-tool-chars")
         .map(|s| s.parse::<usize>())
         .transpose()?;
-    // One owner per session, including across processes. A crash leaves a lock to inspect.
-    let lock_path = path.with_extension("lock");
+    if options.contains_key("--resolve-in-flight") && (!resume || options.contains_key("--input")) {
+        bail!("--resolve-in-flight requires --resume without --input");
+    }
+    // Keep the lock inode permanently. flock ownership ends when this process dies.
+    let lock_path = appended_path(path, ".lock");
     let _lock = fs::OpenOptions::new()
+        .read(true)
         .write(true)
-        .create_new(true)
+        .create(true)
+        .truncate(false)
         .open(&lock_path)
-        .context("session locked; after a crash, verify no process owns it before removing lock")?;
-    struct Guard(std::path::PathBuf);
-    impl Drop for Guard {
-        fn drop(&mut self) {
-            let _ = fs::remove_file(&self.0);
+        .context("cannot open session lock; create its parent directory first")?;
+    #[cfg(unix)]
+    {
+        use std::os::fd::AsRawFd;
+        if unsafe { libc::flock(_lock.as_raw_fd(), libc::LOCK_EX | libc::LOCK_NB) } != 0 {
+            bail!("session locked by another process");
         }
     }
-    let _guard = Guard(lock_path);
+    #[cfg(not(unix))]
+    {
+        bail!("session process locking currently requires Unix");
+    }
     let mut session = if resume {
         Session::load(path)?
     } else {
@@ -91,6 +107,30 @@ fn main() -> Result<()> {
         s.save(path)?;
         s
     };
+    if resume {
+        if let Some(workspace) = options.get("--workspace") {
+            if Path::new(workspace).canonicalize()? != session.workspace {
+                bail!("--workspace does not match the saved session workspace");
+            }
+        }
+    }
+    if let Some(outcome) = options.get("--resolve-in-flight") {
+        session.resolve_in_flight(outcome)?;
+        session.save(path)?;
+    }
+    if resume {
+        if let Some(input) = options.get("--input") {
+            session.append_user(input)?;
+            session.save(path)?;
+        }
+    }
+    let mut definitions = pi_rs::tools::definitions();
+    if !allow_mutations {
+        definitions
+            .as_array_mut()
+            .unwrap()
+            .retain(|t| t["function"]["name"] == "read");
+    }
     let fixture: Option<Vec<Value>> = options
         .get("--fixture")
         .map(|p| -> Result<_> { Ok(serde_json::from_slice(&fs::read(p)?)?) })
@@ -99,34 +139,47 @@ fn main() -> Result<()> {
         .timeout(Duration::from_secs(120))
         .redirect(reqwest::redirect::Policy::none())
         .build()?;
-    let answer = run(&mut session, path, rounds, trim, |messages, cursor| {
-        if let Some(f) = &fixture {
-            return f.get(cursor).cloned().context("fixture exhausted");
-        }
-        let key = env::var("OPENAI_API_KEY").context("OPENAI_API_KEY missing")?;
-        let base =
-            env::var("OPENAI_BASE_URL").unwrap_or_else(|_| "https://api.openai.com/v1".into());
-        let response: Value = client.post(format!("{}/chat/completions", base.trim_end_matches('/'))).bearer_auth(key).json(&json!({
-            "model":options["--model"],"messages":messages,"tools":[{"type":"function","function":{"name":"read","description":"Read a UTF-8 file inside workspace, maximum 65536 bytes","parameters":{"type":"object","properties":{"path":{"type":"string"}},"required":["path"],"additionalProperties":false}}}]
-        })).send()?.error_for_status()?.json()?;
-        if !matches!(
-            response["choices"][0]["finish_reason"].as_str(),
-            Some("stop" | "tool_calls")
-        ) {
-            bail!("model response incomplete or unsupported finish_reason; no tools executed");
-        }
-        let mut message = response["choices"][0]
-            .get("message")
-            .cloned()
-            .context("missing assistant message")?;
-        if let Some(usage) = response.get("usage") {
-            message
-                .as_object_mut()
-                .context("assistant must be object")?
-                .insert("_provider_usage".into(), usage.clone());
-        }
-        Ok(message)
-    })?;
+    let answer = run_with_options(
+        &mut session,
+        path,
+        rounds,
+        trim,
+        allow_mutations,
+        |messages, cursor| {
+            if let Some(f) = &fixture {
+                return f.get(cursor).cloned().context("fixture exhausted");
+            }
+            let key = env::var("OPENAI_API_KEY").context("OPENAI_API_KEY missing")?;
+            let base =
+                env::var("OPENAI_BASE_URL").unwrap_or_else(|_| "https://api.openai.com/v1".into());
+            let response: Value = client
+                .post(format!("{}/chat/completions", base.trim_end_matches('/')))
+                .bearer_auth(key)
+                .json(&json!({
+                    "model":options["--model"],"messages":messages,"tools":definitions
+                }))
+                .send()?
+                .error_for_status()?
+                .json()?;
+            if !matches!(
+                response["choices"][0]["finish_reason"].as_str(),
+                Some("stop" | "tool_calls")
+            ) {
+                bail!("model response incomplete or unsupported finish_reason; no tools executed");
+            }
+            let mut message = response["choices"][0]
+                .get("message")
+                .cloned()
+                .context("missing assistant message")?;
+            if let Some(usage) = response.get("usage") {
+                message
+                    .as_object_mut()
+                    .context("assistant must be object")?
+                    .insert("_provider_usage".into(), usage.clone());
+            }
+            Ok(message)
+        },
+    )?;
     println!("{answer}");
     Ok(())
 }
