@@ -1,0 +1,21 @@
+[
+ {"id":"utf8","text":"你好 🌍 café\n"},
+ {"id":"empty","text":""},
+ {"id":"trailing-newline","text":"a\nb\n"},
+ {"id":"one-line","text":"abc"},
+ {"id":"offset-limit","text":"one\ntwo\nthree\nfour\n","args":{"offset":2,"limit":2}},
+ {"id":"last-empty-line","text":"a\nb\n","args":{"offset":3}},
+ {"id":"beyond-end","text":"a\nb\n","args":{"offset":4},"error":true},
+ {"id":"limit-past-end","text":"a\nb","args":{"offset":2,"limit":99}},
+ {"id":"limit-one","text":"a\nb\n","args":{"limit":1}},
+ {"id":"default-2000-lines","repeat":"row\n","count":2001},
+ {"id":"line-continuation","repeat":"row\n","count":2001,"args":{"offset":2001}},
+ {"id":"exact-2000-lines","repeat":"row\n","count":1999,"tail":"last"},
+ {"id":"source-over-64k","repeat":"1234567890\n","count":7000,"args":{"offset":6999,"limit":2}},
+ {"id":"byte-limit-continuation","repeat":"1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890\n","count":700},
+ {"id":"exact-byte-line","repeat":"x","count":51200},
+ {"id":"first-line-over-byte","repeat":"x","count":51201,"tail":"\nend"},
+ {"id":"unicode-first-line-over","repeat":"界","count":17067,"tail":"\nend"},
+ {"id":"offset-large-line","repeat":"x","count":51201,"tail":"\nend","args":{"offset":2}},
+ {"id":"crlf-bom","text":"﻿a\r\nb\r\n","args":{"limit":1}}
+]

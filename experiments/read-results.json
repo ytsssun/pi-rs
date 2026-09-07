@@ -1,0 +1,237 @@
+{
+  "upstreamCommit": "9767ba275f3e9a5ee0f5c5342249b629ab1b2282",
+  "node": "v22.18.0",
+  "mode": "original/Rust text-read differential",
+  "casesSha256": "fee521cc24f27be8da712b5ee29b29943ee770b61b765b01e4cc25d956f161a3",
+  "loadedOriginalModules": [
+    {
+      "path": "packages/coding-agent/src/core/tools/read.ts",
+      "sha256": "9198b35438927fa392f2b984fd2c3bedcf51209e4d6d5107d813067e928c5acf",
+      "gitStatus": "clean"
+    },
+    {
+      "path": "packages/coding-agent/src/core/tools/path-utils.ts",
+      "sha256": "ab6f420d2388a41366113c17a25e356867820b87b02a169d044cfcf83e1997d3",
+      "gitStatus": "clean"
+    },
+    {
+      "path": "packages/coding-agent/src/utils/paths.ts",
+      "sha256": "a687cdb54b82216673fea5be1210c48e64ffa8398d64cfabf2bd7dba5c9d4210",
+      "gitStatus": "clean"
+    },
+    {
+      "path": "packages/coding-agent/src/utils/child-process.ts",
+      "sha256": "cd324f5b9a1abadd85ab5a331750d475c8bd51ec65cae091ad9b416245ec85d4",
+      "gitStatus": "clean"
+    },
+    {
+      "path": "packages/coding-agent/src/core/tools/truncate.ts",
+      "sha256": "104e61ea602c7f7894097b2771dad8c68de75c5a10ea6222e615c4ad144451c7",
+      "gitStatus": "clean"
+    }
+  ],
+  "stubbedModules": [
+    "typebox",
+    "utils/image-process.ts",
+    "utils/mime.ts",
+    "cross-spawn",
+    "renderers/read.ts",
+    "tool-definition-wrapper.ts"
+  ],
+  "forbiddenStubCalls": 0,
+  "textMimeStubCalls": 22,
+  "validation": "real filesystem; image detector forced text; no model inference",
+  "results": [
+    {
+      "id": "utf8",
+      "passed": true,
+      "error": false,
+      "sourceBytes": 18,
+      "outputBytes": 18,
+      "outputSha256": "f55d184e6aa90815640e0f955039c956cb9926873526ff0bab442fb6d4dde1c4",
+      "tail": "你好 🌍 café\n"
+    },
+    {
+      "id": "empty",
+      "passed": true,
+      "error": false,
+      "sourceBytes": 0,
+      "outputBytes": 0,
+      "outputSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "tail": ""
+    },
+    {
+      "id": "trailing-newline",
+      "passed": true,
+      "error": false,
+      "sourceBytes": 4,
+      "outputBytes": 4,
+      "outputSha256": "911169ddaaf146aff539f58c26c489af3b892dff0fe283c1c264c65ae5aa59a2",
+      "tail": "a\nb\n"
+    },
+    {
+      "id": "one-line",
+      "passed": true,
+      "error": false,
+      "sourceBytes": 3,
+      "outputBytes": 3,
+      "outputSha256": "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad",
+      "tail": "abc"
+    },
+    {
+      "id": "offset-limit",
+      "passed": true,
+      "error": false,
+      "sourceBytes": 19,
+      "outputBytes": 60,
+      "outputSha256": "f138b155c202e7165252a7d708b5302a32df953585c5848950854bf737e2f69e",
+      "tail": "two\nthree\n\n[2 more lines in file. Use offset=4 to continue.]"
+    },
+    {
+      "id": "last-empty-line",
+      "passed": true,
+      "error": false,
+      "sourceBytes": 4,
+      "outputBytes": 0,
+      "outputSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "tail": ""
+    },
+    {
+      "id": "beyond-end",
+      "passed": true,
+      "error": true,
+      "sourceBytes": 4,
+      "outputBytes": 46,
+      "outputSha256": "c5a97f5faa00a1d86d35e1399241ee8e1f68053dd93ed3b53a0a6ddc84f0895f",
+      "tail": "Offset 4 is beyond end of file (3 lines total)"
+    },
+    {
+      "id": "limit-past-end",
+      "passed": true,
+      "error": false,
+      "sourceBytes": 3,
+      "outputBytes": 1,
+      "outputSha256": "3e23e8160039594a33894f6564e1b1348bbd7a0088d42c4acb73eeaed59c009d",
+      "tail": "b"
+    },
+    {
+      "id": "limit-one",
+      "passed": true,
+      "error": false,
+      "sourceBytes": 4,
+      "outputBytes": 52,
+      "outputSha256": "82089717189e0789c670a9105368516338f1e9253c9f4fbbee775718e2f2f1ff",
+      "tail": "a\n\n[2 more lines in file. Use offset=2 to continue.]"
+    },
+    {
+      "id": "default-2000-lines",
+      "passed": true,
+      "error": false,
+      "sourceBytes": 8004,
+      "outputBytes": 8061,
+      "outputSha256": "4ea37ee553ebbb43720d8d0fdc746d484aa29673450f1f5a7594dd42fc5a2dd7",
+      "tail": "ow\nrow\nrow\nrow\nrow\nrow\nrow\nrow\nrow\nrow\nrow\nrow\nrow\nrow\nrow\nrow\nrow\nrow\nrow\nrow\nrow\nrow\nrow\nrow\nrow\nrow\nrow\nrow\nrow\nrow\n\n[Showing lines 1-2000 of 2002. Use offset=2001 to continue.]"
+    },
+    {
+      "id": "line-continuation",
+      "passed": true,
+      "error": false,
+      "sourceBytes": 8004,
+      "outputBytes": 4,
+      "outputSha256": "83ad05a6ffdb5c97fb81a8501561e30cc3458bed5a83525e931acb0f8486a393",
+      "tail": "row\n"
+    },
+    {
+      "id": "exact-2000-lines",
+      "passed": true,
+      "error": false,
+      "sourceBytes": 8000,
+      "outputBytes": 8000,
+      "outputSha256": "e750c35355445d78bcc61a98874e99eba1201f01a26b83a96f860e7d679d4007",
+      "tail": "row\nrow\nrow\nrow\nrow\nrow\nrow\nrow\nrow\nrow\nrow\nrow\nrow\nrow\nrow\nrow\nrow\nrow\nrow\nrow\nrow\nrow\nrow\nrow\nrow\nrow\nrow\nrow\nrow\nrow\nrow\nrow\nrow\nrow\nrow\nrow\nrow\nrow\nrow\nrow\nrow\nrow\nrow\nrow\nlast"
+    },
+    {
+      "id": "source-over-64k",
+      "passed": true,
+      "error": false,
+      "sourceBytes": 77000,
+      "outputBytes": 75,
+      "outputSha256": "929f376660fb5b6cff2fde483da8bbb42973d0b31fdd83dff00512717ed0950e",
+      "tail": "1234567890\n1234567890\n\n[1 more lines in file. Use offset=7001 to continue.]"
+    },
+    {
+      "id": "byte-limit-continuation",
+      "passed": true,
+      "error": false,
+      "sourceBytes": 70700,
+      "outputBytes": 51179,
+      "outputSha256": "1c74243309b6376007c307950ebc3951a5e8e785a51603a90bd9490dadfb1fc3",
+      "tail": "67890\n1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890\n\n[Showing lines 1-506 of 701 (50.0KB limit). Use offset=507 to continue.]"
+    },
+    {
+      "id": "exact-byte-line",
+      "passed": true,
+      "error": false,
+      "sourceBytes": 51200,
+      "outputBytes": 51200,
+      "outputSha256": "b100b3001640df908188d88ad8cc4c708c5fd68f70263d3eeb627ae566b6b8e7",
+      "tail": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+    },
+    {
+      "id": "first-line-over-byte",
+      "passed": true,
+      "error": false,
+      "sourceBytes": 51205,
+      "outputBytes": 88,
+      "outputSha256": "f2801c09feb3e761204385a577ff05773bb2219d4889a5b1fc4eb7269c3b2dd8",
+      "tail": "[Line 1 is 50.0KB, exceeds 50.0KB limit. Use bash: sed -n '1p' file.txt | head -c 51200]"
+    },
+    {
+      "id": "unicode-first-line-over",
+      "passed": true,
+      "error": false,
+      "sourceBytes": 51205,
+      "outputBytes": 88,
+      "outputSha256": "f2801c09feb3e761204385a577ff05773bb2219d4889a5b1fc4eb7269c3b2dd8",
+      "tail": "[Line 1 is 50.0KB, exceeds 50.0KB limit. Use bash: sed -n '1p' file.txt | head -c 51200]"
+    },
+    {
+      "id": "offset-large-line",
+      "passed": true,
+      "error": false,
+      "sourceBytes": 51205,
+      "outputBytes": 3,
+      "outputSha256": "361e48d0308f20e32dba5fb56328baf18d72ef0ccb43b84f5c262d2a6a1fc6c8",
+      "tail": "end"
+    },
+    {
+      "id": "crlf-bom",
+      "passed": true,
+      "error": false,
+      "sourceBytes": 9,
+      "outputBytes": 56,
+      "outputSha256": "19abd4831e4ded6d7d82a34c8be2df0d5820fef85d96ad211b2f43f6bd6a4210",
+      "tail": "﻿a\r\n\n[2 more lines in file. Use offset=2 to continue.]"
+    }
+  ],
+  "exclusions": [
+    {
+      "id": "zero-offset",
+      "originalSuccess": true,
+      "originalOutput": "a\nb\n",
+      "rustRejected": true
+    },
+    {
+      "id": "zero-limit",
+      "originalSuccess": true,
+      "originalOutput": "\n\n[3 more lines in file. Use offset=1 to continue.]",
+      "rustRejected": true
+    },
+    {
+      "id": "source-over-8mib",
+      "originalSuccess": true,
+      "originalOutput": "[Line 1 is 8.0MB, exceeds 50.0KB limit. Use bash: sed -n '1p' file.txt | head -c 51200]",
+      "rustRejected": true
+    }
+  ]
+}

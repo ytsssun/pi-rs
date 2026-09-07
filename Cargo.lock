@@ -466,10 +466,18 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "libc",
+ "pi-rs-compat",
  "reqwest",
  "serde",
  "serde_json",
  "unicode-normalization",
+]
+
+[[package]]
+name = "pi-rs-compat"
+version = "0.1.0"
+dependencies = [
+ "serde_json",
 ]
 
 [[package]]

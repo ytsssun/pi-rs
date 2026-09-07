@@ -1,4 +1,5 @@
 pub mod edit;
+pub mod read;
 pub mod tools;
 use anyhow::{bail, Context, Result};
 use serde::{Deserialize, Serialize};
@@ -182,6 +183,8 @@ pub fn validate_assistant(m: &Value) -> Result<()> {
     }
     Ok(())
 }
+/// Raw bounded loader retained for edit and legacy library callers.
+/// The model-facing paginated tool is `read::execute`; never edit its rendered output.
 pub fn read_tool(workspace: &Path, arguments: &str) -> Result<String> {
     #[derive(Deserialize)]
     #[serde(deny_unknown_fields)]

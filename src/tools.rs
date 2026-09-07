@@ -10,7 +10,7 @@ use std::{
 
 pub fn definitions() -> Value {
     json!([
-        {"type":"function","function":{"name":"read","description":"Read a UTF-8 file inside the workspace (maximum 65536 bytes).","parameters":{"type":"object","properties":{"path":{"type":"string"}},"required":["path"],"additionalProperties":false}}},
+        {"type":"function","function":{"name":"read","description":"Read UTF-8 text inside workspace (source max 8 MiB), with offset/limit pagination and 2000-line/50 KiB output.","parameters":{"type":"object","properties":{"path":{"type":"string"},"offset":{"type":"integer","minimum":1},"limit":{"type":"integer","minimum":1}},"required":["path"],"additionalProperties":false}}},
         {"type":"function","function":{"name":"write","description":"Create or replace a UTF-8 file inside the workspace (maximum 1 MiB); create parent directories.","parameters":{"type":"object","properties":{"path":{"type":"string"},"content":{"type":"string"}},"required":["path","content"],"additionalProperties":false}}},
         {"type":"function","function":{"name":"edit","description":"Replace unique exact blocks in one UTF-8 file (64 KiB source). All edits match original content; fuzzy-only matching unsupported.","parameters":{"type":"object","properties":{"path":{"type":"string"},"edits":{"type":"array","minItems":1,"items":{"type":"object","properties":{"oldText":{"type":"string"},"newText":{"type":"string"}},"required":["oldText","newText"],"additionalProperties":false}}},"required":["path","edits"],"additionalProperties":false}}},
         {"type":"function","function":{"name":"bash","description":"Execute bash in the workspace with host user authority. Default timeout 30 seconds, maximum 300. Output is bounded; background processes are terminated when the shell exits.","parameters":{"type":"object","properties":{"command":{"type":"string"},"timeout":{"type":"integer","minimum":1,"maximum":300}},"required":["command"],"additionalProperties":false}}}
@@ -19,7 +19,7 @@ pub fn definitions() -> Value {
 
 pub fn execute(workspace: &Path, name: &str, arguments: &str) -> Result<String> {
     match name {
-        "read" => crate::read_tool(workspace, arguments),
+        "read" => crate::read::execute(workspace, arguments),
         "write" => write_tool(workspace, arguments),
         "edit" => crate::edit::execute(workspace, arguments),
         "bash" => bash_tool(workspace, arguments),

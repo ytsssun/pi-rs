@@ -40,7 +40,7 @@ Without `--allow-mutations`, only read is advertised and fabricated write/edit/b
 
 ## Behavior and recovery
 
-- `read`: UTF-8 regular file, maximum 64 KiB; rejects oversized files. Pi pagination/truncation is not integrated.
+- `read`: UTF-8 regular file up to 8 MiB; positive integer `offset` (1-based) and `limit`, with Pi-style 2000-line/50 KiB output truncation and continuation notices. No images. Raw edit input remains capped at 64 KiB and never uses a rendered read page.
 - `write`: `{path,content}`, creates parents and atomically replaces files, maximum 1 MiB. Workspace traversal/symlink restrictions assume no hostile concurrent filesystem mutation.
 - `edit`: `{path,edits:[{oldText,newText}]}` targets original file ranges without cascading; BOM/newline handling and ambiguity rules are compared against pinned Pi. Source maximum 64 KiB. Fuzzy-only replacements, legacy argument coercion and rendered diff metadata are not supported; see [exact-profile evidence](experiments/edit-differential.md).
 - `bash`: `{command,timeout?}`, integer seconds, default 30/max 300; retains at most 32 KiB per stdout/stderr stream. Nonzero exit/timeout becomes an error tool result. Normal shell exit/timeout kills ordinary background descendants in its process group. Detached processes or abrupt runtime death are not contained.
@@ -60,6 +60,8 @@ node --experimental-vm-modules experiments/write-differential.mjs
 node --experimental-vm-modules experiments/edit-differential.mjs
 python3 experiments/verify-runtime.py
 python3 experiments/round2-coding.py
+node --experimental-vm-modules experiments/read-differential.mjs
+python3 experiments/read-resume.py
 ```
 
 Node 22.18+ is used for TypeScript stripping. Fixed Pi reference: `9767ba275f3e9a5ee0f5c5342249b629ab1b2282`, MIT. Truncation probe compares 36 full results. Instrumented original write execution compares four filesystem/result cases; see [scope and shims](experiments/write-differential.md). The Node extension spike loads one unchanged extension and is not connected to Rust. No exact bash output, full agent-loop, Pi session import/export, TUI, complete extension/provider or multiplayer claim. No speed/memory advantage has been measured.
