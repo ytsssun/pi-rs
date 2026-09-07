@@ -1,3 +1,4 @@
+pub mod edit;
 pub mod tools;
 use anyhow::{bail, Context, Result};
 use serde::{Deserialize, Serialize};
@@ -83,7 +84,10 @@ impl Session {
                 .iter()
                 .find(|c| c["id"] == *id)
                 .context("missing in-flight call")?;
-            if !matches!(call["function"]["name"].as_str(), Some("write" | "bash")) {
+            if !matches!(
+                call["function"]["name"].as_str(),
+                Some("write" | "bash" | "edit")
+            ) {
                 bail!("in-flight marker must reference a mutation");
             }
         }
@@ -264,7 +268,7 @@ where
                 let done = s.messages.len() - index - 1;
                 for call in calls.iter().skip(done) {
                     let name = call["function"]["name"].as_str().unwrap();
-                    let mutation = matches!(name, "write" | "bash");
+                    let mutation = matches!(name, "write" | "bash" | "edit");
                     if mutation && allow_mutations {
                         s.in_flight = Some(call["id"].as_str().unwrap().to_owned());
                         s.save(path)?;

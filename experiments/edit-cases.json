@@ -1,0 +1,18 @@
+[
+  {"id":"single","before":"value = 1\n","edits":[{"oldText":"1","newText":"2"}],"expected":"value = 2\n"},
+  {"id":"noncascade","before":"alpha beta gamma\n","edits":[{"oldText":"alpha","newText":"beta"},{"oldText":"beta","newText":"delta"}],"expected":"beta delta gamma\n"},
+  {"id":"reverse-order","before":"a=1\nb=2\nc=3\n","edits":[{"oldText":"c=3","newText":"c=30"},{"oldText":"a=1","newText":"a=10"}],"expected":"a=10\nb=2\nc=30\n"},
+  {"id":"adjacent","before":"abcd","edits":[{"oldText":"ab","newText":"x"},{"oldText":"cd","newText":"y"}],"expected":"xy"},
+  {"id":"duplicate-match","before":"foo foo\n","edits":[{"oldText":"foo","newText":"bar"}],"error":true},
+  {"id":"overlap","before":"abcdef\n","edits":[{"oldText":"abc","newText":"x"},{"oldText":"bcd","newText":"y"}],"error":true},
+  {"id":"duplicate-edit","before":"abcdef\n","edits":[{"oldText":"abc","newText":"x"},{"oldText":"abc","newText":"y"}],"error":true},
+  {"id":"empty-old","before":"abc\n","edits":[{"oldText":"","newText":"x"}],"error":true},
+  {"id":"empty-edits","before":"abc\n","edits":[],"error":true},
+  {"id":"no-op","before":"abc\n","edits":[{"oldText":"abc","newText":"abc"}],"error":true},
+  {"id":"missing-after-valid","before":"alpha beta\n","edits":[{"oldText":"alpha","newText":"omega"},{"oldText":"absent","newText":"x"}],"error":true},
+  {"id":"no-cascade-invented-match","before":"alpha\n","edits":[{"oldText":"alpha","newText":"beta"},{"oldText":"beta","newText":"gamma"}],"error":true},
+  {"id":"bom-crlf","before":"﻿first\r\nsecond\r\n","edits":[{"oldText":"first\nsecond","newText":"FIRST\nSECOND"}],"expected":"﻿FIRST\r\nSECOND\r\n"},
+  {"id":"lone-cr-normalization","before":"a\rb\r","edits":[{"oldText":"a\nb","newText":"x\ny"}],"expected":"x\ny\n"},
+  {"id":"utf8","before":"你好 🌍 café\n","edits":[{"oldText":"🌍","newText":"🦀"},{"oldText":"café","newText":"世界"}],"expected":"你好 🦀 世界\n"},
+  {"id":"delete","before":"start middle end","edits":[{"oldText":" middle","newText":""}],"expected":"start end"}
+]

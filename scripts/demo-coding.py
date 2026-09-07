@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 """Deterministic coding demo. Real writes/tests; scripted model, no inference."""
-import json, pathlib, subprocess, tempfile
+import argparse, json, pathlib, subprocess, tempfile
+parser = argparse.ArgumentParser(description=__doc__)
+parser.add_argument("--edit", action="store_true", help="Use targeted edit instead of full-file write")
+options = parser.parse_args()
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 runs = ROOT / '.runs'
 runs.mkdir(exist_ok=True)
@@ -25,6 +28,9 @@ fixture = [
     call(7, 'bash', {'command': 'python3 -B test_calc.py && python3 -B -c "from calc import multiply; assert multiply(3,4) == 12; print(\'multiplication test passed\')"'}),
     {'role': 'assistant', 'content': 'Scripted follow-up finished; both real tests passed.'},
 ]
+if options.edit:
+    fixture[2] = call(3, 'edit', {'path': 'calc.py', 'edits': [{'oldText': 'return a - b', 'newText': 'return a + b'}]})
+    fixture[5] = call(6, 'edit', {'path': 'calc.py', 'edits': [{'oldText': 'return a + b', 'newText': 'return a + b\n\ndef multiply(a, b):\n    return a * b'}]})
 fixture_path = base / 'fixture.json'
 fixture_path.write_text(json.dumps(fixture, indent=2))
 session = base / 'session.json'
@@ -37,7 +43,7 @@ assert 'ERROR:' in results[0] and 'AssertionError' in results[0]
 assert 'addition test passed' in results[3]
 assert 'multiplication test passed' in results[-1]
 assert sum(m['role'] == 'user' for m in history) == 2
-print('Verified actual failure -> write -> passing test -> process exit -> follow-up -> passing tests.')
+print('Verified actual failure -> ' + ('edit' if options.edit else 'write') + ' -> passing test -> process exit -> follow-up -> passing tests.')
 print('Model: scripted fixture; no real inference.')
 print('Artifacts retained:', base)
 print('Session:', session)

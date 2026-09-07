@@ -1,0 +1,106 @@
+{
+  "upstreamCommit": "9767ba275f3e9a5ee0f5c5342249b629ab1b2282",
+  "node": "v22.18.0",
+  "mode": "original/Rust exact-profile differential",
+  "casesSha256": "bbf0bb4f9a22b35b023cd8891a23ed86abf18f67fa1822c3ff2f159d66c6f305",
+  "loadedOriginalModules": [
+    {
+      "path": "packages/coding-agent/src/core/tools/edit.ts",
+      "sha256": "31a368c14cf5437ecac157765660001b16063302d9bd746303d6d1b1dcb5625d",
+      "gitStatus": "clean"
+    },
+    {
+      "path": "packages/coding-agent/src/utils/text.ts",
+      "sha256": "bb323f9607c499115b532021f4f0163c6df04d834aee9c32c3c77b273bd2d7c6",
+      "gitStatus": "clean"
+    },
+    {
+      "path": "packages/coding-agent/src/core/tools/edit-diff.ts",
+      "sha256": "f85a9809eb44b9828236050cf38a8e45933e5cfd583a186e9a0e55a664dd3e8d",
+      "gitStatus": "clean"
+    },
+    {
+      "path": "packages/coding-agent/src/core/tools/path-utils.ts",
+      "sha256": "ab6f420d2388a41366113c17a25e356867820b87b02a169d044cfcf83e1997d3",
+      "gitStatus": "clean"
+    },
+    {
+      "path": "packages/coding-agent/src/utils/paths.ts",
+      "sha256": "a687cdb54b82216673fea5be1210c48e64ffa8398d64cfabf2bd7dba5c9d4210",
+      "gitStatus": "clean"
+    },
+    {
+      "path": "packages/coding-agent/src/utils/child-process.ts",
+      "sha256": "cd324f5b9a1abadd85ab5a331750d475c8bd51ec65cae091ad9b416245ec85d4",
+      "gitStatus": "clean"
+    },
+    {
+      "path": "packages/coding-agent/src/core/tools/file-mutation-queue.ts",
+      "sha256": "33cb06ac9bcdf32c8b84d9d12e33be44c503a7670f668e003a3262cd34294d11",
+      "gitStatus": "clean"
+    }
+  ],
+  "stubbedModules": [
+    "typebox",
+    "diff",
+    "cross-spawn",
+    "renderers/edit.ts",
+    "tool-definition-wrapper.ts"
+  ],
+  "forbiddenStubCalls": 0,
+  "renderStubCalls": 10,
+  "validation": "scripted fixture; real filesystem edits; no model calls; rendering excluded",
+  "results": [
+    {
+      "id": "smart-quote-ambiguity",
+      "passed": true,
+      "outcome": "error, original bytes unchanged",
+      "originalError": "Found 2 occurrences of the text in file.txt. The text must be unique. Please provide more context to make it unique.",
+      "rustResult": "ERROR: edits[0] exact text is not unique in file.txt"
+    },
+    {
+      "id": "nfkc-ambiguity",
+      "passed": true,
+      "outcome": "error, original bytes unchanged",
+      "originalError": "Found 2 occurrences of the text in file.txt. The text must be unique. Please provide more context to make it unique.",
+      "rustResult": "ERROR: edits[0] exact text is not unique in file.txt"
+    },
+    {
+      "id": "overlapping-self-match",
+      "passed": true,
+      "outcome": "success, bytes matched",
+      "originalError": null,
+      "rustResult": "Successfully replaced 1 block(s) in file.txt."
+    },
+    {
+      "id": "whitespace-empty-normalized",
+      "passed": true,
+      "outcome": "success, bytes matched",
+      "originalError": null,
+      "rustResult": "Successfully replaced 1 block(s) in file.txt."
+    }
+  ],
+  "excluded": [
+    {
+      "id": "fuzzy-smart-quotes",
+      "originalSuccess": true,
+      "after": "goodbye\n",
+      "rustRejected": true,
+      "rustProfile": "excluded; exact-match array schema only"
+    },
+    {
+      "id": "legacy-prepare",
+      "originalSuccess": true,
+      "after": "xyz\n",
+      "rustRejected": true,
+      "rustProfile": "excluded; exact-match array schema only"
+    },
+    {
+      "id": "string-edits-prepare",
+      "originalSuccess": true,
+      "after": "xyz\n",
+      "rustRejected": true,
+      "rustProfile": "excluded; exact-match array schema only"
+    }
+  ]
+}

@@ -1,0 +1,46 @@
+[
+  {
+    "id": "smart-quote-ambiguity",
+    "before": "\"x\" “x”\n",
+    "edits": [
+      {
+        "oldText": "\"x\"",
+        "newText": "y"
+      }
+    ],
+    "error": true
+  },
+  {
+    "id": "nfkc-ambiguity",
+    "before": "abc ａｂｃ\n",
+    "edits": [
+      {
+        "oldText": "abc",
+        "newText": "x"
+      }
+    ],
+    "error": true
+  },
+  {
+    "id": "overlapping-self-match",
+    "before": "aaa",
+    "edits": [
+      {
+        "oldText": "aa",
+        "newText": "x"
+      }
+    ],
+    "expected": "xa"
+  },
+  {
+    "id": "whitespace-empty-normalized",
+    "before": "  ",
+    "edits": [
+      {
+        "oldText": " ",
+        "newText": "x"
+      }
+    ],
+    "expected": "x "
+  }
+]

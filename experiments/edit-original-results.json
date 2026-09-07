@@ -1,0 +1,187 @@
+{
+  "upstreamCommit": "9767ba275f3e9a5ee0f5c5342249b629ab1b2282",
+  "node": "v22.18.0",
+  "mode": "original-only expected fixture validation",
+  "casesSha256": "940d6bc182b93f154a4250d32e09eb5d57c6698c4e99b983240f14ecfa59dd22",
+  "loadedOriginalModules": [
+    {
+      "path": "packages/coding-agent/src/core/tools/edit.ts",
+      "sha256": "31a368c14cf5437ecac157765660001b16063302d9bd746303d6d1b1dcb5625d",
+      "gitStatus": "clean"
+    },
+    {
+      "path": "packages/coding-agent/src/utils/text.ts",
+      "sha256": "bb323f9607c499115b532021f4f0163c6df04d834aee9c32c3c77b273bd2d7c6",
+      "gitStatus": "clean"
+    },
+    {
+      "path": "packages/coding-agent/src/core/tools/edit-diff.ts",
+      "sha256": "f85a9809eb44b9828236050cf38a8e45933e5cfd583a186e9a0e55a664dd3e8d",
+      "gitStatus": "clean"
+    },
+    {
+      "path": "packages/coding-agent/src/core/tools/path-utils.ts",
+      "sha256": "ab6f420d2388a41366113c17a25e356867820b87b02a169d044cfcf83e1997d3",
+      "gitStatus": "clean"
+    },
+    {
+      "path": "packages/coding-agent/src/utils/paths.ts",
+      "sha256": "a687cdb54b82216673fea5be1210c48e64ffa8398d64cfabf2bd7dba5c9d4210",
+      "gitStatus": "clean"
+    },
+    {
+      "path": "packages/coding-agent/src/utils/child-process.ts",
+      "sha256": "cd324f5b9a1abadd85ab5a331750d475c8bd51ec65cae091ad9b416245ec85d4",
+      "gitStatus": "clean"
+    },
+    {
+      "path": "packages/coding-agent/src/core/tools/file-mutation-queue.ts",
+      "sha256": "33cb06ac9bcdf32c8b84d9d12e33be44c503a7670f668e003a3262cd34294d11",
+      "gitStatus": "clean"
+    }
+  ],
+  "stubbedModules": [
+    "typebox",
+    "diff",
+    "cross-spawn",
+    "renderers/edit.ts",
+    "tool-definition-wrapper.ts"
+  ],
+  "forbiddenStubCalls": 0,
+  "renderStubCalls": 22,
+  "validation": "scripted fixture; real filesystem edits; no model calls; rendering excluded",
+  "results": [
+    {
+      "id": "single",
+      "passed": true,
+      "outcome": "success, bytes matched",
+      "originalError": null,
+      "rustResult": null
+    },
+    {
+      "id": "noncascade",
+      "passed": true,
+      "outcome": "success, bytes matched",
+      "originalError": null,
+      "rustResult": null
+    },
+    {
+      "id": "reverse-order",
+      "passed": true,
+      "outcome": "success, bytes matched",
+      "originalError": null,
+      "rustResult": null
+    },
+    {
+      "id": "adjacent",
+      "passed": true,
+      "outcome": "success, bytes matched",
+      "originalError": null,
+      "rustResult": null
+    },
+    {
+      "id": "duplicate-match",
+      "passed": true,
+      "outcome": "error, original bytes unchanged",
+      "originalError": "Found 2 occurrences of the text in file.txt. The text must be unique. Please provide more context to make it unique.",
+      "rustResult": null
+    },
+    {
+      "id": "overlap",
+      "passed": true,
+      "outcome": "error, original bytes unchanged",
+      "originalError": "edits[0] and edits[1] overlap in file.txt. Merge them into one edit or target disjoint regions.",
+      "rustResult": null
+    },
+    {
+      "id": "duplicate-edit",
+      "passed": true,
+      "outcome": "error, original bytes unchanged",
+      "originalError": "edits[0] and edits[1] overlap in file.txt. Merge them into one edit or target disjoint regions.",
+      "rustResult": null
+    },
+    {
+      "id": "empty-old",
+      "passed": true,
+      "outcome": "error, original bytes unchanged",
+      "originalError": "oldText must not be empty in file.txt.",
+      "rustResult": null
+    },
+    {
+      "id": "empty-edits",
+      "passed": true,
+      "outcome": "error, original bytes unchanged",
+      "originalError": "Edit tool input is invalid. edits must contain at least one replacement.",
+      "rustResult": null
+    },
+    {
+      "id": "no-op",
+      "passed": true,
+      "outcome": "error, original bytes unchanged",
+      "originalError": "No changes made to file.txt. The replacement produced identical content. This might indicate an issue with special characters or the text not existing as expected.",
+      "rustResult": null
+    },
+    {
+      "id": "missing-after-valid",
+      "passed": true,
+      "outcome": "error, original bytes unchanged",
+      "originalError": "Could not find edits[1] in file.txt. The oldText must match exactly including all whitespace and newlines.",
+      "rustResult": null
+    },
+    {
+      "id": "no-cascade-invented-match",
+      "passed": true,
+      "outcome": "error, original bytes unchanged",
+      "originalError": "Could not find edits[1] in file.txt. The oldText must match exactly including all whitespace and newlines.",
+      "rustResult": null
+    },
+    {
+      "id": "bom-crlf",
+      "passed": true,
+      "outcome": "success, bytes matched",
+      "originalError": null,
+      "rustResult": null
+    },
+    {
+      "id": "lone-cr-normalization",
+      "passed": true,
+      "outcome": "success, bytes matched",
+      "originalError": null,
+      "rustResult": null
+    },
+    {
+      "id": "utf8",
+      "passed": true,
+      "outcome": "success, bytes matched",
+      "originalError": null,
+      "rustResult": null
+    },
+    {
+      "id": "delete",
+      "passed": true,
+      "outcome": "success, bytes matched",
+      "originalError": null,
+      "rustResult": null
+    }
+  ],
+  "excluded": [
+    {
+      "id": "fuzzy-smart-quotes",
+      "originalSuccess": true,
+      "after": "goodbye\n",
+      "rustProfile": "excluded; exact-match array schema only"
+    },
+    {
+      "id": "legacy-prepare",
+      "originalSuccess": true,
+      "after": "xyz\n",
+      "rustProfile": "excluded; exact-match array schema only"
+    },
+    {
+      "id": "string-edits-prepare",
+      "originalSuccess": true,
+      "after": "xyz\n",
+      "rustProfile": "excluded; exact-match array schema only"
+    }
+  ]
+}

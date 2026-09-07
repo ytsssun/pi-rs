@@ -5,7 +5,7 @@ use std::{env, fs, path::Path, time::Duration};
 fn main() -> Result<()> {
     let args: Vec<String> = env::args().skip(1).collect();
     if args.is_empty() || args.iter().any(|a| a == "--help") {
-        println!("pi-rs (--input TEXT | --resume) --session FILE [--workspace DIR] (--fixture FILE | --model NAME) [--max-rounds N] [--context-tool-chars N]\nReal calls use OPENAI_API_KEY and optional OPENAI_BASE_URL (default https://api.openai.com/v1). Default tool: bounded UTF-8 workspace read; write and bash require --allow-mutations. Resume with --input TEXT appends a turn only after completion. --allow-mutations enables write/bash for this invocation. --resolve-in-flight TEXT records an inspected uncertain outcome without replay. Fixtures use the full-session assistant message index, including previous turns. Context-tool-chars persists.");
+        println!("pi-rs (--input TEXT | --resume) --session FILE [--workspace DIR] (--fixture FILE | --model NAME) [--max-rounds N] [--context-tool-chars N]\nReal calls use OPENAI_API_KEY and optional OPENAI_BASE_URL (default https://api.openai.com/v1). Default tool: bounded UTF-8 workspace read; write, edit and bash require --allow-mutations. Resume with --input TEXT appends a turn only after completion. --allow-mutations enables write/edit/bash for this invocation. --resolve-in-flight TEXT records an inspected uncertain outcome without replay. Fixtures use the full-session assistant message index, including previous turns. Context-tool-chars persists.");
         return Ok(());
     }
     let mut options = std::collections::HashMap::new();

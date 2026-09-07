@@ -11,6 +11,7 @@ export PATH="$HOME/.cargo/bin:$PATH"
 cargo build --locked
 cargo test --locked
 python3 scripts/demo-coding.py
+python3 scripts/demo-coding.py --edit
 ```
 
 The demo creates a fresh tiny repository under `.runs/`, runs its failing test, repairs the source through the Rust `write` tool, runs the passing test, exits, and launches a separate CLI process with a follow-up request. It checks actual test output and files. Artifacts and the session are retained in the printed directory. The model decisions are scripted, not real inference.
@@ -35,17 +36,18 @@ cargo run --locked -- --input 'Fix the failing tests' --workspace /absolute/path
 cargo run --locked -- --resume --input 'Add a regression test and run it' --session .runs/coding.json --model MODEL_ID --allow-mutations
 ```
 
-Without `--allow-mutations`, only read is advertised and fabricated write/bash calls return errors. With it, **bash runs with your host user's authority**, in the saved workspace. It is not a sandbox. Use a trusted disposable repository for experiments, and keep session state outside that repository. Codex login is not assumed to be a generic provider API key. Never commit credentials or real session content.
+Without `--allow-mutations`, only read is advertised and fabricated write/edit/bash calls return errors. With it, **bash runs with your host user's authority**, in the saved workspace. It is not a sandbox. Use a trusted disposable repository for experiments, and keep session state outside that repository. Codex login is not assumed to be a generic provider API key. Never commit credentials or real session content.
 
 ## Behavior and recovery
 
 - `read`: UTF-8 regular file, maximum 64 KiB; rejects oversized files. Pi pagination/truncation is not integrated.
 - `write`: `{path,content}`, creates parents and atomically replaces files, maximum 1 MiB. Workspace traversal/symlink restrictions assume no hostile concurrent filesystem mutation.
+- `edit`: `{path,edits:[{oldText,newText}]}` targets original file ranges without cascading; BOM/newline handling and ambiguity rules are compared against pinned Pi. Source maximum 64 KiB. Fuzzy-only replacements, legacy argument coercion and rendered diff metadata are not supported; see [exact-profile evidence](experiments/edit-differential.md).
 - `bash`: `{command,timeout?}`, integer seconds, default 30/max 300; retains at most 32 KiB per stdout/stderr stream. Nonzero exit/timeout becomes an error tool result. Normal shell exit/timeout kills ordinary background descendants in its process group. Detached processes or abrupt runtime death are not contained.
 - `--resume` continues unfinished work or returns the saved final result. `--resume --input TEXT` appends only after the prior turn completed. A mismatched explicit workspace is rejected.
 - `--context-tool-chars N` persists a model-view truncation policy across resumes. Canonical tool results remain intact. This is not yet an append-only context-edit audit or branch system.
 - Native v1 JSON snapshots use fsync/rename and an appended `.lock` file with Unix flock. Old v1 sessions load with default new fields. Leave the permanent lock file in place; ownership releases on process death. A leftover `.tmp` from interrupted save requires inspection before removal; no automatic promotion of incomplete snapshots.
-- Before a write/bash effect, an `in_flight` marker is saved. If the process dies before the result is saved, resume refuses automatic replay. Inspect files and surviving processes, then use `--resume --resolve-in-flight 'observed outcome'` with the normal model/fixture arguments. This records an operator-supplied result and continues; it does not re-run that call or prove exactly-once effects. Do not resolve while the original process is still changing files.
+- Before a write/edit/bash effect, an `in_flight` marker is saved. If the process dies before the result is saved, resume refuses automatic replay. Inspect files and surviving processes, then use `--resume --resolve-in-flight 'observed outcome'` with the normal model/fixture arguments. This records an operator-supplied result and continues; it does not re-run that call or prove exactly-once effects. Do not resolve while the original process is still changing files.
 
 ## Verify the bounded compatibility profiles
 
@@ -55,6 +57,7 @@ cargo build --locked --manifest-path compatibility/Cargo.toml
 node experiments/compare-truncate.mjs
 node prototype/test-extension-sidecar.mjs
 node --experimental-vm-modules experiments/write-differential.mjs
+node --experimental-vm-modules experiments/edit-differential.mjs
 python3 experiments/verify-runtime.py
 python3 experiments/round2-coding.py
 ```
@@ -63,4 +66,4 @@ Node 22.18+ is used for TypeScript stripping. Fixed Pi reference: `9767ba275f3e9
 
 [Checkpoint](docs/checkpoint.md) · [Frozen M2 acceptance](docs/milestone2.md) · [Independent baseline](experiments/round2-baseline.md) · [Coordination retrospective](docs/retrospective-m2.md) · [Board](docs/board.jsonl)
 
-Query durable tasks with `python3 scripts/board.py list`. Root and adapted-source licensing are recorded in LICENSE and compatibility/NOTICE. Full transitive distribution audit remains open before public release.
+Query durable tasks with `python3 scripts/board.py list`. Root and adapted-source licensing are recorded in LICENSE, NOTICE and compatibility/NOTICE. Full transitive distribution audit remains open before public release.
