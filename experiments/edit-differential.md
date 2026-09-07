@@ -37,3 +37,29 @@ EDIT_CASES=experiments/edit-adversarial-cases.json node --experimental-vm-module
 ```
 
 Clean integrated candidate verification is still pending. No live inference occurred.
+
+## Final clean M3 candidate — verified 2026-09-07
+
+Exact candidate **`29727771e457e6cbbb8cebef18c02907ac9255b5`** was checked out into a new detached worktree `/tmp/pi-rs-m3-final` (canonical `/private/tmp/pi-rs-m3-final`) and built with a fresh target directory. This supersedes the pending-clean status above. Executed commands:
+
+```sh
+git worktree add --detach /tmp/pi-rs-m3-final 2972777
+cd /tmp/pi-rs-m3-final
+export PATH="$HOME/.cargo/bin:$PATH"
+cargo build --locked
+cargo test --locked
+cargo clippy --locked --all-targets -- -D warnings
+python3 scripts/demo-coding.py --edit
+python3 experiments/round2-coding.py
+sh scripts/bootstrap-upstream.sh
+node --experimental-vm-modules experiments/edit-differential.mjs > /tmp/pi-rs-m3-edit-main.json
+EDIT_CASES=experiments/edit-adversarial-cases.json node --experimental-vm-modules experiments/edit-differential.mjs > /tmp/pi-rs-m3-edit-extra.json
+cmp experiments/edit-results.json /tmp/pi-rs-m3-edit-main.json
+cmp experiments/edit-adversarial-results.json /tmp/pi-rs-m3-edit-extra.json
+git status --short
+git rev-parse HEAD
+```
+
+All commands passed: **25 Rust tests** (5 coding tools, 6 exact edit, 2 edit runtime, 6 legacy runtime, 6 session), strict clippy, real edit demo, **28 M2 regression checks**, **16 + 4 original/Rust edit cases** and the **3 observed exclusion cases** in each differential run. Fresh upstream bootstrap obtained the pinned commit. The regenerated JSON reports matched tracked evidence byte-for-byte. Git status was empty and HEAD matched the exact candidate. No code was changed during clean verification.
+
+The demo printed `Verified actual failure -> edit -> passing test -> process exit -> follow-up -> passing tests.` Its retained session is `/private/tmp/pi-rs-m3-final/.runs/coding-zxto8zl5/session.json`. It uses scripted model decisions but real repository edits/tests and separate CLI processes. Node emitted the documented experimental VM/TypeScript warnings only. No new mismatch was observed. Live model inference and excluded compatibility profiles remain unverified/unsupported as described above; unrelated write/truncation probes were not redundantly rerun in this M3 final check.
