@@ -22,3 +22,9 @@ Original read.ts text branch executes with real filesystem operations and unchan
 Coordinator corrections: removed false-positive BMP-prefix rejection (ordinary text starting BMR must read); source cap/positive usize checks keep allocation/indexing bounded. Size hint now rounds positive binary-unit ties upward like JS toFixed, instead of Rust ties-even; 52480-byte line regression expects 51.3KB. Raw edit input remains separate to prevent writing truncated content/notices back to disk.
 
 Clean-checkout confirmation is appended after candidate verification. No full Pi compatibility or real-model claim.
+
+## Clean candidate execution
+
+Coordinator created fresh detached `/tmp/pi-rs-m4-final` at `bf37af7`, built from a new target directory, and ran build, all 32 Rust tests, strict clippy, 9 read-resume checks and 28 M2 checks successfully. No live model.
+
+Unresolved reproduction failure: after bootstrap to the pinned upstream, `node --experimental-vm-modules experiments/read-differential.mjs` in that clean checkout terminated with exit 139, no useful output. One identical retry failed; explicitly selecting the documented Node 22.18 binary also failed. Stop identical retries. The working-checkout 19-case comparison passed earlier, but clean-checkout original-read comparison is NOT verified. Next investigation should isolate Node VM/TypeScript loader behavior by module and avoid assuming this is Rust failure or waving away the harness crash. This limitation does not erase successful Rust and HTTP tests.

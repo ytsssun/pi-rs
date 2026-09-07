@@ -51,3 +51,5 @@ M3 evidence-only followup commit contains final board/report updates. Next indep
 ## M4 read pagination
 
 Model-facing read now supports positive offset/limit, source cap 8 MiB and shared Pi truncation library. Raw edit loader unchanged. Coordinator resumed partial worker artifacts after quota errors, fixed JS-vs-Rust tie rounding for first-line size notices and verified 19 original text-read cases, 9 separate-process read-resume checks, 28 M2 checks, and shared truncation parity. See experiments/read-verification.md for scope and latest clean-checkout evidence. Next: actual provider remains blocked on access; improve supported Pi profile rather than assume full compatibility.
+
+M4 candidate bf37af7 fresh checkout passed all32 Rust tests/clippy/9 read-resume/28 M2 checks. Original Node read harness crashed exit139 in clean checkout despite prior working-checkout19-case success; unresolved T014, see read-verification.md. Do not claim clean read parity. Next bounded task isolate VM/TS harness crash.
