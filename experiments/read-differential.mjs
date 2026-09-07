@@ -12,6 +12,12 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const upstream = path.join(root, 'vendor/pi-mono');
 const commit = '9767ba275f3e9a5ee0f5c5342249b629ab1b2282';
 assert.equal(execFileSync('git',['-C',upstream,'rev-parse','HEAD'],{encoding:'utf8'}).trim(),commit);
+// Import host namespaces before VM linking. Dynamic import within recursively
+// linked VM callbacks crashes Node 22.18 in the clean-checkout repro (T014).
+const builtins = new Map();
+for (const id of ['fs', 'fs/promises', 'path', 'node:fs', 'node:fs/promises', 'node:os', 'node:path', 'node:url', 'node:child_process']) {
+  builtins.set(id, await import(id));
+}
 const loaded = [], stubs = [], cache = new Map();
 let forbiddenStubCalls = 0, textMimeStubCalls = 0;
 function synthetic(id, exports) {
@@ -30,7 +36,7 @@ async function load(id) {
   const key = Object.keys(stubExports).find(k=>id===k || id.endsWith('/'+k));
   let mod;
   if (key) { stubs.push(key); mod=synthetic(id,stubExports[key]); }
-  else if (id.startsWith('node:') || ['fs','fs/promises','path'].includes(id)) mod=synthetic(id,await import(id));
+  else if (id.startsWith('node:') || ['fs','fs/promises','path'].includes(id)) mod=synthetic(id,builtins.get(id));
   else {
     assert(id.startsWith(upstream+path.sep),`unexpected module ${id}`);
     const relative=path.relative(upstream,id);
