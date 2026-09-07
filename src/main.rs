@@ -76,6 +76,11 @@ fn main() -> Result<()> {
     if options.contains_key("--resolve-in-flight") && (!resume || options.contains_key("--input")) {
         bail!("--resolve-in-flight requires --resume without --input");
     }
+    // Validate local transport input before creating or changing durable state.
+    let fixture: Option<Vec<Value>> = options
+        .get("--fixture")
+        .map(|p| -> Result<_> { Ok(serde_json::from_slice(&fs::read(p)?)?) })
+        .transpose()?;
     // Keep the lock inode permanently. flock ownership ends when this process dies.
     let lock_path = appended_path(path, ".lock");
     let _lock = fs::OpenOptions::new()
@@ -138,10 +143,6 @@ fn main() -> Result<()> {
             .unwrap()
             .retain(|t| t["function"]["name"] == "read");
     }
-    let fixture: Option<Vec<Value>> = options
-        .get("--fixture")
-        .map(|p| -> Result<_> { Ok(serde_json::from_slice(&fs::read(p)?)?) })
-        .transpose()?;
     let client = reqwest::blocking::Client::builder()
         .timeout(Duration::from_secs(120))
         .redirect(reqwest::redirect::Policy::none())
