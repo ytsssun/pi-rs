@@ -1,3 +1,9 @@
+# Current correction — batch block semantics
+
+E085 corrects a prior compatibility error: per-tool block does not cancel its peers; blocked immediate outcomes skip tool_result hooks. Both block and input-mutation fixtures pass. Earlier zero-execution block and blocked-result-hook claims are superseded. Actual AbortSignal cancellation remains unimplemented/unverified. Full Pi compatibility is not achieved.
+
+## Historical checkpoint (claims require their later corrections)
+
 # Checkpoint — M7 event/tool parity proposed; implementation remains
 
 ## Current verified status
