@@ -141,3 +141,5 @@ Verified E053: `experiments/upstream-parallel-contract.mjs` executable check con
 Tested E054: Rust runtime now has an opt-in `parallel:true` batch action with per-call request IDs; `batch_result` validates count/IDs and persists source-order tool results. Default sequential behavior is unchanged. Cargo tests pass. The native JS driver still needs batch execution/preflight semantics, so this is not a live or full upstream compatibility result.
 
 Tested E055: native driver now passes `parallel` to Rust `begin`, executes `tool_batch` calls concurrently, and submits source-correlated `batch_result` outcomes. Existing sequential fixture and `/Users/stevensun/.cargo/bin/cargo test --locked` pass. This is an opt-in prototype; full upstream preflight/abort semantics and live batch verification remain open.
+
+Verified E056: `experiments/native-batch.mjs` sends batch outcomes in reverse completion order; Rust maps by request ID and persists `one,two` source order. The prior positional-matching failure was fixed in `2a747fe`. This remains deterministic native evidence; preflight/abort, sequential override, and live model batch execution remain open.
