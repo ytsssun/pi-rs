@@ -277,3 +277,7 @@ Verified E097: rebuilt native addon and independently exercised `queue_create`, 
 - Real provider tool-call stream consumed via native queue and assembled into one canonical tool call named `echo` with `text` argument.
 - Evidence: output `items=1`, `toolName=echo`, `argKeys=[text]`, process exit 0. Stop reason is currently `eof` because native terminal `[DONE]` is not yet mapped to assembler `done`.
 - This exposes the next fix: preserve provider finish reason/usage and then invoke runtime tool execution.
+
+### E108 — live tool bridge terminal mapping (verified)
+- Live provider tool call passed through native queue and bridge with canonical `echo` call and `text` argument.
+- Evidence: `name=echo`, `args=[text]`, `stop=stop`, process exit 0; terminal no longer misclassified as EOF.
