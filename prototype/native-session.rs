@@ -117,6 +117,26 @@ impl Registry {
                     self.queues.insert(handle.clone(), q);
                     Ok(json!(handle))
                 }
+                "provider_stream_start" => {
+                    let key = std::env::var("OPENAI_API_KEY").map_err(|_| "OPENAI_API_KEY missing".to_string())?;
+                    let base = std::env::var("OPENAI_BASE_URL").unwrap_or_else(|_| "https://api.openai.com/v1".into());
+                    let model = r["model"].as_str().ok_or("model required")?.to_string();
+                    let messages = r["messages"].as_array().ok_or("messages required")?.to_vec();
+                    let tools = r["tools"].clone();
+                    let effort = r["reasoning_effort"].as_str().map(str::to_string);
+                    let q = std::sync::Arc::new(StreamQueue::new(r["capacity"].as_u64().unwrap_or(32) as usize));
+                    self.next = self.next.checked_add(1).ok_or("stream handle exhausted")?;
+                    let handle = format!("{}:s{}", self.prefix, self.next);
+                    let worker_q = std::sync::Arc::clone(&q);
+                    let producer = std::thread::spawn(move || {
+                        let result = pi_rs::provider::client().and_then(|c| pi_rs::provider::openai_chat_stream_to_queue(&c, &base, &key, &model, &messages, &tools, effort.as_deref(), worker_q.clone()));
+                        if let Err(e) = result { let _ = worker_q.push(StreamEvent { value: json!({"type":"error","message":e.to_string()}), terminal:true }); }
+                        Ok(())
+                    });
+                    self.producers.insert(handle.clone(), producer);
+                    self.queues.insert(handle.clone(), q);
+                    Ok(json!(handle))
+                }
                 "stream_status" => {
                     let handle = r["handle"].as_str().ok_or("handle required")?;
                     let producer = self.producers.get(handle).ok_or("unknown stream")?;
