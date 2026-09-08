@@ -183,3 +183,5 @@ Tested E074: native batch execution now invokes Pi `ExtensionRunner.emitToolResu
 Verified E075: abort fixture now registers an unchanged Pi `tool_result` hook and confirms both blocked outcomes traverse it in source order while zero tools execute. Native addon rebuilt before the run.
 
 Verified E076: native batch `tool_result` hook events now match Pi's declared shape (`type`, `input`, `content`, `details`, `isError`, optional `usage`). Abort fixture asserts the shape and still passes zero execution/source order.
+
+E076 is superseded: strengthening the abort fixture to assert full tool_result event shape exposed that only one blocked outcome reached the hook, contrary to the two-result expectation. No full event-shape compatibility claim is made; investigate before retrying.
