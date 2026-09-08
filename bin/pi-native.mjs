@@ -25,11 +25,11 @@ const {createBackend}=await import('../prototype/architecture/native-store-backe
 const {createHost,tsBackend}=await import('../prototype/real-plugin-host.mjs');
 const {drive}=await import('../prototype/architecture/native-runtime-driver.mjs');
 const {nativeProviderStream}=await import('../prototype/architecture/native-provider-stream.mjs');
-const {createCodingToolDefinitions}=await import('../vendor/pi-mono/packages/coding-agent/src/core/tools/index.ts');
-const definitions=createCodingToolDefinitions(cwd);
+const {createCodingTools}=await import('../vendor/pi-mono/packages/coding-agent/src/core/tools/index.ts');
+const tools=createCodingTools(cwd);
 const manager=await createBackend({path,cwd,mode:options['--resume']?'open':'create'});
 try {
-  const host=await createHost(tsBackend(definitions.map(t=>t.name)),{cwd,sessionManager:manager,extensionPaths:extensions,factories:[pi=>{for(const tool of definitions) pi.registerTool(tool);} ]});
+  const host=await createHost(tsBackend(tools.map(t=>t.name)),{cwd,sessionManager:manager,extensionPaths:extensions,factories:[pi=>{for(const tool of tools) pi.registerTool(tool);} ]});
   let index=0;
   const stream=fixture?async()=>{const message=fixture[index++]; if(!message)throw Error('fixture exhausted');return {async *[Symbol.asyncIterator](){},async result(){return message;}};}:nativeProviderStream({model:options['--model'],streaming:true});
   const result=await drive({manager,host,prompt:options['--input'],stream});
