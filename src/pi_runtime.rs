@@ -201,7 +201,6 @@ impl PiRuntime {
                 json!({"type":"message","message":message}),
                 timestamp,
             )?;
-            Self::append(store,json!({"type":"custom","customType":"pi-rs.in-flight.v1","data":{"requestId":request["requestId"],"toolCallId":call["id"],"toolName":call["name"],"state":"resolved","isError":request["isError"].as_bool().unwrap_or(false)}}),timestamp)?;
             self.waiting = None;
             self.tools = calls;
             if self.tools.is_empty() {
@@ -225,6 +224,7 @@ impl PiRuntime {
                 json!({"type":"message","message":message}),
                 timestamp,
             )?;
+            Self::append(store,json!({"type":"custom","customType":"pi-rs.in-flight.v1","data":{"requestId":request["requestId"],"toolCallId":call["id"],"toolName":call["name"],"state":"resolved","isError":request["isError"].as_bool().unwrap_or(false)}}),timestamp)?;
             self.waiting = None;
             self.active_tool = None;
             self.tool_updates.clear();
