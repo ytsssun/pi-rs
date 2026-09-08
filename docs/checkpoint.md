@@ -161,3 +161,5 @@ Verified E063: independently rebuilt and reran `experiments/native-batch-hook-ab
 Tested E064: batch `write/edit/bash` calls now write native in-flight pending markers before execution, aligning mutation durability with sequential path. Existing integration and syntax checks pass; batch crash/reopen recovery remains unverified.
 
 Verified E065: two batch mutation markers survive simulated process exit 9; reopen blocks replay until both are explicitly resolved, then a new turn begins. This validates durable batch recovery markers but not crash during actual concurrent execution.
+
+T066 in progress: live harness now accepts `parallel` stage and passes `parallel:true` to the Rust/native driver for two independent file tasks. Syntax verified; no live model call has yet been counted.
