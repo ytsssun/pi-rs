@@ -1,5 +1,7 @@
 # Current checkpoint
 
+E190 revalidates live actual-CLI write → bash after implementing getThinkingLevel: both tools succeed and an external exact file assertion passes.
+
 E189 verifies live actual-CLI edit → bash continuation: exact external edit and successful bash result, with gpt-5.4-mini and no steering.
 
 E185 records three independent live actual-CLI write → fresh-process resume → edit successes with exact external assertions and no steering.
