@@ -1,6 +1,6 @@
 # M7 — native event and tool-hook parity
 
-**Status: tested (sequential fixture)** (2026-09-08). The current native runtime proves sequential state, persistence and context projection with fixtures. It does not yet prove Pi's observable agent-loop contract.
+**Status: incomplete; handwritten fixture only** (2026-09-08). The current native runtime proves sequential state, persistence and context projection with fixtures. It does not yet prove Pi's observable agent-loop contract.
 
 ## Frozen acceptance
 
@@ -16,3 +16,9 @@ These cases cover the sequential profile only. Parallel calls, steering/cancel, 
 ## First differential result
 
 `node experiments/compare-event-trace.mjs` was rerun on current main and **passed**. The normalized lifecycle and tool ordering arrays were identical (E121). This covers only the deterministic sequential fixture; async sink completion, failed-tool recovery, and broader upstream execution remain open.
+
+## Evidence correction
+
+E121 does not prove upstream parity: `upstream-event-trace.mjs` manually constructs
+the expected array without executing Pi. Its green comparison is only a local
+regression. Frozen upstream acceptance remains unmet.

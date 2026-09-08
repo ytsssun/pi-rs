@@ -1,3 +1,30 @@
+# Current checkpoint
+
+The Rust/Node-API runtime remains an integration prototype; the shipped Rust CLI
+still uses the legacy execution path. Running CLI help does not prove extension
+integration or a clean build (E128 overstated both).
+
+Current work: unified execution path remains the priority. The latest change fixes
+live harness acceptance/reporting: per-scenario file checks, byte-exact text (no
+trim), and unknown-stage rejection. Reproduce offline counterexamples with
+`node --test experiments/native-live-acceptance.test.mjs`.
+
+Evidence limits: E121 compared against a handwritten lifecycle trace, not executed
+upstream Pi; upstream lifecycle parity remains unverified. E132/E133 checked trimmed
+parallel file content, so exact-byte claims are superseded. No fresh live run has
+been performed under the stricter acceptance introduced here. E126 was a tool-loop
+smoke, not independent coding-task completion. Existing live/fixture results remain
+historical evidence within their stated scope, not full Pi compatibility.
+
+Next executable work: connect a user-facing Node entry to the Rust runtime and
+unchanged extension host, retaining Pi tool implementations. Freeze the CLI entry
+acceptance before implementation: new request, real tool execution, persisted
+session, fresh-process follow-up, unchanged extension hook, and rejection of
+invalid CLI inputs before effects. Do not rerun unrelated passing legacy tests as
+substitutes for this integration.
+
+## Historical checkpoint (preserved; later corrections take precedence)
+
 # Current correction — batch block semantics
 
 E085 corrects a prior compatibility error: per-tool block does not cancel its peers; blocked immediate outcomes skip tool_result hooks. Both block and input-mutation fixtures pass. Earlier zero-execution block and blocked-result-hook claims are superseded. Actual AbortSignal cancellation remains unimplemented/unverified. Full Pi compatibility is not achieved.
