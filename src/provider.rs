@@ -31,12 +31,6 @@ pub fn openai_chat(client: &Client, base: &str, key: &str, model: &str, messages
         bail!("model response incomplete or unsupported finish_reason; no tools executed");
     }
     let mut message = response["choices"][0].get("message").cloned().context("missing assistant message")?;
-    if let Some(content) = message.get("content").and_then(Value::as_str) {
-        message["content"] = json!([{"type":"text","text":content}]);
-    }
-    if let Some(calls) = message.get("tool_calls").and_then(Value::as_array).cloned() {
-        message["content"] = json!(calls.into_iter().map(|call| json!({"type":"toolCall","id":call["id"],"name":call["function"]["name"],"arguments":serde_json::from_str::<Value>(call["function"]["arguments"].as_str().unwrap_or("{}" )).unwrap_or(json!({}))})).collect::<Vec<_>>());
-    }
     if let Some(usage) = response.get("usage") { message.as_object_mut().context("assistant must be object")?.insert("_provider_usage".into(), usage.clone()); }
     Ok(message)
 }
