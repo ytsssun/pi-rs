@@ -1,5 +1,7 @@
 # Current checkpoint
 
+E193 revalidates live actual-CLI provider continuation from the authoritative baseline: write in one process, edit after fresh --resume, exact external assertion passes.
+
 E192 verifies host action thinking-level roundtrip (off → high) through the bound extension runtime; this is in-process state only.
 
 E191 verifies empty fixture input is rejected before session creation, with a clear error and no side effects.
