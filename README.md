@@ -26,7 +26,7 @@ cargo run --locked -- --resume --session .runs/demo.json --fixture fixtures/read
 
 Use a fresh session path for a new run. Fixtures index responses by **all historical assistant messages**, including earlier turns; a follow-up fixture must include that history's response prefix.
 
-## Real provider interface (not live-verified)
+## Real provider interface
 
 Set `OPENAI_API_KEY`, optionally `OPENAI_BASE_URL` (default `https://api.openai.com/v1`), and use a tool-capable model ID:
 
@@ -35,6 +35,22 @@ mkdir -p .runs
 cargo run --locked -- --input 'Fix the failing tests' --workspace /absolute/path/to/small-repo --session .runs/coding.json --model MODEL_ID --allow-mutations
 cargo run --locked -- --resume --input 'Add a regression test and run it' --session .runs/coding.json --model MODEL_ID --allow-mutations
 ```
+
+For the recorded live validation harness, load a local ignored dotenv file without
+sourcing it as shell code:
+
+```sh
+python3 experiments/run_live.py --phase pilot --output .runs/my-luna-pilot \
+  --env-file .env --model gpt-5.6-luna --reasoning-effort none
+```
+
+The observed Luna Chat Completions API rejects tool calls with default reasoning;
+`--reasoning-effort none` is required for this tested combination. The CLI forwards
+explicit effort and otherwise preserves provider defaults; support is model/API
+specific. Repeat the option on resume: provider/model/effort are not yet bound into
+the native session. Higher reasoning for Luna requires a Responses adapter, which
+is not implemented. [Live evidence](experiments/live-luna-review.md) separates
+provider configuration errors from task failures.
 
 Without `--allow-mutations`, only read is advertised and fabricated write/edit/bash calls return errors. With it, **bash runs with your host user's authority**, in the saved workspace. It is not a sandbox. Use a trusted disposable repository for experiments, and keep session state outside that repository. Codex login is not assumed to be a generic provider API key. Never commit credentials or real session content.
 

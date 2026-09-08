@@ -1,0 +1,200 @@
+{
+  "reviewer": "live_review independent verifier",
+  "model": "gpt-5.6-luna",
+  "reasoning_effort": "none",
+  "verdicts": [
+    {
+      "phase": "pilot",
+      "scenario": "bug",
+      "repetition": 1,
+      "passed": true,
+      "stages": [
+        {
+          "stage": 1,
+          "tool_call_ids": [
+            "call_i1ggSNlxRmvN5ki0oKEuLSsE"
+          ],
+          "evidence": "Protected visible assertions executed; correlated stdout visible tests passed."
+        }
+      ],
+      "failure_category": null,
+      "human_interventions": 0
+    },
+    {
+      "phase": "baseline",
+      "scenario": "bug",
+      "repetition": 1,
+      "passed": true,
+      "stages": [
+        {
+          "stage": 1,
+          "tool_call_ids": [
+            "call_CNSl9yAUWZkBPECbxrS0cj3f"
+          ],
+          "evidence": "Protected visible assertions executed; correlated stdout visible tests passed."
+        }
+      ],
+      "failure_category": null,
+      "human_interventions": 0
+    },
+    {
+      "phase": "baseline",
+      "scenario": "bug",
+      "repetition": 2,
+      "passed": true,
+      "stages": [
+        {
+          "stage": 1,
+          "tool_call_ids": [
+            "call_6bH3BvXXr9AsnlwOxY5zkOnJ"
+          ],
+          "evidence": "Protected visible assertions executed; correlated stdout visible tests passed."
+        }
+      ],
+      "failure_category": null,
+      "human_interventions": 0
+    },
+    {
+      "phase": "baseline",
+      "scenario": "bug",
+      "repetition": 3,
+      "passed": true,
+      "stages": [
+        {
+          "stage": 1,
+          "tool_call_ids": [
+            "call_QbTP4ZyFhIaVV09RklYvCr4P"
+          ],
+          "evidence": "Protected visible assertions executed; correlated stdout visible tests passed."
+        }
+      ],
+      "failure_category": null,
+      "human_interventions": 0
+    },
+    {
+      "phase": "baseline",
+      "scenario": "behavior",
+      "repetition": 1,
+      "passed": true,
+      "stages": [
+        {
+          "stage": 1,
+          "tool_call_ids": [
+            "call_2T65627hoHuShgIrmBrO5ysi"
+          ],
+          "evidence": "Existing and new function assertions executed; matching success output."
+        }
+      ],
+      "failure_category": null,
+      "human_interventions": 0
+    },
+    {
+      "phase": "baseline",
+      "scenario": "behavior",
+      "repetition": 2,
+      "passed": false,
+      "stages": [
+        {
+          "stage": 1,
+          "tool_call_ids": [
+            "call_jbtsZM8L5nIYzmaNgWGpqhRX"
+          ],
+          "evidence": "Unittest discovery executes only total assertions in protected file. No discount tests executed despite frozen prompt requiring new behavior tests."
+        }
+      ],
+      "failure_category": [
+        "model behavior"
+      ],
+      "human_interventions": 0
+    },
+    {
+      "phase": "baseline",
+      "scenario": "behavior",
+      "repetition": 3,
+      "passed": true,
+      "stages": [
+        {
+          "stage": 1,
+          "tool_call_ids": [
+            "call_VST8e3iIKoj1y2h3iKh4UnQV"
+          ],
+          "evidence": "Existing and new function assertions executed; matching success output."
+        }
+      ],
+      "failure_category": null,
+      "human_interventions": 0
+    },
+    {
+      "phase": "baseline",
+      "scenario": "resume",
+      "repetition": 1,
+      "passed": true,
+      "stages": [
+        {
+          "stage": 1,
+          "tool_call_ids": [
+            "call_2Ye9lwokhlP9C2LZ128q0hEl"
+          ],
+          "evidence": "Visible total and discount assertions passed."
+        },
+        {
+          "stage": 2,
+          "tool_call_ids": [
+            "call_nEpve3iguq41GlaWhPOJPIZ9"
+          ],
+          "evidence": "Actual assertions for total, discount, invoice passed; canonical prefix unchanged; separate process."
+        }
+      ],
+      "failure_category": null,
+      "human_interventions": 0
+    },
+    {
+      "phase": "baseline",
+      "scenario": "resume",
+      "repetition": 2,
+      "passed": true,
+      "stages": [
+        {
+          "stage": 1,
+          "tool_call_ids": [
+            "call_kB7k97yOMXiNlgMWxX2JP6f6"
+          ],
+          "evidence": "Visible total and discount assertions passed."
+        },
+        {
+          "stage": 2,
+          "tool_call_ids": [
+            "call_xW7OC7YRvFJpWbx4YFJ68rcP"
+          ],
+          "evidence": "Actual assertions for total, discount, invoice passed; canonical prefix unchanged; separate process."
+        }
+      ],
+      "failure_category": null,
+      "human_interventions": 0
+    },
+    {
+      "phase": "baseline",
+      "scenario": "resume",
+      "repetition": 3,
+      "passed": true,
+      "stages": [
+        {
+          "stage": 1,
+          "tool_call_ids": [
+            "call_KOYrC5ttQI1vKiegIP7W80Uv"
+          ],
+          "evidence": "Visible total and discount assertions passed."
+        },
+        {
+          "stage": 2,
+          "tool_call_ids": [
+            "call_GfY5SIaMkrT1MZ7iJXF4oII9"
+          ],
+          "evidence": "Actual assertions for total, discount, invoice passed; canonical prefix unchanged; separate process."
+        }
+      ],
+      "failure_category": null,
+      "human_interventions": 0
+    }
+  ]
+}

@@ -9,6 +9,7 @@ import json
 import os
 from pathlib import Path
 import signal
+import shlex
 import subprocess
 import sys
 import time
@@ -33,8 +34,10 @@ def main():
     p.add_argument('--phase', choices=['pilot', 'baseline', 'context'], required=True)
     p.add_argument('--output', type=Path, required=True, help='new artifact directory under .runs')
     p.add_argument('--model', required=True)
+    p.add_argument('--reasoning-effort', choices=['none', 'low', 'medium', 'high', 'xhigh', 'max'])
     p.add_argument('--endpoint', default='https://api.openai.com/v1')
     p.add_argument('--key-file', type=Path, help='plaintext API key file; otherwise OPENAI_API_KEY')
+    p.add_argument('--env-file', type=Path, help='read only OPENAI_API_KEY from dotenv; never execute shell content')
     p.add_argument('--gate', type=Path, help='previous successful summary.json')
     a = p.parse_args()
     os.umask(0o077)
@@ -47,10 +50,24 @@ def main():
     if not binary.is_file():
         p.error('build first: cargo build --locked')
     # Resolve credentials before producing task state. No login-token fallback.
+    if a.key_file and a.env_file:
+        p.error('choose --key-file or --env-file')
     key = a.key_file.read_text().strip() if a.key_file else os.environ.get('OPENAI_API_KEY', '')
+    if a.env_file:
+        matches = []
+        for line in a.env_file.read_text().splitlines():
+            name, sep, value = line.partition('=')
+            if sep and name.strip() in ('OPENAI_API_KEY', 'export OPENAI_API_KEY'):
+                parts = shlex.split(value, comments=True)
+                if len(parts) != 1:
+                    p.error('invalid OPENAI_API_KEY dotenv value')
+                matches.append(parts[0])
+        if len(matches) != 1:
+            p.error('dotenv must contain exactly one OPENAI_API_KEY')
+        key = matches[0]
     if not key:
         p.error('live access blocked: provide --key-file or OPENAI_API_KEY; no run attempted')
-    config = {'model': a.model, 'endpoint': a.endpoint.rstrip('/'), 'binary_sha256': sha(binary),
+    config = {'model': a.model, 'reasoning_effort': a.reasoning_effort, 'endpoint': a.endpoint.rstrip('/'), 'binary_sha256': sha(binary),
               'acceptance_sha256': sha(ROOT / 'experiments/live_acceptance.py'),
               'max_rounds': 16, 'process_timeout_seconds': 600}
     if a.phase != 'pilot':
@@ -76,6 +93,10 @@ def main():
     tasks = [('bug', 1)] if a.phase == 'pilot' else ([(s, n) for s in ['bug', 'behavior', 'resume'] for n in range(1, 4)] if a.phase == 'baseline' else [('resume', 1)])
     consecutive_failures = 0
     for scenario, repetition in tasks:
+        if (output / 'STOP').exists():
+            summary['stopped_reason'] = 'independent verifier requested stop; preserve completed and unrun cases'
+            save(output / 'summary.json', summary)
+            break
         stages = []
         base = output / ('%s-%d' % (scenario, repetition))
         try:
@@ -99,6 +120,8 @@ def main():
                     cmd = [str(binary), '--workspace', str(base / 'workspace'), '--session', str(session),
                            '--model', a.model, '--allow-mutations', '--max-rounds', '16',
                            '--context-tool-chars', trim, '--input', prompt]
+                    if a.reasoning_effort is not None:
+                        cmd += ['--reasoning-effort', a.reasoning_effort]
                     if stage > 1:
                         cmd.append('--resume')
                     save(base / ('stage-%d.started.json' % stage), {'request': prompt, 'command': cmd, 'status': 'started'})

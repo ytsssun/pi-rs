@@ -1,6 +1,8 @@
-# Current checkpoint — live-model validation blocked on access
+# Current checkpoint — M5 live reliability validation in progress
 
 ## Current verified state
+
+M5 milestone: repeatable real-model modify/test/resume reliability, with no TUI, multiplayer, provider expansion or extension work. Acceptance is frozen at 9/9 independent Luna baseline runs before any context trial.
 
 Work on `main`, authorized for suitable verified commits/pushes; never force-push.
 Live cycle starting commit: `ef2b8e6a11bb54f5600e30880f19c05d5ce229ad`.
@@ -12,10 +14,8 @@ new independent acceptance self-check passed, with no live requests.
 
 ## Limits and current blocker
 
-Live attempts/completions/failures: **0/0/0**; human-steered attempts: **0**.
-No API credential is set in the environment or Pi auth files. Codex is signed in
-via ChatGPT, with an empty API key field; no login settings were changed.
-Requested authorized key-file path, endpoint and model ID from user; answer pending.
+Live historical attempts remain recorded in `experiments/live-openai-results.json`; current M5 retry is separate. Human-steered attempts remain **0**.
+OpenAI API key is available only through ignored `.env`; it is never committed or printed. Codex desktop login is separate and unchanged. Luna provider configuration requires `--reasoning-effort none` for Chat Completions tools.
 Daily-use readiness remains unverified. Bash has host authority, not a sandbox.
 No full Pi compatibility, integrated extensions, Pi session format, TUI,
 multiplayer or performance advantage is claimed. Prior Node oracle crash has a
@@ -23,7 +23,7 @@ tested mitigation, not a proven root-cause fix.
 
 ## Next steps and exact recovery
 
-1. Read `experiments/live-model.md` and `experiments/live-acceptance.md` for frozen
+1. M5 retry uses `experiments/live-luna-none-pilot-02` then a new baseline output; old 8/9 and all failures remain immutable. Read `experiments/live-model.md` and `experiments/live-acceptance.md` for frozen
    acceptance and commands. Do not replace live criteria with fixtures.
 2. Obtain the requested access configuration without printing secrets. Build with
    `export PATH="$HOME/.cargo/bin:$PATH"; cargo build --locked`.

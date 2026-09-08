@@ -4,3 +4,7 @@
 
 /compatibility/target/
 /experiments/.deps/
+
+# Local provider credentials
+.env
+.env.*

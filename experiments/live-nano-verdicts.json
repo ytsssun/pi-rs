@@ -1,0 +1,179 @@
+{
+  "reviewer": "live_review independent verifier",
+  "frozen_criteria": "experiments/live-acceptance.md",
+  "verdicts": [
+    {
+      "phase": "pilot",
+      "scenario": "bug",
+      "repetition": 1,
+      "passed": true,
+      "stages": [
+        {
+          "stage": 1,
+          "tool_call_ids": [
+            "call_KWxhxXDmJa2ctRrbwhQjZQmu"
+          ],
+          "evidence": "Executed python3 test_billing.py; visible tests passed; external 5 assertions passed."
+        }
+      ],
+      "failure_category": null,
+      "human_interventions": 0
+    },
+    {
+      "phase": "baseline",
+      "scenario": "bug",
+      "repetition": 1,
+      "passed": false,
+      "stages": [
+        {
+          "stage": 1,
+          "tool_call_ids": [
+            "call_99j9PfG4oEwWVsBj1MNNZdNm",
+            "call_sEmvH9RXSCuPvHX61hdcbjvx"
+          ],
+          "evidence": "No tests executed: absent pytest/python and incorrect bash quoting; final || true masks exit. External code assertions pass."
+        }
+      ],
+      "failure_category": [
+        "environment",
+        "model behavior"
+      ],
+      "human_interventions": 0
+    },
+    {
+      "phase": "baseline",
+      "scenario": "bug",
+      "repetition": 2,
+      "passed": true,
+      "stages": [
+        {
+          "stage": 1,
+          "tool_call_ids": [
+            "call_RFn7JnPRAWaZxUJdcMBuLJHU"
+          ],
+          "evidence": "Executed python3 test_billing.py; visible tests passed; external 5 assertions passed."
+        }
+      ],
+      "failure_category": null,
+      "human_interventions": 0
+    },
+    {
+      "phase": "baseline",
+      "scenario": "bug",
+      "repetition": 3,
+      "passed": true,
+      "stages": [
+        {
+          "stage": 1,
+          "tool_call_ids": [
+            "call_2yzy5Yy9SejI9NTSNCY8BABs"
+          ],
+          "evidence": "Executed python3 test_billing.py; visible tests passed; external 5 assertions passed."
+        }
+      ],
+      "failure_category": null,
+      "human_interventions": 0
+    },
+    {
+      "phase": "baseline",
+      "scenario": "behavior",
+      "repetition": 1,
+      "passed": true,
+      "stages": [
+        {
+          "stage": 1,
+          "tool_call_ids": [
+            "call_CODakEtZCrLt3yBL8M0YfRKA",
+            "call_T9x4oSGr7PN7HjXlsB4Xog2L"
+          ],
+          "evidence": "Executed visible tests plus python3 heredoc calling discount on normal/rounding/invalid inputs; matching outputs; external 39 assertions passed."
+        }
+      ],
+      "failure_category": null,
+      "human_interventions": 0
+    },
+    {
+      "phase": "baseline",
+      "scenario": "behavior",
+      "repetition": 2,
+      "passed": false,
+      "stages": [
+        {
+          "stage": 1,
+          "tool_call_ids": [
+            "call_WHXdfynvT0A3XGaOwtShjvP2",
+            "call_pqi2EXzSw0hbDloh8XF6sVYx"
+          ],
+          "evidence": "No tests executed: absent pytest/python and incorrect bash quoting. External 39 source assertions pass."
+        }
+      ],
+      "failure_category": [
+        "environment",
+        "model behavior"
+      ],
+      "human_interventions": 0
+    },
+    {
+      "phase": "baseline",
+      "scenario": "behavior",
+      "repetition": 3,
+      "passed": false,
+      "stages": [
+        {
+          "stage": 1,
+          "tool_call_ids": [
+            "call_Kts2KpTrc0rmydQdVMUXyOmt"
+          ],
+          "evidence": "Only pytest -q attempted, exit127 command not found; no executed tests of existing or new behavior. External 39 source assertions pass."
+        }
+      ],
+      "failure_category": [
+        "environment",
+        "model behavior"
+      ],
+      "human_interventions": 0
+    },
+    {
+      "phase": "baseline",
+      "scenario": "resume",
+      "repetition": 1,
+      "passed": false,
+      "stages": [
+        {
+          "stage": 1,
+          "tool_call_ids": [
+            "call_WsZi1Z3INm4ZOVUZCDDcJh3l"
+          ],
+          "evidence": "Only pytest -q attempted; exit127; no tests executed."
+        },
+        {
+          "stage": 2,
+          "tool_call_ids": [
+            "call_PonGSvuRAGhuEtk4tMSFOO1l"
+          ],
+          "evidence": "Only pytest -q attempted; exit127; no tests executed."
+        }
+      ],
+      "failure_category": [
+        "environment",
+        "model behavior"
+      ],
+      "human_interventions": 0
+    }
+  ],
+  "incomplete": [
+    {
+      "phase": "baseline",
+      "scenario": "resume",
+      "repetition": 2,
+      "status": "interrupted",
+      "reason": "Coordinator stop/model switch; partial artifacts retained; not independently completed."
+    },
+    {
+      "phase": "baseline",
+      "scenario": "resume",
+      "repetition": 3,
+      "status": "unrun"
+    }
+  ]
+}

@@ -5,7 +5,7 @@ use std::{env, fs, path::Path, time::Duration};
 fn main() -> Result<()> {
     let args: Vec<String> = env::args().skip(1).collect();
     if args.is_empty() || args.iter().any(|a| a == "--help") {
-        println!("pi-rs (--input TEXT | --resume) --session FILE [--workspace DIR] (--fixture FILE | --model NAME) [--max-rounds N] [--context-tool-chars N|none]\nReal calls use OPENAI_API_KEY and optional OPENAI_BASE_URL (default https://api.openai.com/v1). Default tool: paginated UTF-8 workspace read; write, edit and bash require --allow-mutations. Resume with --input TEXT appends a turn only after completion. --allow-mutations enables write/edit/bash for this invocation. --resolve-in-flight TEXT records an inspected uncertain outcome without replay. Fixtures use the full-session assistant message index, including previous turns. Context-tool-chars persists; use none to restore full canonical tool results in the model view.");
+        println!("pi-rs (--input TEXT | --resume) --session FILE [--workspace DIR] (--fixture FILE | --model NAME) [--max-rounds N] [--reasoning-effort none|low|medium|high|xhigh|max] [--context-tool-chars N|none]\nReal calls use OPENAI_API_KEY and optional OPENAI_BASE_URL (default https://api.openai.com/v1). Default tool: paginated UTF-8 workspace read; write, edit and bash require --allow-mutations. Resume with --input TEXT appends a turn only after completion. --allow-mutations enables write/edit/bash for this invocation. --resolve-in-flight TEXT records an inspected uncertain outcome without replay. Fixtures use the full-session assistant message index, including previous turns. Context-tool-chars persists; use none to restore full canonical tool results in the model view.");
         return Ok(());
     }
     let mut options = std::collections::HashMap::new();
@@ -33,6 +33,7 @@ fn main() -> Result<()> {
             "--workspace",
             "--fixture",
             "--model",
+            "--reasoning-effort",
             "--max-rounds",
             "--context-tool-chars",
             "--resolve-in-flight",
@@ -53,6 +54,14 @@ fn main() -> Result<()> {
     }
     if options.contains_key("--fixture") == options.contains_key("--model") {
         bail!("provide exactly one of --fixture or --model");
+    }
+    if let Some(effort) = options.get("--reasoning-effort") {
+        if options.contains_key("--fixture") {
+            bail!("--reasoning-effort requires --model");
+        }
+        if !["none", "low", "medium", "high", "xhigh", "max"].contains(&effort.as_str()) {
+            bail!("unsupported --reasoning-effort");
+        }
     }
     let rounds: usize = options
         .get("--max-rounds")
@@ -170,12 +179,16 @@ fn main() -> Result<()> {
             let key = env::var("OPENAI_API_KEY").context("OPENAI_API_KEY missing")?;
             let base =
                 env::var("OPENAI_BASE_URL").unwrap_or_else(|_| "https://api.openai.com/v1".into());
+            let mut request = json!({
+                "model":options["--model"],"messages":messages,"tools":definitions
+            });
+            if let Some(effort) = options.get("--reasoning-effort") {
+                request["reasoning_effort"] = json!(effort);
+            }
             let response: Value = client
                 .post(format!("{}/chat/completions", base.trim_end_matches('/')))
                 .bearer_auth(key)
-                .json(&json!({
-                    "model":options["--model"],"messages":messages,"tools":definitions
-                }))
+                .json(&request)
                 .send()?
                 .error_for_status()?
                 .json()?;

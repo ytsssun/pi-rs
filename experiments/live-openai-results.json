@@ -1,0 +1,1033 @@
+{
+  "scope": "Actual live OpenAI calls, fixed tiny tasks; independent verdict files override automated flags.",
+  "groups": [
+    {
+      "artifact": ".runs/live-nano-pilot-01",
+      "runtime_commit": "2b5d52f89a8a9d95806b3398350a85d144f7dd19",
+      "config": {
+        "model": "gpt-5-nano-2025-08-07",
+        "endpoint": "https://api.openai.com/v1",
+        "binary_sha256": "5225f35f1d4270de021950b4189760baa5ca10335e2d27bd997559e742e252de",
+        "acceptance_sha256": "810aa9fc4a0b2679364f0c7c7809d92c632d3a88c4804a88686e42f1453b7906",
+        "max_rounds": 16,
+        "process_timeout_seconds": 600
+      },
+      "phase": "pilot",
+      "provider_requests_recorded": 7,
+      "provider_responses_recorded": 7,
+      "http_statuses": {
+        "200": 7
+      },
+      "usage_response_count": 7,
+      "prompt_tokens": 4886,
+      "cached_prompt_tokens": 0,
+      "completion_tokens": 1125,
+      "estimated_recorded_usage_usd": 0.0006943,
+      "cost_note": "Listed standard text rates, not invoice. Missing/incomplete response usage unknown; no extrapolation.",
+      "independent_review": {
+        "status": "passed",
+        "reviewer": "live_review independent verifier",
+        "evidence": "experiments/live-nano-review.md: pilot; session test call call_KWxhxXDmJa2ctRrbwhQjZQmu runs python3 test_billing.py and returns visible tests passed; protected tests unchanged; independent evaluate rerun 5 assertions passed; only billing.py multiplication diff; no steering user message beyond frozen prompt."
+      },
+      "runs": [
+        {
+          "scenario": "bug",
+          "repetition": 1,
+          "automated_passed": true,
+          "task_input_commit": "6c1f7056405b6969a11a1618ec23121d1eff3a30",
+          "stages": [
+            {
+              "stage": 1,
+              "pid": 45731,
+              "exit_status": 0,
+              "elapsed_seconds": 14.182572417000001,
+              "checks": {
+                "process_ok": true,
+                "external_acceptance": true,
+                "manifest_unchanged": true,
+                "bash_used": true,
+                "canonical_prefix_preserved": true,
+                "context_policy": true,
+                "real_provider_request": true
+              },
+              "external_acceptance": {
+                "scenario": "bug",
+                "stage": 1,
+                "integrity_errors": [],
+                "acceptance_exit": 0,
+                "stdout": "{\"checks\": 5}\n",
+                "stderr": "",
+                "expected_checks": 5,
+                "assertions_completed": true,
+                "passed": true
+              },
+              "request": "Fix billing.total: each pair is (integer price, positive integer quantity); return the sum of price times quantity, and zero for empty input. Run the existing tests. Preserve existing tests and edit only billing.py; do not create other files.",
+              "human_interventions": [],
+              "session_sha256": "ec7f76f31db519761300370a863b5d6065d9a3a09cbb81d4181035100ced03e5",
+              "diff": "diff --git a/billing.py b/billing.py\nindex bcaa52e..66d1b3e 100644\n--- a/billing.py\n+++ b/billing.py\n@@ -1,3 +1,3 @@\n def total(items):\n     \"\"\"Sum integer prices times positive integer quantities; empty input is zero.\"\"\"\n-    return sum(price + quantity for price, quantity in items)\n+    return sum(price * quantity for price, quantity in items)\n"
+            }
+          ]
+        }
+      ],
+      "interrupted_runs": [],
+      "unrun": [],
+      "corrections": []
+    },
+    {
+      "artifact": ".runs/live-nano-baseline-01",
+      "runtime_commit": "2b5d52f89a8a9d95806b3398350a85d144f7dd19",
+      "config": {
+        "model": "gpt-5-nano-2025-08-07",
+        "endpoint": "https://api.openai.com/v1",
+        "binary_sha256": "5225f35f1d4270de021950b4189760baa5ca10335e2d27bd997559e742e252de",
+        "acceptance_sha256": "810aa9fc4a0b2679364f0c7c7809d92c632d3a88c4804a88686e42f1453b7906",
+        "max_rounds": 16,
+        "process_timeout_seconds": 600
+      },
+      "phase": "baseline",
+      "provider_requests_recorded": 74,
+      "provider_responses_recorded": 73,
+      "http_statuses": {
+        "200": 73
+      },
+      "usage_response_count": 73,
+      "prompt_tokens": 75788,
+      "cached_prompt_tokens": 23552,
+      "completion_tokens": 31947,
+      "estimated_recorded_usage_usd": 0.01550836,
+      "cost_note": "Listed standard text rates, not invoice. Missing/incomplete response usage unknown; no extrapolation.",
+      "independent_review": {
+        "status": "failed",
+        "reviewer": "live_review independent verifier",
+        "evidence": "experiments/live-nano-verdicts.json and experiments/live-nano-review.md; bug1, behavior2, behavior3, resume1 have no successfully executed relevant tests; frozen actual-test criterion fails despite externally correct source."
+      },
+      "runs": [
+        {
+          "scenario": "bug",
+          "repetition": 1,
+          "automated_passed": true,
+          "task_input_commit": "0fc08560cb6d30c49cbc521c73959d6a87ca3fc6",
+          "stages": [
+            {
+              "stage": 1,
+              "pid": 46103,
+              "exit_status": 0,
+              "elapsed_seconds": 16.700875749999998,
+              "checks": {
+                "process_ok": true,
+                "external_acceptance": true,
+                "manifest_unchanged": true,
+                "bash_used": true,
+                "canonical_prefix_preserved": true,
+                "context_policy": true,
+                "real_provider_request": true
+              },
+              "external_acceptance": {
+                "scenario": "bug",
+                "stage": 1,
+                "integrity_errors": [],
+                "acceptance_exit": 0,
+                "stdout": "{\"checks\": 5}\n",
+                "stderr": "",
+                "expected_checks": 5,
+                "assertions_completed": true,
+                "passed": true
+              },
+              "request": "Fix billing.total: each pair is (integer price, positive integer quantity); return the sum of price times quantity, and zero for empty input. Run the existing tests. Preserve existing tests and edit only billing.py; do not create other files.",
+              "human_interventions": [],
+              "session_sha256": "2f8c256d98680cb6d7055ce4a4374b0fc072af118b0b90306ef563542c0c7e1c",
+              "diff": "diff --git a/billing.py b/billing.py\nindex bcaa52e..66d1b3e 100644\n--- a/billing.py\n+++ b/billing.py\n@@ -1,3 +1,3 @@\n def total(items):\n     \"\"\"Sum integer prices times positive integer quantities; empty input is zero.\"\"\"\n-    return sum(price + quantity for price, quantity in items)\n+    return sum(price * quantity for price, quantity in items)\n"
+            }
+          ]
+        },
+        {
+          "scenario": "bug",
+          "repetition": 2,
+          "automated_passed": true,
+          "task_input_commit": "4bd550a7e8de969cd93b8b666d042396f4db4bfa",
+          "stages": [
+            {
+              "stage": 1,
+              "pid": 46164,
+              "exit_status": 0,
+              "elapsed_seconds": 14.950669292,
+              "checks": {
+                "process_ok": true,
+                "external_acceptance": true,
+                "manifest_unchanged": true,
+                "bash_used": true,
+                "canonical_prefix_preserved": true,
+                "context_policy": true,
+                "real_provider_request": true
+              },
+              "external_acceptance": {
+                "scenario": "bug",
+                "stage": 1,
+                "integrity_errors": [],
+                "acceptance_exit": 0,
+                "stdout": "{\"checks\": 5}\n",
+                "stderr": "",
+                "expected_checks": 5,
+                "assertions_completed": true,
+                "passed": true
+              },
+              "request": "Fix billing.total: each pair is (integer price, positive integer quantity); return the sum of price times quantity, and zero for empty input. Run the existing tests. Preserve existing tests and edit only billing.py; do not create other files.",
+              "human_interventions": [],
+              "session_sha256": "4b3722d54f4f14bafeaed34e55828a5daa14ba826b300cea13bdf1003446f15c",
+              "diff": "diff --git a/billing.py b/billing.py\nindex bcaa52e..66d1b3e 100644\n--- a/billing.py\n+++ b/billing.py\n@@ -1,3 +1,3 @@\n def total(items):\n     \"\"\"Sum integer prices times positive integer quantities; empty input is zero.\"\"\"\n-    return sum(price + quantity for price, quantity in items)\n+    return sum(price * quantity for price, quantity in items)\n"
+            }
+          ]
+        },
+        {
+          "scenario": "bug",
+          "repetition": 3,
+          "automated_passed": true,
+          "task_input_commit": "bdbab3345c4050cba832176b6d3031ce3ff079a2",
+          "stages": [
+            {
+              "stage": 1,
+              "pid": 46213,
+              "exit_status": 0,
+              "elapsed_seconds": 16.532957583000005,
+              "checks": {
+                "process_ok": true,
+                "external_acceptance": true,
+                "manifest_unchanged": true,
+                "bash_used": true,
+                "canonical_prefix_preserved": true,
+                "context_policy": true,
+                "real_provider_request": true
+              },
+              "external_acceptance": {
+                "scenario": "bug",
+                "stage": 1,
+                "integrity_errors": [],
+                "acceptance_exit": 0,
+                "stdout": "{\"checks\": 5}\n",
+                "stderr": "",
+                "expected_checks": 5,
+                "assertions_completed": true,
+                "passed": true
+              },
+              "request": "Fix billing.total: each pair is (integer price, positive integer quantity); return the sum of price times quantity, and zero for empty input. Run the existing tests. Preserve existing tests and edit only billing.py; do not create other files.",
+              "human_interventions": [],
+              "session_sha256": "811f108c4b129c72292324b38e030193bb8f1c6057ad847b7174412fec3f0259",
+              "diff": "diff --git a/billing.py b/billing.py\nindex bcaa52e..66d1b3e 100644\n--- a/billing.py\n+++ b/billing.py\n@@ -1,3 +1,3 @@\n def total(items):\n     \"\"\"Sum integer prices times positive integer quantities; empty input is zero.\"\"\"\n-    return sum(price + quantity for price, quantity in items)\n+    return sum(price * quantity for price, quantity in items)\n"
+            }
+          ]
+        },
+        {
+          "scenario": "behavior",
+          "repetition": 1,
+          "automated_passed": true,
+          "task_input_commit": "6d77adb53e25b485805dbc62ae3ef9db87308efa",
+          "stages": [
+            {
+              "stage": 1,
+              "pid": 46255,
+              "exit_status": 0,
+              "elapsed_seconds": 28.297256708,
+              "checks": {
+                "process_ok": true,
+                "external_acceptance": true,
+                "manifest_unchanged": true,
+                "bash_used": true,
+                "canonical_prefix_preserved": true,
+                "context_policy": true,
+                "real_provider_request": true
+              },
+              "external_acceptance": {
+                "scenario": "behavior",
+                "stage": 1,
+                "integrity_errors": [],
+                "acceptance_exit": 0,
+                "stdout": "{\"checks\": 39}\n",
+                "stderr": "",
+                "expected_checks": 39,
+                "assertions_completed": true,
+                "passed": true
+              },
+              "request": "Add billing.discount(amount, percent), for nonnegative integer amount and integer percent. Return amount * (100 - percent) // 100 (integer floor division). Percent outside 0 through 100 inclusive must raise ValueError. Preserve total. Run tests including your new behavior. Preserve existing tests and edit only billing.py; do not create other files.",
+              "human_interventions": [],
+              "session_sha256": "0b155c5aa1493a7ae5dbc4e0cc01db812fc2e81ced0c007472f4a10c6c535bce",
+              "diff": "diff --git a/billing.py b/billing.py\nindex 66d1b3e..4fdc625 100644\n--- a/billing.py\n+++ b/billing.py\n@@ -1,3 +1,15 @@\n def total(items):\n     \"\"\"Sum integer prices times positive integer quantities; empty input is zero.\"\"\"\n     return sum(price * quantity for price, quantity in items)\n+\n+\n+def discount(amount, percent):\n+    \"\"\"Return a discounted amount given an integer percent (0-100 inclusive).\n+    amount must be a nonnegative integer; percent must be an integer in the\n+    inclusive range [0, 100]. The result uses integer floor division.\n+    \"\"\"\n+    if not isinstance(amount, int) or amount < 0:\n+        raise ValueError(\"amount must be a nonnegative integer\")\n+    if not isinstance(percent, int) or percent < 0 or percent > 100:\n+        raise ValueError(\"percent must be an integer between 0 and 100 inclusive\")\n+    return (amount * (100 - percent)) // 100\n"
+            }
+          ]
+        },
+        {
+          "scenario": "behavior",
+          "repetition": 2,
+          "automated_passed": true,
+          "task_input_commit": "ddf0212e74671a5c80c5b36f5410b9acc575df5f",
+          "stages": [
+            {
+              "stage": 1,
+              "pid": 46368,
+              "exit_status": 0,
+              "elapsed_seconds": 53.647814792000005,
+              "checks": {
+                "process_ok": true,
+                "external_acceptance": true,
+                "manifest_unchanged": true,
+                "bash_used": true,
+                "canonical_prefix_preserved": true,
+                "context_policy": true,
+                "real_provider_request": true
+              },
+              "external_acceptance": {
+                "scenario": "behavior",
+                "stage": 1,
+                "integrity_errors": [],
+                "acceptance_exit": 0,
+                "stdout": "{\"checks\": 39}\n",
+                "stderr": "",
+                "expected_checks": 39,
+                "assertions_completed": true,
+                "passed": true
+              },
+              "request": "Add billing.discount(amount, percent), for nonnegative integer amount and integer percent. Return amount * (100 - percent) // 100 (integer floor division). Percent outside 0 through 100 inclusive must raise ValueError. Preserve total. Run tests including your new behavior. Preserve existing tests and edit only billing.py; do not create other files.",
+              "human_interventions": [],
+              "session_sha256": "f3a4d292dc50c93dedd9baff26e73edce66b86d7ba525e89f053d166510ed5c0",
+              "diff": "diff --git a/billing.py b/billing.py\nindex 66d1b3e..f1d2a8e 100644\n--- a/billing.py\n+++ b/billing.py\n@@ -1,3 +1,24 @@\n-def total(items):\n-    \"\"\"Sum integer prices times positive integer quantities; empty input is zero.\"\"\"\n-    return sum(price * quantity for price, quantity in items)\n+def total(entries):\n+    \"\"\"Compute the total of a list of (amount, percent) pairs as amount * percent.\"\"\"\n+    total = 0\n+    for amount, percent in entries:\n+        total += amount * percent\n+    return total\n+\n+\n+def discount(amount, percent):\n+    \"\"\"Apply an integer percent discount to a nonnegative integer amount.\n+\n+    - amount must be a nonnegative integer\n+    - percent must be an integer in [0, 100]\n+    - returns floor division of (amount * (100 - percent)) / 100\n+    - raises ValueError if percent is outside [0, 100] or amount is negative\n+    - raises TypeError if amount or percent are not integers\n+    \"\"\"\n+    if not isinstance(amount, int) or not isinstance(percent, int):\n+        raise TypeError(\"amount and percent must be integers\")\n+    if amount < 0:\n+        raise ValueError(\"amount must be nonnegative\")\n+    if percent < 0 or percent > 100:\n+        raise ValueError(\"percent must be between 0 and 100 inclusive\")\n+    return (amount * (100 - percent)) // 100\n"
+            }
+          ]
+        },
+        {
+          "scenario": "behavior",
+          "repetition": 3,
+          "automated_passed": true,
+          "task_input_commit": "9032ad54e8cc55c38f53434492c1a694f3d3a052",
+          "stages": [
+            {
+              "stage": 1,
+              "pid": 46502,
+              "exit_status": 0,
+              "elapsed_seconds": 16.064347666999993,
+              "checks": {
+                "process_ok": true,
+                "external_acceptance": true,
+                "manifest_unchanged": true,
+                "bash_used": true,
+                "canonical_prefix_preserved": true,
+                "context_policy": true,
+                "real_provider_request": true
+              },
+              "external_acceptance": {
+                "scenario": "behavior",
+                "stage": 1,
+                "integrity_errors": [],
+                "acceptance_exit": 0,
+                "stdout": "{\"checks\": 39}\n",
+                "stderr": "",
+                "expected_checks": 39,
+                "assertions_completed": true,
+                "passed": true
+              },
+              "request": "Add billing.discount(amount, percent), for nonnegative integer amount and integer percent. Return amount * (100 - percent) // 100 (integer floor division). Percent outside 0 through 100 inclusive must raise ValueError. Preserve total. Run tests including your new behavior. Preserve existing tests and edit only billing.py; do not create other files.",
+              "human_interventions": [],
+              "session_sha256": "87297dc767fbcb5cabe8861e0144387db0d6957b026795b3a081efb296c09c1f",
+              "diff": "diff --git a/billing.py b/billing.py\nindex 66d1b3e..6625367 100644\n--- a/billing.py\n+++ b/billing.py\n@@ -1,3 +1,17 @@\n def total(items):\n     \"\"\"Sum integer prices times positive integer quantities; empty input is zero.\"\"\"\n     return sum(price * quantity for price, quantity in items)\n+\n+\n+def discount(amount, percent):\n+    \"\"\"Return amount discounted by percent using integer arithmetic.\n+    amount must be a nonnegative integer; percent must be an integer in [0, 100].\n+    The result is floor division of amount * (100 - percent) by 100.\n+    \"\"\"\n+    if not isinstance(amount, int) or not isinstance(percent, int):\n+        raise TypeError(\"amount and percent must be integers\")\n+    if amount < 0:\n+        raise ValueError(\"amount must be nonnegative\")\n+    if percent < 0 or percent > 100:\n+        raise ValueError(\"percent must be between 0 and 100 inclusive\")\n+    return (amount * (100 - percent)) // 100\n"
+            }
+          ]
+        },
+        {
+          "scenario": "resume",
+          "repetition": 1,
+          "automated_passed": true,
+          "task_input_commit": "22c15fdd4875f836de5784ea04bfec4bf7bf3d49",
+          "stages": [
+            {
+              "stage": 1,
+              "pid": 46537,
+              "exit_status": 0,
+              "elapsed_seconds": 34.40919916600001,
+              "checks": {
+                "process_ok": true,
+                "external_acceptance": true,
+                "manifest_unchanged": true,
+                "bash_used": true,
+                "canonical_prefix_preserved": true,
+                "context_policy": true,
+                "real_provider_request": true
+              },
+              "external_acceptance": {
+                "scenario": "resume",
+                "stage": 1,
+                "integrity_errors": [],
+                "acceptance_exit": 0,
+                "stdout": "{\"checks\": 39}\n",
+                "stderr": "",
+                "expected_checks": 39,
+                "assertions_completed": true,
+                "passed": true
+              },
+              "request": "Fix billing.total: each pair is (integer price, positive integer quantity); return the sum of price times quantity, and zero for empty input. Also add billing.discount(amount, percent): return amount * (100 - percent) // 100 for nonnegative integer amounts; percent outside 0 through 100 must raise ValueError. Run tests. Preserve existing tests and edit only billing.py; do not create other files.",
+              "human_interventions": [],
+              "session_sha256": "f6416309cfb419a89459d1d77e820da222de4412db68858e4ad599188a06bbd1",
+              "diff": "diff --git a/billing.py b/billing.py\nindex bcaa52e..fbbc09a 100644\n--- a/billing.py\n+++ b/billing.py\n@@ -1,3 +1,15 @@\n def total(items):\n     \"\"\"Sum integer prices times positive integer quantities; empty input is zero.\"\"\"\n-    return sum(price + quantity for price, quantity in items)\n+    return sum(price * quantity for price, quantity in items)\n+\n+\n+def discount(amount, percent):\n+    \"\"\"Return amount * (100 - percent) // 100 for nonnegative integer amounts;\n+    percent outside 0 through 100 must raise ValueError.\"\"\"\n+    if not isinstance(amount, int) or not isinstance(percent, int):\n+        raise ValueError(\"amount and percent must be integers\")\n+    if amount < 0:\n+        raise ValueError(\"amount must be nonnegative\")\n+    if percent < 0 or percent > 100:\n+        raise ValueError(\"percent must be in [0, 100]\")\n+    return amount * (100 - percent) // 100\n"
+            },
+            {
+              "stage": 2,
+              "pid": 46603,
+              "exit_status": 0,
+              "elapsed_seconds": 15.041511708999991,
+              "checks": {
+                "process_ok": true,
+                "external_acceptance": true,
+                "manifest_unchanged": true,
+                "bash_used": true,
+                "canonical_prefix_preserved": true,
+                "context_policy": true,
+                "real_provider_request": true
+              },
+              "external_acceptance": {
+                "scenario": "resume",
+                "stage": 2,
+                "integrity_errors": [],
+                "acceptance_exit": 0,
+                "stdout": "{\"checks\": 48}\n",
+                "stderr": "",
+                "expected_checks": 48,
+                "assertions_completed": true,
+                "passed": true
+              },
+              "request": "Continue the previous billing task. Add invoice(items, percent) that applies our existing discount rule to the total of the line items. Preserve the previous functionality and run tests for all three functions. Preserve existing tests and edit only billing.py; do not create other files.",
+              "human_interventions": [],
+              "session_sha256": "619816e82e43347cd968ae271980807a5d91b486442e21b9afdda44b8716724f",
+              "diff": "diff --git a/billing.py b/billing.py\nindex bcaa52e..a27cae0 100644\n--- a/billing.py\n+++ b/billing.py\n@@ -1,3 +1,21 @@\n def total(items):\n     \"\"\"Sum integer prices times positive integer quantities; empty input is zero.\"\"\"\n-    return sum(price + quantity for price, quantity in items)\n+    return sum(price * quantity for price, quantity in items)\n+\n+\n+def discount(amount, percent):\n+    \"\"\"Return amount * (100 - percent) // 100 for nonnegative integer amounts;\n+    percent outside 0 through 100 must raise ValueError.\"\"\"\n+    if not isinstance(amount, int) or not isinstance(percent, int):\n+        raise ValueError(\"amount and percent must be integers\")\n+    if amount < 0:\n+        raise ValueError(\"amount must be nonnegative\")\n+    if percent < 0 or percent > 100:\n+        raise ValueError(\"percent must be in [0, 100]\")\n+    return amount * (100 - percent) // 100\n+\n+\n+def invoice(items, percent):\n+    \"\"\"Return the discounted total for the given line items using the discount percent.\"\"\"\n+    total_cost = total(items)\n+    return discount(total_cost, percent)\n"
+            }
+          ]
+        }
+      ],
+      "interrupted_runs": [
+        {
+          "scenario": "resume",
+          "repetition": 2,
+          "status": "coordinator_cancelled",
+          "artifact": ".runs/live-nano-baseline-01/resume-2",
+          "reason": "User model switch and consecutive independent failures; partial artifacts retained"
+        }
+      ],
+      "unrun": [
+        "resume-3"
+      ],
+      "corrections": [
+        {
+          "superseded": "Initial cancellation record identified resume-1 from earlier in-flight snapshot",
+          "evidence": "Final persisted run/stage outputs show resume-1 completed both stages exit0; resume-2 has started.json but no result.json",
+          "replacement": "resume-1 completed and independently failed; resume-2 interrupted; resume-3 unrun"
+        }
+      ]
+    },
+    {
+      "artifact": ".runs/live-luna-pilot-01",
+      "runtime_commit": "2b5d52f89a8a9d95806b3398350a85d144f7dd19",
+      "config": {
+        "model": "gpt-5.6-luna",
+        "endpoint": "https://api.openai.com/v1",
+        "binary_sha256": "5225f35f1d4270de021950b4189760baa5ca10335e2d27bd997559e742e252de",
+        "acceptance_sha256": "810aa9fc4a0b2679364f0c7c7809d92c632d3a88c4804a88686e42f1453b7906",
+        "max_rounds": 16,
+        "process_timeout_seconds": 600
+      },
+      "phase": "pilot",
+      "provider_requests_recorded": 1,
+      "provider_responses_recorded": 1,
+      "http_statuses": {
+        "400": 1
+      },
+      "usage_response_count": 0,
+      "prompt_tokens": 0,
+      "cached_prompt_tokens": 0,
+      "completion_tokens": 0,
+      "estimated_recorded_usage_usd": null,
+      "cost_note": "Listed standard text rates, not invoice. Missing/incomplete response usage unknown; no extrapolation.",
+      "independent_review": {
+        "status": "pending"
+      },
+      "runs": [
+        {
+          "scenario": "bug",
+          "repetition": 1,
+          "automated_passed": false,
+          "task_input_commit": "f578060af99a00abdaeb35c121af97aab8d4a2a9",
+          "stages": [
+            {
+              "stage": 1,
+              "pid": 46685,
+              "exit_status": 1,
+              "elapsed_seconds": 0.266486958,
+              "checks": {
+                "process_ok": false,
+                "external_acceptance": false,
+                "manifest_unchanged": true,
+                "bash_used": false,
+                "canonical_prefix_preserved": true,
+                "context_policy": true,
+                "real_provider_request": true
+              },
+              "external_acceptance": {
+                "scenario": "bug",
+                "stage": 1,
+                "integrity_errors": [],
+                "acceptance_exit": 1,
+                "stdout": "",
+                "stderr": "Traceback (most recent call last):\n  File \"/var/folders/bz/hx4rp21969d9y1490_ymbbdc0000gn/T/pi-rs-external-acceptance-sunzhqfb/check.py\", line 11, in <module>\n    equal(m.total(items), sum(p*q for p,q in items))\n  File \"/var/folders/bz/hx4rp21969d9y1490_ymbbdc0000gn/T/pi-rs-external-acceptance-sunzhqfb/check.py\", line 8, in equal\n    assert actual == expected, (actual, expected)\nAssertionError: (3, 0)\n",
+                "expected_checks": 5,
+                "assertions_completed": false,
+                "passed": false
+              },
+              "request": "Fix billing.total: each pair is (integer price, positive integer quantity); return the sum of price times quantity, and zero for empty input. Run the existing tests. Preserve existing tests and edit only billing.py; do not create other files.",
+              "human_interventions": [],
+              "session_sha256": "53d3361f4c43f8c2f47bd85db889de4260905d86f20fb48cb67774546d982ac7",
+              "diff": ""
+            }
+          ]
+        }
+      ],
+      "interrupted_runs": [],
+      "unrun": [],
+      "corrections": []
+    },
+    {
+      "artifact": ".runs/live-luna-none-pilot-01",
+      "runtime_commit": "2b5d52f89a8a9d95806b3398350a85d144f7dd19",
+      "config": {
+        "model": "gpt-5.6-luna",
+        "reasoning_effort": "none",
+        "endpoint": "https://api.openai.com/v1",
+        "binary_sha256": "ce9fb9f7dc12b6bbbe4f4c80697a5bfa85cf533365ad59ddafa3f8123e5827a8",
+        "acceptance_sha256": "810aa9fc4a0b2679364f0c7c7809d92c632d3a88c4804a88686e42f1453b7906",
+        "max_rounds": 16,
+        "process_timeout_seconds": 600
+      },
+      "phase": "pilot",
+      "provider_requests_recorded": 5,
+      "provider_responses_recorded": 5,
+      "http_statuses": {
+        "200": 5
+      },
+      "usage_response_count": 5,
+      "prompt_tokens": 3005,
+      "cached_prompt_tokens": 0,
+      "completion_tokens": 190,
+      "estimated_recorded_usage_usd": 0.000829,
+      "cost_note": "Listed standard text rates, not invoice. Missing/incomplete response usage unknown; no extrapolation.",
+      "independent_review": {
+        "status": "passed",
+        "reviewer": "live_review independent verifier",
+        "evidence": "experiments/live-luna-review.md; call_i1ggSNlxRmvN5ki0oKEuLSsE executes unittest discovery importing protected top-level assertion file, visible tests passed; independent external 5 assertions, source-only multiplication diff, one frozen user message, context none."
+      },
+      "runs": [
+        {
+          "scenario": "bug",
+          "repetition": 1,
+          "automated_passed": true,
+          "task_input_commit": "236dca16cd0039905a12623c7a8ad94858e1c826",
+          "stages": [
+            {
+              "stage": 1,
+              "pid": 47167,
+              "exit_status": 0,
+              "elapsed_seconds": 7.934929457999999,
+              "checks": {
+                "process_ok": true,
+                "external_acceptance": true,
+                "manifest_unchanged": true,
+                "bash_used": true,
+                "canonical_prefix_preserved": true,
+                "context_policy": true,
+                "real_provider_request": true
+              },
+              "external_acceptance": {
+                "scenario": "bug",
+                "stage": 1,
+                "integrity_errors": [],
+                "acceptance_exit": 0,
+                "stdout": "{\"checks\": 5}\n",
+                "stderr": "",
+                "expected_checks": 5,
+                "assertions_completed": true,
+                "passed": true
+              },
+              "request": "Fix billing.total: each pair is (integer price, positive integer quantity); return the sum of price times quantity, and zero for empty input. Run the existing tests. Preserve existing tests and edit only billing.py; do not create other files.",
+              "human_interventions": [],
+              "session_sha256": "ab31406bcc6f636533b9383b7520d42e1e5c1c7e6a5602302eca8b264245ea86",
+              "diff": "diff --git a/billing.py b/billing.py\nindex bcaa52e..66d1b3e 100644\n--- a/billing.py\n+++ b/billing.py\n@@ -1,3 +1,3 @@\n def total(items):\n     \"\"\"Sum integer prices times positive integer quantities; empty input is zero.\"\"\"\n-    return sum(price + quantity for price, quantity in items)\n+    return sum(price * quantity for price, quantity in items)\n"
+            }
+          ]
+        }
+      ],
+      "interrupted_runs": [],
+      "unrun": [],
+      "corrections": []
+    },
+    {
+      "artifact": ".runs/live-luna-none-baseline-01",
+      "runtime_commit": "2b5d52f89a8a9d95806b3398350a85d144f7dd19",
+      "config": {
+        "model": "gpt-5.6-luna",
+        "reasoning_effort": "none",
+        "endpoint": "https://api.openai.com/v1",
+        "binary_sha256": "ce9fb9f7dc12b6bbbe4f4c80697a5bfa85cf533365ad59ddafa3f8123e5827a8",
+        "acceptance_sha256": "810aa9fc4a0b2679364f0c7c7809d92c632d3a88c4804a88686e42f1453b7906",
+        "max_rounds": 16,
+        "process_timeout_seconds": 600
+      },
+      "phase": "baseline",
+      "provider_requests_recorded": 68,
+      "provider_responses_recorded": 68,
+      "http_statuses": {
+        "200": 68
+      },
+      "usage_response_count": 68,
+      "prompt_tokens": 66942,
+      "cached_prompt_tokens": 24151,
+      "completion_tokens": 5876,
+      "estimated_recorded_usage_usd": 0.01609242,
+      "cost_note": "Listed standard text rates, not invoice. Missing/incomplete response usage unknown; no extrapolation.",
+      "independent_review": {
+        "status": "failed",
+        "reviewer": "live_review independent verifier",
+        "evidence": "experiments/live-luna-verdicts.json and experiments/live-luna-review.md; 8/9 pass, behavior2 only tested total not new discount. Three resume scenarios genuinely execute required tests, preserve canonical prefixes in distinct processes. Context gate must remain closed."
+      },
+      "runs": [
+        {
+          "scenario": "bug",
+          "repetition": 1,
+          "automated_passed": true,
+          "task_input_commit": "981bd536ba6db23af91a5637aa8a3e18fba4d69e",
+          "stages": [
+            {
+              "stage": 1,
+              "pid": 47364,
+              "exit_status": 0,
+              "elapsed_seconds": 8.849413042,
+              "checks": {
+                "process_ok": true,
+                "external_acceptance": true,
+                "manifest_unchanged": true,
+                "bash_used": true,
+                "canonical_prefix_preserved": true,
+                "context_policy": true,
+                "real_provider_request": true
+              },
+              "external_acceptance": {
+                "scenario": "bug",
+                "stage": 1,
+                "integrity_errors": [],
+                "acceptance_exit": 0,
+                "stdout": "{\"checks\": 5}\n",
+                "stderr": "",
+                "expected_checks": 5,
+                "assertions_completed": true,
+                "passed": true
+              },
+              "request": "Fix billing.total: each pair is (integer price, positive integer quantity); return the sum of price times quantity, and zero for empty input. Run the existing tests. Preserve existing tests and edit only billing.py; do not create other files.",
+              "human_interventions": [],
+              "session_sha256": "4efaea119fe5fccf9809d8888dd1db6e02f45c5f44449f906daf684044bc420b",
+              "diff": "diff --git a/billing.py b/billing.py\nindex bcaa52e..66d1b3e 100644\n--- a/billing.py\n+++ b/billing.py\n@@ -1,3 +1,3 @@\n def total(items):\n     \"\"\"Sum integer prices times positive integer quantities; empty input is zero.\"\"\"\n-    return sum(price + quantity for price, quantity in items)\n+    return sum(price * quantity for price, quantity in items)\n"
+            }
+          ]
+        },
+        {
+          "scenario": "bug",
+          "repetition": 2,
+          "automated_passed": true,
+          "task_input_commit": "1734c7c3aa5af6aa0485727070ff05c1ade45792",
+          "stages": [
+            {
+              "stage": 1,
+              "pid": 47399,
+              "exit_status": 0,
+              "elapsed_seconds": 7.570549333000001,
+              "checks": {
+                "process_ok": true,
+                "external_acceptance": true,
+                "manifest_unchanged": true,
+                "bash_used": true,
+                "canonical_prefix_preserved": true,
+                "context_policy": true,
+                "real_provider_request": true
+              },
+              "external_acceptance": {
+                "scenario": "bug",
+                "stage": 1,
+                "integrity_errors": [],
+                "acceptance_exit": 0,
+                "stdout": "{\"checks\": 5}\n",
+                "stderr": "",
+                "expected_checks": 5,
+                "assertions_completed": true,
+                "passed": true
+              },
+              "request": "Fix billing.total: each pair is (integer price, positive integer quantity); return the sum of price times quantity, and zero for empty input. Run the existing tests. Preserve existing tests and edit only billing.py; do not create other files.",
+              "human_interventions": [],
+              "session_sha256": "ff05678e3e93798dfe3d58c26bf56c4053b31087aad323707071db840e2e4d31",
+              "diff": "diff --git a/billing.py b/billing.py\nindex bcaa52e..66d1b3e 100644\n--- a/billing.py\n+++ b/billing.py\n@@ -1,3 +1,3 @@\n def total(items):\n     \"\"\"Sum integer prices times positive integer quantities; empty input is zero.\"\"\"\n-    return sum(price + quantity for price, quantity in items)\n+    return sum(price * quantity for price, quantity in items)\n"
+            }
+          ]
+        },
+        {
+          "scenario": "bug",
+          "repetition": 3,
+          "automated_passed": true,
+          "task_input_commit": "31a84957ea41003c4ce09d027b38f98f8763565c",
+          "stages": [
+            {
+              "stage": 1,
+              "pid": 47427,
+              "exit_status": 0,
+              "elapsed_seconds": 8.538893083000001,
+              "checks": {
+                "process_ok": true,
+                "external_acceptance": true,
+                "manifest_unchanged": true,
+                "bash_used": true,
+                "canonical_prefix_preserved": true,
+                "context_policy": true,
+                "real_provider_request": true
+              },
+              "external_acceptance": {
+                "scenario": "bug",
+                "stage": 1,
+                "integrity_errors": [],
+                "acceptance_exit": 0,
+                "stdout": "{\"checks\": 5}\n",
+                "stderr": "",
+                "expected_checks": 5,
+                "assertions_completed": true,
+                "passed": true
+              },
+              "request": "Fix billing.total: each pair is (integer price, positive integer quantity); return the sum of price times quantity, and zero for empty input. Run the existing tests. Preserve existing tests and edit only billing.py; do not create other files.",
+              "human_interventions": [],
+              "session_sha256": "1a0bf4ff5e8f76ce142c0d57dcc4d974cef2bb5802f731ed465e49a5938a58a1",
+              "diff": "diff --git a/billing.py b/billing.py\nindex bcaa52e..66d1b3e 100644\n--- a/billing.py\n+++ b/billing.py\n@@ -1,3 +1,3 @@\n def total(items):\n     \"\"\"Sum integer prices times positive integer quantities; empty input is zero.\"\"\"\n-    return sum(price + quantity for price, quantity in items)\n+    return sum(price * quantity for price, quantity in items)\n"
+            }
+          ]
+        },
+        {
+          "scenario": "behavior",
+          "repetition": 1,
+          "automated_passed": true,
+          "task_input_commit": "f037417503c5add993c1c0811821bdc8efbf283d",
+          "stages": [
+            {
+              "stage": 1,
+              "pid": 47465,
+              "exit_status": 0,
+              "elapsed_seconds": 12.011114708000004,
+              "checks": {
+                "process_ok": true,
+                "external_acceptance": true,
+                "manifest_unchanged": true,
+                "bash_used": true,
+                "canonical_prefix_preserved": true,
+                "context_policy": true,
+                "real_provider_request": true
+              },
+              "external_acceptance": {
+                "scenario": "behavior",
+                "stage": 1,
+                "integrity_errors": [],
+                "acceptance_exit": 0,
+                "stdout": "{\"checks\": 39}\n",
+                "stderr": "",
+                "expected_checks": 39,
+                "assertions_completed": true,
+                "passed": true
+              },
+              "request": "Add billing.discount(amount, percent), for nonnegative integer amount and integer percent. Return amount * (100 - percent) // 100 (integer floor division). Percent outside 0 through 100 inclusive must raise ValueError. Preserve total. Run tests including your new behavior. Preserve existing tests and edit only billing.py; do not create other files.",
+              "human_interventions": [],
+              "session_sha256": "d603d4d69560aae83333b319ea33272570f7f7a56661671e8adb934866b5af75",
+              "diff": "diff --git a/billing.py b/billing.py\nindex 66d1b3e..30900f4 100644\n--- a/billing.py\n+++ b/billing.py\n@@ -1,3 +1,10 @@\n def total(items):\n     \"\"\"Sum integer prices times positive integer quantities; empty input is zero.\"\"\"\n     return sum(price * quantity for price, quantity in items)\n+\n+\n+def discount(amount, percent):\n+    \"\"\"Return *amount* reduced by *percent*, rounded down to whole units.\"\"\"\n+    if not 0 <= percent <= 100:\n+        raise ValueError(\"percent must be between 0 and 100 inclusive\")\n+    return amount * (100 - percent) // 100\n"
+            }
+          ]
+        },
+        {
+          "scenario": "behavior",
+          "repetition": 2,
+          "automated_passed": true,
+          "task_input_commit": "6e8ba5d80282284b77b77307d09dc11355c7473c",
+          "stages": [
+            {
+              "stage": 1,
+              "pid": 47508,
+              "exit_status": 0,
+              "elapsed_seconds": 8.934945542000001,
+              "checks": {
+                "process_ok": true,
+                "external_acceptance": true,
+                "manifest_unchanged": true,
+                "bash_used": true,
+                "canonical_prefix_preserved": true,
+                "context_policy": true,
+                "real_provider_request": true
+              },
+              "external_acceptance": {
+                "scenario": "behavior",
+                "stage": 1,
+                "integrity_errors": [],
+                "acceptance_exit": 0,
+                "stdout": "{\"checks\": 39}\n",
+                "stderr": "",
+                "expected_checks": 39,
+                "assertions_completed": true,
+                "passed": true
+              },
+              "request": "Add billing.discount(amount, percent), for nonnegative integer amount and integer percent. Return amount * (100 - percent) // 100 (integer floor division). Percent outside 0 through 100 inclusive must raise ValueError. Preserve total. Run tests including your new behavior. Preserve existing tests and edit only billing.py; do not create other files.",
+              "human_interventions": [],
+              "session_sha256": "fa562a20e15aa7d79dba9bfb50251976f1b0dd665e186720c819154be540c9ed",
+              "diff": "diff --git a/billing.py b/billing.py\nindex 66d1b3e..a61c3d9 100644\n--- a/billing.py\n+++ b/billing.py\n@@ -1,3 +1,13 @@\n def total(items):\n     \"\"\"Sum integer prices times positive integer quantities; empty input is zero.\"\"\"\n     return sum(price * quantity for price, quantity in items)\n+\n+\n+def discount(amount, percent):\n+    \"\"\"Return amount reduced by percent, using integer floor division.\n+\n+    ``percent`` must be between 0 and 100, inclusive.\n+    \"\"\"\n+    if not 0 <= percent <= 100:\n+        raise ValueError(\"percent must be between 0 and 100\")\n+    return amount * (100 - percent) // 100\n"
+            }
+          ]
+        },
+        {
+          "scenario": "behavior",
+          "repetition": 3,
+          "automated_passed": true,
+          "task_input_commit": "19750e79dcb51c33cbc122a5613970d76214b2e9",
+          "stages": [
+            {
+              "stage": 1,
+              "pid": 47540,
+              "exit_status": 0,
+              "elapsed_seconds": 14.015365834,
+              "checks": {
+                "process_ok": true,
+                "external_acceptance": true,
+                "manifest_unchanged": true,
+                "bash_used": true,
+                "canonical_prefix_preserved": true,
+                "context_policy": true,
+                "real_provider_request": true
+              },
+              "external_acceptance": {
+                "scenario": "behavior",
+                "stage": 1,
+                "integrity_errors": [],
+                "acceptance_exit": 0,
+                "stdout": "{\"checks\": 39}\n",
+                "stderr": "",
+                "expected_checks": 39,
+                "assertions_completed": true,
+                "passed": true
+              },
+              "request": "Add billing.discount(amount, percent), for nonnegative integer amount and integer percent. Return amount * (100 - percent) // 100 (integer floor division). Percent outside 0 through 100 inclusive must raise ValueError. Preserve total. Run tests including your new behavior. Preserve existing tests and edit only billing.py; do not create other files.",
+              "human_interventions": [],
+              "session_sha256": "226a8abacd694430d86d4ecce23bf7d240b89ff292ad6fc60c5081ff2a4db20d",
+              "diff": "diff --git a/billing.py b/billing.py\nindex 66d1b3e..aa503d7 100644\n--- a/billing.py\n+++ b/billing.py\n@@ -1,3 +1,10 @@\n def total(items):\n     \"\"\"Sum integer prices times positive integer quantities; empty input is zero.\"\"\"\n     return sum(price * quantity for price, quantity in items)\n+\n+\n+def discount(amount, percent):\n+    \"\"\"Apply a percentage discount to a nonnegative integer amount.\"\"\"\n+    if not 0 <= percent <= 100:\n+        raise ValueError(\"percent must be between 0 and 100 inclusive\")\n+    return amount * (100 - percent) // 100\n"
+            }
+          ]
+        },
+        {
+          "scenario": "resume",
+          "repetition": 1,
+          "automated_passed": true,
+          "task_input_commit": "1e8ef81789d9f12aa28e58dcac0f28a749b13fc4",
+          "stages": [
+            {
+              "stage": 1,
+              "pid": 47586,
+              "exit_status": 0,
+              "elapsed_seconds": 9.927787792000004,
+              "checks": {
+                "process_ok": true,
+                "external_acceptance": true,
+                "manifest_unchanged": true,
+                "bash_used": true,
+                "canonical_prefix_preserved": true,
+                "context_policy": true,
+                "real_provider_request": true
+              },
+              "external_acceptance": {
+                "scenario": "resume",
+                "stage": 1,
+                "integrity_errors": [],
+                "acceptance_exit": 0,
+                "stdout": "{\"checks\": 39}\n",
+                "stderr": "",
+                "expected_checks": 39,
+                "assertions_completed": true,
+                "passed": true
+              },
+              "request": "Fix billing.total: each pair is (integer price, positive integer quantity); return the sum of price times quantity, and zero for empty input. Also add billing.discount(amount, percent): return amount * (100 - percent) // 100 for nonnegative integer amounts; percent outside 0 through 100 must raise ValueError. Run tests. Preserve existing tests and edit only billing.py; do not create other files.",
+              "human_interventions": [],
+              "session_sha256": "9cd145f91cdc5720103e3a4d27fef4950d954f63bfa363151ec9ca7d30eaaf0b",
+              "diff": "diff --git a/billing.py b/billing.py\nindex bcaa52e..dff2e04 100644\n--- a/billing.py\n+++ b/billing.py\n@@ -1,3 +1,10 @@\n def total(items):\n-    \"\"\"Sum integer prices times positive integer quantities; empty input is zero.\"\"\"\n-    return sum(price + quantity for price, quantity in items)\n+    \"\"\"Return the total price for (integer price, positive quantity) pairs.\"\"\"\n+    return sum(price * quantity for price, quantity in items)\n+\n+\n+def discount(amount, percent):\n+    \"\"\"Apply a percentage discount to a nonnegative integer amount.\"\"\"\n+    if not 0 <= percent <= 100:\n+        raise ValueError(\"percent must be between 0 and 100\")\n+    return amount * (100 - percent) // 100\n"
+            },
+            {
+              "stage": 2,
+              "pid": 47634,
+              "exit_status": 0,
+              "elapsed_seconds": 5.765513333000001,
+              "checks": {
+                "process_ok": true,
+                "external_acceptance": true,
+                "manifest_unchanged": true,
+                "bash_used": true,
+                "canonical_prefix_preserved": true,
+                "context_policy": true,
+                "real_provider_request": true
+              },
+              "external_acceptance": {
+                "scenario": "resume",
+                "stage": 2,
+                "integrity_errors": [],
+                "acceptance_exit": 0,
+                "stdout": "{\"checks\": 48}\n",
+                "stderr": "",
+                "expected_checks": 48,
+                "assertions_completed": true,
+                "passed": true
+              },
+              "request": "Continue the previous billing task. Add invoice(items, percent) that applies our existing discount rule to the total of the line items. Preserve the previous functionality and run tests for all three functions. Preserve existing tests and edit only billing.py; do not create other files.",
+              "human_interventions": [],
+              "session_sha256": "556377bf84c444807f4ccf195a9702e6c58faa8c98e8d34714c5ad8068dcb2d8",
+              "diff": "diff --git a/billing.py b/billing.py\nindex bcaa52e..38a4e0a 100644\n--- a/billing.py\n+++ b/billing.py\n@@ -1,3 +1,15 @@\n def total(items):\n-    \"\"\"Sum integer prices times positive integer quantities; empty input is zero.\"\"\"\n-    return sum(price + quantity for price, quantity in items)\n+    \"\"\"Return the total price for (integer price, positive quantity) pairs.\"\"\"\n+    return sum(price * quantity for price, quantity in items)\n+\n+\n+def discount(amount, percent):\n+    \"\"\"Apply a percentage discount to a nonnegative integer amount.\"\"\"\n+    if not 0 <= percent <= 100:\n+        raise ValueError(\"percent must be between 0 and 100\")\n+    return amount * (100 - percent) // 100\n+\n+\n+def invoice(items, percent):\n+    \"\"\"Return the discounted total for the line items.\"\"\"\n+    return discount(total(items), percent)\n"
+            }
+          ]
+        },
+        {
+          "scenario": "resume",
+          "repetition": 2,
+          "automated_passed": true,
+          "task_input_commit": "45aac57556324582ec43150deb3b6162fb7e0222",
+          "stages": [
+            {
+              "stage": 1,
+              "pid": 47656,
+              "exit_status": 0,
+              "elapsed_seconds": 11.0888475,
+              "checks": {
+                "process_ok": true,
+                "external_acceptance": true,
+                "manifest_unchanged": true,
+                "bash_used": true,
+                "canonical_prefix_preserved": true,
+                "context_policy": true,
+                "real_provider_request": true
+              },
+              "external_acceptance": {
+                "scenario": "resume",
+                "stage": 1,
+                "integrity_errors": [],
+                "acceptance_exit": 0,
+                "stdout": "{\"checks\": 39}\n",
+                "stderr": "",
+                "expected_checks": 39,
+                "assertions_completed": true,
+                "passed": true
+              },
+              "request": "Fix billing.total: each pair is (integer price, positive integer quantity); return the sum of price times quantity, and zero for empty input. Also add billing.discount(amount, percent): return amount * (100 - percent) // 100 for nonnegative integer amounts; percent outside 0 through 100 must raise ValueError. Run tests. Preserve existing tests and edit only billing.py; do not create other files.",
+              "human_interventions": [],
+              "session_sha256": "7126cf9538d14fc61f926904d3fac61f684f81d68a402e2caaf1511adf0c4ca5",
+              "diff": "diff --git a/billing.py b/billing.py\nindex bcaa52e..0f0940d 100644\n--- a/billing.py\n+++ b/billing.py\n@@ -1,3 +1,10 @@\n def total(items):\n     \"\"\"Sum integer prices times positive integer quantities; empty input is zero.\"\"\"\n-    return sum(price + quantity for price, quantity in items)\n+    return sum(price * quantity for price, quantity in items)\n+\n+\n+def discount(amount, percent):\n+    \"\"\"Apply an integer percentage discount to a nonnegative amount.\"\"\"\n+    if not 0 <= percent <= 100:\n+        raise ValueError(\"percent must be between 0 and 100\")\n+    return amount * (100 - percent) // 100\n"
+            },
+            {
+              "stage": 2,
+              "pid": 47698,
+              "exit_status": 0,
+              "elapsed_seconds": 7.107877375000001,
+              "checks": {
+                "process_ok": true,
+                "external_acceptance": true,
+                "manifest_unchanged": true,
+                "bash_used": true,
+                "canonical_prefix_preserved": true,
+                "context_policy": true,
+                "real_provider_request": true
+              },
+              "external_acceptance": {
+                "scenario": "resume",
+                "stage": 2,
+                "integrity_errors": [],
+                "acceptance_exit": 0,
+                "stdout": "{\"checks\": 48}\n",
+                "stderr": "",
+                "expected_checks": 48,
+                "assertions_completed": true,
+                "passed": true
+              },
+              "request": "Continue the previous billing task. Add invoice(items, percent) that applies our existing discount rule to the total of the line items. Preserve the previous functionality and run tests for all three functions. Preserve existing tests and edit only billing.py; do not create other files.",
+              "human_interventions": [],
+              "session_sha256": "a0a0e82a2045dea85df2bcd580862194aa279c2552f0088e138e73d2402b1b34",
+              "diff": "diff --git a/billing.py b/billing.py\nindex bcaa52e..ad84cbe 100644\n--- a/billing.py\n+++ b/billing.py\n@@ -1,3 +1,15 @@\n def total(items):\n     \"\"\"Sum integer prices times positive integer quantities; empty input is zero.\"\"\"\n-    return sum(price + quantity for price, quantity in items)\n+    return sum(price * quantity for price, quantity in items)\n+\n+\n+def discount(amount, percent):\n+    \"\"\"Apply an integer percentage discount to a nonnegative amount.\"\"\"\n+    if not 0 <= percent <= 100:\n+        raise ValueError(\"percent must be between 0 and 100\")\n+    return amount * (100 - percent) // 100\n+\n+\n+def invoice(items, percent):\n+    \"\"\"Return the discounted total for the invoice line items.\"\"\"\n+    return discount(total(items), percent)\n"
+            }
+          ]
+        },
+        {
+          "scenario": "resume",
+          "repetition": 3,
+          "automated_passed": true,
+          "task_input_commit": "74ed233297ade44b2dd261db229e4e063eefd1eb",
+          "stages": [
+            {
+              "stage": 1,
+              "pid": 47723,
+              "exit_status": 0,
+              "elapsed_seconds": 11.466417249999992,
+              "checks": {
+                "process_ok": true,
+                "external_acceptance": true,
+                "manifest_unchanged": true,
+                "bash_used": true,
+                "canonical_prefix_preserved": true,
+                "context_policy": true,
+                "real_provider_request": true
+              },
+              "external_acceptance": {
+                "scenario": "resume",
+                "stage": 1,
+                "integrity_errors": [],
+                "acceptance_exit": 0,
+                "stdout": "{\"checks\": 39}\n",
+                "stderr": "",
+                "expected_checks": 39,
+                "assertions_completed": true,
+                "passed": true
+              },
+              "request": "Fix billing.total: each pair is (integer price, positive integer quantity); return the sum of price times quantity, and zero for empty input. Also add billing.discount(amount, percent): return amount * (100 - percent) // 100 for nonnegative integer amounts; percent outside 0 through 100 must raise ValueError. Run tests. Preserve existing tests and edit only billing.py; do not create other files.",
+              "human_interventions": [],
+              "session_sha256": "a1be7fa253a9f27f70802c09768cc0512f5cf65b24d1641972dd6536bb1c2306",
+              "diff": "diff --git a/billing.py b/billing.py\nindex bcaa52e..f35d766 100644\n--- a/billing.py\n+++ b/billing.py\n@@ -1,3 +1,10 @@\n def total(items):\n-    \"\"\"Sum integer prices times positive integer quantities; empty input is zero.\"\"\"\n-    return sum(price + quantity for price, quantity in items)\n+    \"\"\"Return the sum of each integer price multiplied by its quantity.\"\"\"\n+    return sum(price * quantity for price, quantity in items)\n+\n+\n+def discount(amount, percent):\n+    \"\"\"Return amount reduced by percent using integer floor division.\"\"\"\n+    if not 0 <= percent <= 100:\n+        raise ValueError(\"percent must be between 0 and 100\")\n+    return amount * (100 - percent) // 100\n"
+            },
+            {
+              "stage": 2,
+              "pid": 47756,
+              "exit_status": 0,
+              "elapsed_seconds": 5.655569624999998,
+              "checks": {
+                "process_ok": true,
+                "external_acceptance": true,
+                "manifest_unchanged": true,
+                "bash_used": true,
+                "canonical_prefix_preserved": true,
+                "context_policy": true,
+                "real_provider_request": true
+              },
+              "external_acceptance": {
+                "scenario": "resume",
+                "stage": 2,
+                "integrity_errors": [],
+                "acceptance_exit": 0,
+                "stdout": "{\"checks\": 48}\n",
+                "stderr": "",
+                "expected_checks": 48,
+                "assertions_completed": true,
+                "passed": true
+              },
+              "request": "Continue the previous billing task. Add invoice(items, percent) that applies our existing discount rule to the total of the line items. Preserve the previous functionality and run tests for all three functions. Preserve existing tests and edit only billing.py; do not create other files.",
+              "human_interventions": [],
+              "session_sha256": "e3d7a554c431e4556c4b1ac0f0d4085ecfa1decfb882af504483804eef9a6e08",
+              "diff": "diff --git a/billing.py b/billing.py\nindex bcaa52e..af55cb1 100644\n--- a/billing.py\n+++ b/billing.py\n@@ -1,3 +1,15 @@\n def total(items):\n-    \"\"\"Sum integer prices times positive integer quantities; empty input is zero.\"\"\"\n-    return sum(price + quantity for price, quantity in items)\n+    \"\"\"Return the sum of each integer price multiplied by its quantity.\"\"\"\n+    return sum(price * quantity for price, quantity in items)\n+\n+\n+def discount(amount, percent):\n+    \"\"\"Return amount reduced by percent using integer floor division.\"\"\"\n+    if not 0 <= percent <= 100:\n+        raise ValueError(\"percent must be between 0 and 100\")\n+    return amount * (100 - percent) // 100\n+\n+\n+def invoice(items, percent):\n+    \"\"\"Return the discounted total for the line items.\"\"\"\n+    return discount(total(items), percent)\n"
+            }
+          ]
+        }
+      ],
+      "interrupted_runs": [],
+      "unrun": [],
+      "corrections": []
+    }
+  ]
+}
