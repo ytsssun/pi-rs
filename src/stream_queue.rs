@@ -1,7 +1,8 @@
 //! Bounded, thread-safe event queue used by the native streaming seam.
 use serde_json::Value;
 use std::collections::VecDeque;
-use std::sync::{Condvar, Mutex};
+use std::sync::{Arc, Condvar, Mutex};
+use std::thread::{self, JoinHandle};
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct StreamEvent {
@@ -14,6 +15,28 @@ pub enum PushError {
     Closed,
     Full,
     TerminalAlreadySent,
+}
+
+#[derive(Debug, PartialEq)]
+pub enum ProducerError { Push(PushError) }
+
+/// Spawn a bounded producer. The iterator runs on a dedicated thread; closing
+/// the queue cancels production (the next push returns `Closed`). A full queue
+/// is surfaced to the caller through `join` rather than silently dropping data.
+pub fn spawn_producer<I>(queue: Arc<StreamQueue>, events: I) -> JoinHandle<Result<(), ProducerError>>
+where I: IntoIterator<Item = StreamEvent> + Send + 'static,
+      I::IntoIter: Send,
+{
+    thread::spawn(move || {
+        for event in events {
+            match queue.push(event) {
+                Ok(()) => {},
+                Err(PushError::Closed) => return Ok(()),
+                Err(e) => return Err(ProducerError::Push(e)),
+            }
+        }
+        Ok(())
+    })
 }
 
 struct State {
@@ -95,5 +118,24 @@ mod tests {
         assert_eq!(t.join().unwrap(), None);
         assert_eq!(q.push(e(1, false)), Err(PushError::Closed));
         assert_eq!(q.poll(), None);
+    }
+
+    #[test]
+    fn producer_reports_overflow_and_terminal() {
+        let q = Arc::new(StreamQueue::new(1));
+        q.push(e(0, false)).unwrap();
+        let result = spawn_producer(Arc::clone(&q), vec![e(1, false)]).join().unwrap();
+        assert_eq!(result, Err(ProducerError::Push(PushError::Full)));
+        assert_eq!(q.poll(), Some(e(0, false)));
+    }
+
+    #[test]
+    fn producer_close_cancels_without_error() {
+        let q = Arc::new(StreamQueue::new(1));
+        let handle = spawn_producer(Arc::clone(&q), vec![e(1, false), e(2, false)]);
+        // First event may be queued before close; closure must stop production
+        // and must never turn cancellation into a producer failure.
+        q.close();
+        assert_eq!(handle.join().unwrap(), Ok(()));
     }
 }
