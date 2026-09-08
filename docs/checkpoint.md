@@ -1,5 +1,7 @@
 # Current checkpoint
 
+E182 verifies exact projected toolResult truncation at a fixed limit, including the canonical-retained marker, while the persisted canonical result remains complete.
+
 E180 verifies a live long-read run with context-tool-chars=20 completes and persists a session. It does not yet expose an independent assertion of the exact model-view bytes; context editing correctness remains partially verified.
 
 E179 verifies three fresh live CLI write → independent-process resume → edit runs with exact external assertions and no steering. This strengthens the core coding loop; provider breadth, crash-during-call recovery, and full Pi ecosystem compatibility remain open.
