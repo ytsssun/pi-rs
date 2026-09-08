@@ -123,3 +123,5 @@ Post-system-prompt live check: isolated seed/resume with gpt-5.6-luna still comp
 Verified E044: native live seed/resume now includes `bash`; gpt-5.6-luna autonomously ran an exact-content shell test in both processes, with `isError: false`. This is one isolated scenario and uses a bounded harness bash wrapper; production command parity and repeated trials remain open.
 
 E045 repetition audit: two clean native live bash seed/resume runs passed; the attempted third run was invalid because the command used an incorrect environment assignment and reused an existing session path. It is excluded from reliability counts; the three-run gate remains open.
+
+Verified E046: corrected third clean native live bash seed/resume run passed. Together with the two valid E045 runs, the three-run reliability gate passes; the prior invalid attempt remains excluded.
