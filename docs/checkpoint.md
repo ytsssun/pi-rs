@@ -321,3 +321,8 @@ Streaming and synchronous HTTP requests now use the same Rust `chat_request` enc
 ### E116 — protected-path extension in live harness (tested)
 - Fresh live seed with unchanged `protected-paths.ts` loaded through `real-plugin-host` completed write/edit/bash and persisted messages.
 - The model used a non-protected target, so this does not test blocking; output showed `verified:true`, `toolResults:3`, `assistants:4`, exit 0. External result was `NATIVE_LIVE_EDITED` (seed expectation metadata was not applicable).
+
+### E117 — protected path hook through real extension runner (verified)
+- Loaded pinned unchanged `protected-paths.ts` through `real-plugin-host` and emitted a write `tool_call` for `.env`.
+- Evidence: runner returned `block:true` with reason `Path ".env" is protected`.
+- This proves the extension hook contract at the JS runner seam; full Rust driver integration still requires running the same hook inside a live driver turn.
