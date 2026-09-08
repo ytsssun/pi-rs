@@ -195,3 +195,5 @@ F079 proposed: native provider adapter currently uses synchronous Rust `provider
 Verified E081: deterministic stream assembler covers ordered text deltas, incremental tool JSON, terminal done/error, EOF without terminal rejection, and post-terminal rejection. This is a JS seam fixture only; Rust nonblocking transport and live streaming remain unimplemented.
 
 Tested E082: batch preflight now preserves Pi's mutable `tool_call` input object for execution, including in-place hook mutations, without revalidation afterward. Existing integration and syntax checks pass; a dedicated mutation fixture remains open.
+
+Verified E083: `experiments/native-batch-input-mutation.mjs` proves validation before hooks and execution of hook-mutated arguments without revalidation. E082 inadvertently removed initial validation; this regression is repaired. The fixture also checks the tool_call event type. Invalid arguments currently reject the driver rather than producing a per-call error outcome; full batch compatibility remains incomplete.
