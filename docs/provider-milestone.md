@@ -10,3 +10,7 @@ Acceptance:
 4. Provider HTTP/API failures are recorded separately from tool or runtime failures.
 
 This is one provider/model path only; it does not claim all providers, streaming parity, performance gains, or full Pi compatibility.
+
+## Implementation finding
+
+The existing OpenAI Chat Completions request lives in `src/main.rs` inside the legacy `run_with_options` closure. The Node-API/native driver has no provider callback into that transport. The implementation must extract a shared Rust provider service and expose one request/stream seam to the native host; duplicating the HTTP request in JavaScript would create two execution paths and is rejected.
