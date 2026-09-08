@@ -143,3 +143,5 @@ Tested E054: Rust runtime now has an opt-in `parallel:true` batch action with pe
 Tested E055: native driver now passes `parallel` to Rust `begin`, executes `tool_batch` calls concurrently, and submits source-correlated `batch_result` outcomes. Existing sequential fixture and `/Users/stevensun/.cargo/bin/cargo test --locked` pass. This is an opt-in prototype; full upstream preflight/abort semantics and live batch verification remain open.
 
 Verified E056: `experiments/native-batch.mjs` sends batch outcomes in reverse completion order; Rust maps by request ID and persists `one,two` source order. The prior positional-matching failure was fixed in `2a747fe`. This remains deterministic native evidence; preflight/abort, sequential override, and live model batch execution remain open.
+
+E056 initial run is superseded: it used a stale native addon. Verified E057 after `python3 scripts/build-native-session.py`: reverse-order batch completion passes and source order is persisted.
