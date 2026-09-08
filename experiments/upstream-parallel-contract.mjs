@@ -1,0 +1,10 @@
+import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
+const p='vendor/pi-mono/packages/agent/src/agent-loop.ts';
+const s=readFileSync(p,'utf8');
+assert.match(s,/executionMode === "sequential"/);
+assert.match(s,/executeToolCallsSequential\(currentContext/);
+assert.match(s,/const orderedFinalizedCalls = await Promise\.all/);
+assert.match(s,/for \(const toolCall of toolCalls\)/);
+assert.match(s,/createToolResultMessage\(finalized\)/);
+console.log(JSON.stringify({verified:true,reference:'9767ba275f3e9a5ee0f5c5342249b629ab1b2282',checks:['whole-batch sequential override','source-order preflight','parallel completion then source-order persistence']}));
