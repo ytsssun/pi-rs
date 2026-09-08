@@ -1,0 +1,9 @@
+import assert from 'node:assert/strict';
+import { createRequire } from 'node:module';
+const addon = createRequire(import.meta.url)('../target/native-session.node');
+const request = (v) => { const r=JSON.parse(addon.request(JSON.stringify(v))); if(r.error) throw Error(r.error); return r.result; };
+const h=request({op:'stream_fixture_start',capacity:4,events:[{value:{type:'text_delta',delta:'x'}},{value:{type:'done'},terminal:true}]});
+assert.deepEqual(request({op:'queue_poll',handle:h}),{value:{type:'text_delta',delta:'x'},terminal:false});
+assert.deepEqual(request({op:'queue_poll',handle:h}),{value:{type:'done'},terminal:true});
+request({op:'queue_close',handle:h});
+console.log(JSON.stringify({verified:true,handle:true,terminal:true,close:true}));
