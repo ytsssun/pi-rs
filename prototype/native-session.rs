@@ -115,7 +115,8 @@ impl Registry {
                 "queue_poll" => {
                     let handle = r["handle"].as_str().ok_or("handle required")?;
                     let q = self.queues.get(handle).ok_or("unknown queue")?;
-                    Ok(q.poll().map(|e| json!({"value":e.value,"terminal":e.terminal})).unwrap_or(Value::Null))
+                    let event = if r["wait"].as_bool().unwrap_or(false) { q.wait_poll() } else { q.poll() };
+                    Ok(event.map(|e| json!({"value":e.value,"terminal":e.terminal})).unwrap_or(Value::Null))
                 }
                 "queue_close" => {
                     let handle = r["handle"].as_str().ok_or("handle required")?;
