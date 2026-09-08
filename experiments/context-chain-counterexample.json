@@ -1,0 +1,11 @@
+{
+  "status": "superseded_hypothesis_reproduced",
+  "hypothesis": "A context hook can rebuild its input from persisted canonical messages without affecting earlier plugins",
+  "reproduction": "TSX_TSCONFIG_PATH=vendor/pi-mono/tsconfig.json node --import ./vendor/pi-mono/node_modules/tsx/dist/loader.mjs experiments/real-plugin-architecture.mjs --canonical-counterexample",
+  "expected_exit": 1,
+  "assertion": "disabled policy must not overwrite preceding plugin edits",
+  "expected_tool_text": "extension-adjusted-result",
+  "actual_tool_text": "a😀b\nlong tool result",
+  "fix": "Project the current context event view passed through the hook chain; keep persisted canonical state separate.",
+  "limits": "Negative option deliberately reproduces the old adapter, not an upstream bug. Positive mode verifies only the documented one-text-tool mapping."
+}

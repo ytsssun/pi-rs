@@ -1,0 +1,493 @@
+{
+  "status": "tested",
+  "upstream": "9767ba275f3e9a5ee0f5c5342249b629ab1b2282",
+  "node": "v22.18.0",
+  "sources": [
+    {
+      "path": "vendor/pi-mono/packages/coding-agent/examples/extensions/kimi-deferred-tools.ts",
+      "sha256": "3ed3203385bcd621b4e3071ce815cf6a841aa5857bd7a5c83f7aff16be9ea7cf"
+    },
+    {
+      "path": "vendor/pi-mono/packages/coding-agent/src/core/extensions/loader.ts",
+      "sha256": "7e0e3a70994686f592e19fdf93f07bc65e397c3671f64e0faac3ffa061ba9f63"
+    },
+    {
+      "path": "vendor/pi-mono/packages/coding-agent/src/core/extensions/runner.ts",
+      "sha256": "6d5101ab0551c2ddd904a8089cc221b3c448fcfe36c27e36da02cdacc869c084"
+    }
+  ],
+  "reports": [
+    {
+      "kind": "ts",
+      "toolResult": {
+        "pluginSha256": "3ed3203385bcd621b4e3071ce815cf6a841aa5857bd7a5c83f7aff16be9ea7cf",
+        "initial": [
+          "tool_search"
+        ],
+        "noMatch": {
+          "content": [
+            {
+              "type": "text",
+              "text": "The relevant tools do not exist."
+            }
+          ],
+          "details": {
+            "matches": [],
+            "added": []
+          }
+        },
+        "afterNoMatch": [
+          "tool_search"
+        ],
+        "search": {
+          "content": [
+            {
+              "type": "text",
+              "text": "Success. Found 1 matching tool(s)"
+            }
+          ],
+          "details": {
+            "matches": [
+              "Calculator"
+            ],
+            "added": [
+              "Calculator"
+            ]
+          }
+        },
+        "nextRequest": [
+          "tool_search",
+          "Calculator"
+        ],
+        "repeatedSearch": {
+          "content": [
+            {
+              "type": "text",
+              "text": "Success. Found 1 matching tool(s)"
+            }
+          ],
+          "details": {
+            "matches": [
+              "Calculator"
+            ],
+            "added": []
+          }
+        },
+        "calculator": {
+          "content": [
+            {
+              "type": "text",
+              "text": "42"
+            }
+          ],
+          "details": {}
+        },
+        "staleApiRejected": true,
+        "errors": []
+      },
+      "originalLoop": {
+        "snapshots": [
+          [
+            "tool_search"
+          ],
+          [
+            "tool_search",
+            "Calculator"
+          ],
+          [
+            "tool_search",
+            "Calculator"
+          ]
+        ],
+        "results": [
+          {
+            "toolCallId": "search",
+            "toolName": "tool_search",
+            "content": [
+              {
+                "type": "text",
+                "text": "Success. Found 1 matching tool(s)"
+              }
+            ],
+            "isError": false
+          },
+          {
+            "toolCallId": "calculate",
+            "toolName": "Calculator",
+            "content": [
+              {
+                "type": "text",
+                "text": "42"
+              }
+            ],
+            "isError": false
+          }
+        ],
+        "events": [
+          "agent_start",
+          "turn_start",
+          "message_start",
+          "message_end",
+          "message_start",
+          "message_end",
+          "tool_execution_start",
+          "tool_execution_end",
+          "message_start",
+          "message_end",
+          "turn_end",
+          "turn_start",
+          "message_start",
+          "message_end",
+          "tool_execution_start",
+          "tool_execution_end",
+          "message_start",
+          "message_end",
+          "turn_end",
+          "turn_start",
+          "message_start",
+          "message_end",
+          "turn_end",
+          "agent_end"
+        ],
+        "source": "upstream runAgentLoop unchanged; fixture stream; host supplies next-turn snapshot"
+      },
+      "pluginChain": {
+        "precedingEditPreservedWithDisabledPolicy": true,
+        "precedingEditProjectedWithEnabledPolicy": true
+      },
+      "context": {
+        "observed": [
+          {
+            "role": "user",
+            "content": "read data",
+            "timestamp": 1
+          },
+          {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "toolCall",
+                "id": "read-1",
+                "name": "read",
+                "arguments": {
+                  "path": "data"
+                }
+              }
+            ],
+            "stopReason": "toolUse",
+            "timestamp": 2
+          },
+          {
+            "role": "toolResult",
+            "toolCallId": "read-1",
+            "toolName": "read",
+            "content": [
+              {
+                "type": "text",
+                "text": "a😀\n[context view truncated; canonical result retained]"
+              }
+            ],
+            "isError": false,
+            "timestamp": 3
+          },
+          {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "text",
+                "text": "read complete"
+              }
+            ],
+            "stopReason": "stop",
+            "timestamp": 4
+          }
+        ],
+        "canonicalPreserved": true,
+        "handlerMutationVisible": "hook local mutation"
+      },
+      "resume": {
+        "separateProcess": true,
+        "policyPersisted": true,
+        "canonicalPreserved": true,
+        "resetRestored": true,
+        "audit": [
+          {
+            "after_messages": 4,
+            "previous_tool_chars": null,
+            "tool_chars": 2
+          },
+          {
+            "after_messages": 4,
+            "previous_tool_chars": 2,
+            "tool_chars": null
+          }
+        ]
+      },
+      "activeTools": [
+        "tool_search",
+        "Calculator"
+      ]
+    },
+    {
+      "kind": "rust",
+      "toolResult": {
+        "pluginSha256": "3ed3203385bcd621b4e3071ce815cf6a841aa5857bd7a5c83f7aff16be9ea7cf",
+        "initial": [
+          "tool_search"
+        ],
+        "noMatch": {
+          "content": [
+            {
+              "type": "text",
+              "text": "The relevant tools do not exist."
+            }
+          ],
+          "details": {
+            "matches": [],
+            "added": []
+          }
+        },
+        "afterNoMatch": [
+          "tool_search"
+        ],
+        "search": {
+          "content": [
+            {
+              "type": "text",
+              "text": "Success. Found 1 matching tool(s)"
+            }
+          ],
+          "details": {
+            "matches": [
+              "Calculator"
+            ],
+            "added": [
+              "Calculator"
+            ]
+          }
+        },
+        "nextRequest": [
+          "tool_search",
+          "Calculator"
+        ],
+        "repeatedSearch": {
+          "content": [
+            {
+              "type": "text",
+              "text": "Success. Found 1 matching tool(s)"
+            }
+          ],
+          "details": {
+            "matches": [
+              "Calculator"
+            ],
+            "added": []
+          }
+        },
+        "calculator": {
+          "content": [
+            {
+              "type": "text",
+              "text": "42"
+            }
+          ],
+          "details": {}
+        },
+        "staleApiRejected": true,
+        "errors": []
+      },
+      "originalLoop": {
+        "snapshots": [
+          [
+            "tool_search"
+          ],
+          [
+            "tool_search",
+            "Calculator"
+          ],
+          [
+            "tool_search",
+            "Calculator"
+          ]
+        ],
+        "results": [
+          {
+            "toolCallId": "search",
+            "toolName": "tool_search",
+            "content": [
+              {
+                "type": "text",
+                "text": "Success. Found 1 matching tool(s)"
+              }
+            ],
+            "isError": false
+          },
+          {
+            "toolCallId": "calculate",
+            "toolName": "Calculator",
+            "content": [
+              {
+                "type": "text",
+                "text": "42"
+              }
+            ],
+            "isError": false
+          }
+        ],
+        "events": [
+          "agent_start",
+          "turn_start",
+          "message_start",
+          "message_end",
+          "message_start",
+          "message_end",
+          "tool_execution_start",
+          "tool_execution_end",
+          "message_start",
+          "message_end",
+          "turn_end",
+          "turn_start",
+          "message_start",
+          "message_end",
+          "tool_execution_start",
+          "tool_execution_end",
+          "message_start",
+          "message_end",
+          "turn_end",
+          "turn_start",
+          "message_start",
+          "message_end",
+          "turn_end",
+          "agent_end"
+        ],
+        "source": "upstream runAgentLoop unchanged; fixture stream; host supplies next-turn snapshot"
+      },
+      "pluginChain": {
+        "precedingEditPreservedWithDisabledPolicy": true,
+        "precedingEditProjectedWithEnabledPolicy": true
+      },
+      "context": {
+        "observed": [
+          {
+            "role": "user",
+            "content": "read data",
+            "timestamp": 1
+          },
+          {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "toolCall",
+                "id": "read-1",
+                "name": "read",
+                "arguments": {
+                  "path": "data"
+                }
+              }
+            ],
+            "stopReason": "toolUse",
+            "timestamp": 2
+          },
+          {
+            "role": "toolResult",
+            "toolCallId": "read-1",
+            "toolName": "read",
+            "content": [
+              {
+                "type": "text",
+                "text": "a😀\n[context view truncated; canonical result retained]"
+              }
+            ],
+            "isError": false,
+            "timestamp": 3
+          },
+          {
+            "role": "assistant",
+            "content": [
+              {
+                "type": "text",
+                "text": "read complete"
+              }
+            ],
+            "stopReason": "stop",
+            "timestamp": 4
+          }
+        ],
+        "canonicalPreserved": true,
+        "handlerMutationVisible": "hook local mutation"
+      },
+      "resume": {
+        "separateProcess": true,
+        "policyPersisted": true,
+        "canonicalPreserved": true,
+        "resetRestored": true,
+        "audit": [
+          {
+            "after_messages": 4,
+            "previous_tool_chars": null,
+            "tool_chars": 2
+          },
+          {
+            "after_messages": 4,
+            "previous_tool_chars": 2,
+            "tool_chars": null
+          }
+        ]
+      },
+      "activeTools": [
+        "tool_search",
+        "Calculator"
+      ]
+    }
+  ],
+  "upstreamContextErrorChain": {
+    "canonical": [
+      {
+        "role": "user",
+        "content": [
+          {
+            "type": "text",
+            "text": "canonical"
+          }
+        ],
+        "timestamp": 1
+      }
+    ],
+    "output": [
+      {
+        "role": "user",
+        "content": [
+          {
+            "type": "text",
+            "text": "canonical:mutated:before-error"
+          }
+        ],
+        "timestamp": 1
+      },
+      {
+        "role": "user",
+        "content": [
+          {
+            "type": "text",
+            "text": "continued"
+          }
+        ],
+        "timestamp": 2
+      }
+    ],
+    "seen": [
+      "mutate",
+      "project",
+      "throw",
+      "after-error"
+    ],
+    "errors": [
+      {
+        "event": "context",
+        "error": "deliberate context failure"
+      }
+    ]
+  },
+  "equal": true,
+  "limits": "Original loader/runner and unchanged Kimi plugin, original TS agent loop plus scripted model stream/no live inference. Rust authoritative file-backed synchronous subprocess state; TS control same experiment schema. Context custom factories, narrow one-text-tool translation, not full Pi SessionManager/session import or all plugin compatibility. No performance claim."
+}

@@ -102,3 +102,59 @@ noting identity conversion uses normalized messages and JSON-copy dispatch order
 remains synchronous. Full source audit: docs/plugin-seams.md. Next concrete test
 is unchanged kimi-deferred-tools through actual loader/runner against Rust-owned
 active-tool state. This work is still incomplete; keep active goal running.
+
+## Second experiment cycle: actual plugin host and durable projection
+
+Combined experiment `experiments/real-plugin-architecture.mjs` now imports actual
+pinned loader and ExtensionRunner with installed upstream dependencies; it loads
+unchanged kimi-deferred-tools.ts and its actual TypeBox schemas. It compares TS
+control with synchronous Rust file-backed state (`examples/compat_kernel.rs`).
+Both preserve synchronous get/set activation, no-match/repeated search, Calculator
+result and stale-context/API rejection. No plugin source patch or loader stub.
+
+The experiment also executes original upstream runAgentLoop with deterministic
+stream responses and registered plugin tools. At prepareNextTurn the host supplies
+fresh tools from the backend. Three captured stream requests see search-only,
+then search+Calculator twice; both tool results succeed. This removes the earlier
+limitation of only inspecting a constructed requestTools snapshot. The loop is
+still upstream TS, NOT a Rust loop implementation; no live inference is involved.
+
+Actual ExtensionRunner context hooks apply the same persisted policy in both
+controls. Unicode-aware projection, no-op audit behavior, prior plugin edits,
+canonical isolation, separate Node process restore and reset pass. The TS control
+uses an experiment schema equivalent to the native Rust Session for these valid
+inputs; it does not implement Pi SessionManager or match Rust's corrupt-state
+validation. A narrow one-text-tool conversion preserves other Pi message fields;
+it cannot be used as evidence of full message/provider/session compatibility.
+
+### Falsified adapter and correction
+
+Independent reviewer identified that initial projectPi reconstructed tool results
+from canonical state and overwrote prior plugin edits, even with policy disabled.
+Reproduced exit1 and retained executable negative mode:
+`--canonical-counterexample`; see experiments/context-chain-counterexample.json.
+The corrected adapter passes the current event view into Rust projection without
+persisting that view. Both disabled and enabled policies now preserve/apply to
+preceding plugin changes. Existing9/9 live-test gate is unrelated to these pure
+architecture probes; no live quality benefit claimed.
+
+### Ownership demonstrated versus outstanding
+
+| Responsibility | Actual owner in this experiment | Evidence/limit |
+|---|---|---|
+| TS extension loading, npm schemas, captured functions | Unmodified Pi JS host | Actual Kimi plugin loaded |
+| Plugin context chain, errors, lifecycle/staleness | Unmodified Pi ExtensionRunner | Mutation/error/continuation and stale access tested |
+| Active tool names | TS control or Rust state process | Synchronous operations and next-request visibility agree |
+| Tool definitions/execution callbacks | JS host | Definitions and closures never serialized into Rust |
+| Context limit/audit/canonical projection | TS control or Rust Session through process | Valid inputs, save/reload/reset, plugin-view separation |
+| Agent loop, streaming event orchestration | Original TS loop | Rust replacement NOT demonstrated |
+| Pi session manager, auth, UI, broader core calls | Guarded/unexercised host bindings | No compatibility claim |
+
+Synchronous process calls deliberately block Node and start a new Rust process
+per operation. They prove a seam can preserve this synchronous contract, not that
+such IPC is a production recommendation. Reentrant calls originating from a live
+Rust loop, async cancellation and UI handles still require direct experiments.
+Native binding is still an unevaluated alternative. No throughput/latency/RSS
+measurement or performance benefit has been claimed. Upstream dependencies are
+experimental dev dependencies in ignored vendor, not a new distribution bundle.
+Setup/version/hydrated-catalog limits: docs/real-plugin-host.md.

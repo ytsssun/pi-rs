@@ -23,3 +23,5 @@ Live-model cycle from ef2b8e6: coordinator plus one independent acceptance/revie
 Coordinator plus one newly active replacement verifier (2 active, cap4); previous pending_init review never produced work. Pilot02:5 actual HTTP responses,3242 reported total tokens. Existing artifacts reused, no pilot rerun needed. No native usage counters or capacity-reset actions. Final matrix usage is exported without summing cumulative session vectors.
 
 Final retry matrix: 64 responses with usage, 61719 input tokens and 5538 completion tokens (provider-reported, no invoice claim). 7/9 independent successes,2 failed tasks. Export: experiments/live-retry-results.json. No missing response usage in this matrix.
+
+Architecture cycle2: coordinator plus1 worker, at most2 active (cap4). npm ci installed320 pinned dependencies with scripts disabled; public catalog hydration required actual loader imports. No credentials or live project-model calls. Native agent usage unavailable. Positive and negative deterministic probes independently rerun. No performance claims.
