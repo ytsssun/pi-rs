@@ -119,3 +119,5 @@ Verified E042: three fresh isolated native live seed/resume runs with gpt-5.6-lu
 Verified E043: native live resume autonomously selected `edit`, replaced NATIVE_LIVE_OK with NATIVE_LIVE_EDITED, then selected `read`; external exact-content check passed. This is a simple exact replacement fixture and not full Pi edit semantics; bash, repeated edit runs, crash recovery and broader compatibility remain open.
 
 Post-system-prompt live check: isolated seed/resume with gpt-5.6-luna still completed write, edit and read through unchanged JS tools; external target content was `NATIVE_LIVE_EDITED`. This is a regression smoke, not a new reliability sample.
+
+Verified E044: native live seed/resume now includes `bash`; gpt-5.6-luna autonomously ran an exact-content shell test in both processes, with `isError: false`. This is one isolated scenario and uses a bounded harness bash wrapper; production command parity and repeated trials remain open.
