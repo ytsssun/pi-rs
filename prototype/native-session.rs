@@ -117,6 +117,11 @@ impl Registry {
                     self.queues.insert(handle.clone(), q);
                     Ok(json!(handle))
                 }
+                "stream_status" => {
+                    let handle = r["handle"].as_str().ok_or("handle required")?;
+                    let producer = self.producers.get(handle).ok_or("unknown stream")?;
+                    Ok(json!({"finished": producer.is_finished()}))
+                }
                 "queue_push" => {
                     let handle = r["handle"].as_str().ok_or("handle required")?;
                     let q = self.queues.get(handle).ok_or("unknown queue")?;
