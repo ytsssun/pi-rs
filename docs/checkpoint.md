@@ -317,3 +317,7 @@ Streaming and synchronous HTTP requests now use the same Rust `chat_request` enc
 ### E115 — unchanged Pi extension sidecar (tested)
 - Ran `node prototype/test-extension-sidecar.mjs` against the pinned upstream `protected-paths.ts` without modification.
 - Protected-path blocks, allowed paths, malformed hook inputs, and malformed JSON behavior matched the fixture expectations. This validates the Node extension host in isolation; it is not yet proof that the extension is wired into the Rust-driven live runtime.
+
+### E116 — protected-path extension in live harness (tested)
+- Fresh live seed with unchanged `protected-paths.ts` loaded through `real-plugin-host` completed write/edit/bash and persisted messages.
+- The model used a non-protected target, so this does not test blocking; output showed `verified:true`, `toolResults:3`, `assistants:4`, exit 0. External result was `NATIVE_LIVE_EDITED` (seed expectation metadata was not applicable).
