@@ -173,3 +173,5 @@ Verified E069: a live `gpt-5.6-luna` parallel session was closed and reopened in
 Tested E070: Rust batch_result now honors all-results termination semantics: only an all-`terminate:true` batch returns done; mixed outcomes continue to model. Cargo test passes. Native terminate fixture and live validation remain open.
 
 Verified E071: native batch termination fixture proves mixed terminate flags continue to model, while all results requesting termination return done.
+
+E071 initial termination fixture was superseded due to a test script field typo. Verified E072 after correction: mixed terminate flags continue to model; all terminate=true returns done.
