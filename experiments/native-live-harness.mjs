@@ -20,6 +20,7 @@ try {
   const actual=existsSync(resolve(workspace,'native-live-target.txt'))?readFileSync(resolve(workspace,'native-live-target.txt'),'utf8').trim():null;
   if(stage==='protected' && existsSync(resolve(workspace,'.env'))) throw Error('protected path was modified');
   if((stage==='resume'||stage==='seed') && actual!==expected) throw Error(`external assertion failed: expected ${expected}, got ${actual}`);
+  if(stage==='parallel'||stage==='parallel-resume') for(const name of ['parallel-a.txt','parallel-b.txt']) { const value=existsSync(resolve(workspace,name))?readFileSync(resolve(workspace,name),'utf8').trim():null; if(value!=='PARALLEL_OK') throw Error(`parallel assertion failed for ${name}: ${value}`); }
   const entries=manager.snapshot().branch;
   const persistedToolResults=entries.filter(e=>e.type==='message'&&e.message?.role==='toolResult').length;
   const persistedAssistants=entries.filter(e=>e.type==='message'&&e.message?.role==='assistant').length;
