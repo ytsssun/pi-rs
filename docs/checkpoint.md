@@ -209,3 +209,5 @@ Verified E084: invalid batch arguments become per-call error outcomes; a valid p
 Tested E086: native batch driver forwards tool `usage` and `terminate` fields into Rust batch_result. Input mutation/invalid argument fixture and syntax checks pass. Live terminate remains unverified.
 
 Verified E087: immediate batch outcomes now traverse Pi `tool_result` hooks before Rust persistence, matching upstream prepared-tool flow. Existing hook-abort and input-mutation fixtures pass; dedicated result-hook error behavior remains open.
+
+Verified E088: immediate blocked outcomes retain input and traverse Pi `tool_result`; fixture accepts completion-order hook callbacks while asserting canonical persistence source order. This corrected an overstrict test assumption about parallel hook event order.
