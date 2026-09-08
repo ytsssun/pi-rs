@@ -1,6 +1,6 @@
 //! Node-API integration experiment for the real Rust Pi session module.
 //! Registry belongs to napi_env; explicit close or environment teardown drops stores.
-use pi_rs::{pi_runtime::PiRuntime, pi_session_store::PiSessionStore, provider::openai_chat};
+use pi_rs::{pi_runtime::PiRuntime, pi_session_store::PiSessionStore, provider::openai_chat, stream_queue::{StreamEvent, StreamQueue}};
 use serde_json::{json, Value};
 use std::{
     cell::RefCell,
@@ -60,6 +60,7 @@ struct Registry {
     prefix: u64,
     next: u64,
     stores: HashMap<String, NativeSession>,
+    queues: HashMap<String, std::sync::Arc<StreamQueue>>,
 }
 impl Drop for Registry {
     fn drop(&mut self) {
@@ -97,6 +98,31 @@ impl Registry {
                     Ok(json!(handle))
                 }
                 "count" => Ok(json!(self.stores.len())),
+                "queue_create" => {
+                    let capacity = r["capacity"].as_u64().ok_or("capacity required")? as usize;
+                    if capacity == 0 { return Err("capacity must be positive".into()); }
+                    self.next = self.next.checked_add(1).ok_or("queue handle exhausted")?;
+                    let handle = format!("{}:q{}", self.prefix, self.next);
+                    self.queues.insert(handle.clone(), std::sync::Arc::new(StreamQueue::new(capacity)));
+                    Ok(json!(handle))
+                }
+                "queue_push" => {
+                    let handle = r["handle"].as_str().ok_or("handle required")?;
+                    let q = self.queues.get(handle).ok_or("unknown queue")?;
+                    q.push(StreamEvent { value: r["event"].clone(), terminal: r["terminal"].as_bool().unwrap_or(false) }).map_err(|e| format!("push: {:?}", e))?;
+                    Ok(Value::Null)
+                }
+                "queue_poll" => {
+                    let handle = r["handle"].as_str().ok_or("handle required")?;
+                    let q = self.queues.get(handle).ok_or("unknown queue")?;
+                    Ok(q.poll().map(|e| json!({"value":e.value,"terminal":e.terminal})).unwrap_or(Value::Null))
+                }
+                "queue_close" => {
+                    let handle = r["handle"].as_str().ok_or("handle required")?;
+                    let q = self.queues.remove(handle).ok_or("unknown queue")?;
+                    q.close();
+                    Ok(Value::Null)
+                }
                 "diagnostics" => Ok(
                     json!({"finalizedEnvironments":ENV_DROPS.load(Ordering::Relaxed),"abandonedStoresDropped":ABANDONED_DROPS.load(Ordering::Relaxed)}),
                 ),
@@ -217,6 +243,7 @@ pub unsafe extern "C" fn napi_register_module_v1(env: Handle, exports: Handle) -
         prefix,
         next: 0,
         stores: HashMap::new(),
+        queues: HashMap::new(),
     })))
     .cast();
     if napi_set_instance_data(env, state, Some(cleanup), null_mut()) != 0 {
