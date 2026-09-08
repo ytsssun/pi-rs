@@ -151,3 +151,5 @@ Tested E058: native batch driver now completes lookup and argument validation fo
 Tested E059: native batch host honors registered `executionMode: "sequential"` by serializing the entire batch; otherwise it executes admitted calls concurrently. Existing integration fixture and syntax checks pass. Hook-driven preflight abort and live batch remain open.
 
 Tested E060: batch preflight now invokes unchanged Pi `ExtensionRunner.emitToolCall` for every call before execution and turns hook blocks into error outcomes. Existing integrated fixture, syntax and diff checks pass. A dedicated hook-abort fixture and full upstream event differential remain open.
+
+Tested E061: batch admission now propagates any preflight hook block across the whole batch, so no call executes after a batch-level abort. Existing integration and syntax checks pass; dedicated hook-abort fixture remains to be added.

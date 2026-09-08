@@ -50,6 +50,8 @@ export async function drive({manager,host,prompt,stream,trace=[],onToolUpdate=()
         if(hook?.block) return {entry,call,blocked:hook.block};
         return {entry,call,tool,args:validateToolArguments(tool,call)};
       }));
+      const batchBlocked=prepared.find(item=>item.blocked)?.blocked;
+      if(batchBlocked) for(const item of prepared) item.blocked=batchBlocked;
       const runOne=async ({entry,call,tool,args,blocked})=>{
         let result,isError=false;
         try {
