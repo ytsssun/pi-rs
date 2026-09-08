@@ -111,3 +111,5 @@ E038 failed: native live harness reached the real provider but OpenAI returned H
 Verified E039: fresh native Node-API harness with real `gpt-5.6-luna` completed model → unchanged JS `read` tool → model → turn end. This is the first live model execution through the native runtime. It is one read-only scenario in one process; cross-process native resume, mutations, and repeated trials remain unverified.
 
 Verified E040: native live harness now supports `seed`/`resume`. Two independent processes using gpt-5.6-luna completed model → unchanged JS read tool → model; the second opened the first session successfully with no prior tool replay. This remains read-only and one trial; mutation coding and repeated independent runs remain open.
+
+Verified E041: isolated native live mutation/resume passed across two processes with gpt-5.6-luna. Seed autonomously wrote `NATIVE_LIVE_OK` via unchanged JS `write`; resume autonomously read it and completed. External check matched exact file content. This is one scenario; three-run reliability, broader mutation tools, and crash recovery remain open.
