@@ -2,42 +2,40 @@
 
 ## Verified state
 
-Starting commit dc3393cad72e1dbfed4fce65bfa2594978a695a2, main authorized.
-Pinned upstream 9767ba275f3e9a5ee0f5c5342249b629ab1b2282 (MIT).
-Five deterministic prepared-tool cases compare equal between original upstream
-execution and Rust-owned update acceptance/completion ledger: success, thrown
-string, cooperative JS abort, undefined sink rejection, rejection with pending
-peer. Actual loader/runner/registered-tool wrapper exercised. Independent reviewer
-found two initial sink-error failures; fixes and pre-fix evidence retained.
-Earlier live Rust dispatcher synchronous plugin reentry and context projection
-comparisons remain valid within their recorded scopes.
+Starting commit68f5369705a03cf5cea31e3906a15331c52d36df, main authorized.
+Pinned Pi9767ba275f3e9a5ee0f5c5342249b629ab1b2282 (MIT) unchanged.
+Native Rust Node-API probe runs unchanged Kimi plugin with actual loader/runner/tool
+wrapper and matches TS control. Nested callbacks reenter Rust state; same-object,
+Promise, exception and real Text/Theme identity pass. Native method invokes JS
+AbortController preserving reason identity and listener reentry. UTF16 scalar
+state fixes independently found lone-surrogate loss. No new dependencies.
+Earlier IPC reentry, five async cases and TS/Rust context comparisons remain valid
+within their scopes; full compatibility and final architecture are not proven.
 
-Reproduce (no credentials):
+Reproduce:
 ```
-export PATH="$HOME/.cargo/bin:$PATH"
-cargo build --locked --example async_kernel
-TSX_TSCONFIG_PATH=vendor/pi-mono/tsconfig.json node --experimental-vm-modules --import ./vendor/pi-mono/node_modules/tsx/dist/loader.mjs experiments/async-tool-parity.mjs
+scripts/build-native-seam.sh
+TSX_TSCONFIG_PATH=vendor/pi-mono/tsconfig.json node --import ./vendor/pi-mono/node_modules/tsx/dist/loader.mjs experiments/native-seam.mjs
 ```
-Append `--fire-and-forget-counterexample` for expected exit1. Dependency setup and
-Node version caveat: docs/real-plugin-host.md. Source hashes/cases/protocol trace:
-experiments/async-tool-parity-results.json. Independent evidence:
-docs/async-tool-contract-review.md. Design: docs/async-boundary-evaluation.md.
+Evidence: experiments/native-seam-results.json, docs/native-seam-review.md.
+Setup/caveats: docs/real-plugin-host.md. Executed platform Darwin arm64 Node22.18.0;
+upstream requires22.19+, Linux build option untested. No credential/model use.
 
-## Limits and next work
+## Decision candidate, limits and next work
 
-These are isolated architecture probes, not an integrated Rust model-driven loop.
-JS retains original AbortSignal; Rust-originated cancellation, arbitrary reason
-and result identity, multiple-sink rejection selection order, cancellation during
-blocking RPC, synchronous sink throw,
-process death during drain and reconnect/recovery are unverified. No transport
-performance measurement, native binding comparison, live UI factory proof or real
-Pi SessionManager/context-policy persistence yet. Full compatibility unproven.
+Proposed primary integration candidate: Node-API plus unchanged upstream JS host.
+Comparison and rationale: docs/native-seam-evaluation.md. TS is natural for plugins;
+current evidence does not require whole runtime in TS. TS fork already demonstrates
+context editing, so that capability alone does not establish a need or speed gain
+for Rust. Rust runtime ownership remains the user's explicit goal.
 
-Next decisive work: compare native binding against helper-based IPC for synchronous
-callbacks and opaque JS values; test Rust-originated cancellation and live UI
-objects staying in JS. Carry these requirements into a concrete ownership decision,
-then verify real Pi session persistence with context editing before final judgment.
-Do not spend another cycle repeating already-passing registry/projection cases.
+Next: test real Pi SessionManager context policy persistence/reload and plugin
+restore lifecycle, plus actual UI factory host invocation. Use those results and
+full interface inventory to refine the architecture decision. Do not repeat passed
+scalar reentry tests. Native prototype has callback-local handles only, no retained
+references/background thread; its abort is test-triggered, not autonomous scheduler.
+No UI mounting/disposal, full agent loop, session ownership or distribution proof.
+Raw unsafe FFI is not production bindings; multi-rejection IPC ordering still open.
 
 ## Goal and coordination
 
@@ -47,10 +45,10 @@ TS fork remains the control for context editing. Only core/compatibility changes
 major licensing/distribution decisions or actual access blockers need user input.
 No global memory edits. Repository checkpoint/append-only board are authoritative.
 
-T022 ongoing overall architecture assessment; T024 tested async boundary subset.
+T022 ongoing architecture assessment; T025 tested native seam subset, D008 proposed
+Node-API primary candidate. Full compatibility goal unchanged.
 This cycle used coordinator plus one independent reviewer (cap4); reviewer-owned
-scenario fixture was consumed by coordinator unchanged. Both discovered failures
-were fixed before integration without user intervention. No live model calls or
+review findings corrected UTF16 state and FFI declaration before integration without user intervention. No live model calls or
 credentials; agent token counts unavailable. No background uptime promise.
 
 ## Historical evidence

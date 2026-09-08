@@ -43,3 +43,11 @@ pending-peer failure mismatches, both fixed and independently rerun. No user
 intervention or redundant acceptance implementation. No new dependencies, live
 model calls or credentials. Native agent token accounting unavailable. Host
 execution times are not performance measurements or end-to-end speed claims.
+
+### Native seam comparison (starting68f5369)
+
+Coordinator+one independent reviewer,2active against cap4. Reviewer proposed actual
+Text/Theme case and found lone-surrogate loss plus UTF16 FFI declaration mismatch;
+coordinator used those findings and fixed both. No user intervention, model calls,
+credentials or dependencies added. Node docs/public local headers inspected. Agent
+token usage unavailable. Native build/probe timings are not performance evidence.

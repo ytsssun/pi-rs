@@ -1,0 +1,78 @@
+{
+  "upstream": "9767ba275f3e9a5ee0f5c5342249b629ab1b2282",
+  "pluginSha256": "3ed3203385bcd621b4e3071ce815cf6a841aa5857bd7a5c83f7aff16be9ea7cf",
+  "nativeSourceSha256": "98f5f529914825b9fa921d91a5ae1e635489eb28d7d13a82f4378a0f06cc07f4",
+  "platform": "darwin",
+  "arch": "arm64",
+  "node": "v22.18.0",
+  "controlEqualsNative": true,
+  "plugin": {
+    "results": [
+      {
+        "content": [
+          {
+            "type": "text",
+            "text": "Success. Found 1 matching tool(s)"
+          }
+        ],
+        "details": {
+          "matches": [
+            "Calculator"
+          ],
+          "added": [
+            "Calculator"
+          ]
+        },
+        "addedToolNames": [
+          "Calculator"
+        ]
+      },
+      {
+        "content": [
+          {
+            "type": "text",
+            "text": "42"
+          }
+        ],
+        "details": {}
+      }
+    ],
+    "active": [
+      "tool_search",
+      "Calculator"
+    ]
+  },
+  "checks": {
+    "nestedReentry": [
+      "outer",
+      "inner",
+      "after-inner"
+    ],
+    "cyclicObjectIdentity": true,
+    "symbolAndMethodIdentity": true,
+    "promiseIdentity": true,
+    "thrownIdentityTypes": [
+      "undefined",
+      "null",
+      "symbol",
+      "object",
+      "object"
+    ],
+    "nativeInvokedAbortReasonIdentity": true,
+    "abortListenerReentry": true,
+    "actualTextThemeIdentity": true,
+    "componentClosureAndMutation": true,
+    "utf16StateRoundtrip": true,
+    "throwingGetterIdentity": true,
+    "naiveJsonCycleRejected": true,
+    "naiveJsonComponentMethodsLost": true
+  },
+  "limitations": [
+    "Synchronous Node-API callbacks only; no retained native references or background Rust thread",
+    "Native abort call triggered by JS test, not autonomous runtime cancellation scheduling",
+    "Actual Text/Theme used without interactive TUI lifecycle or real UI factory host",
+    "Thread-local scalar registry, not per-session/environment core",
+    "No full Rust loop, Pi session persistence, cross-platform binary matrix or performance proof",
+    "Hand-declared unsafe FFI experiment, not production bindings"
+  ]
+}
