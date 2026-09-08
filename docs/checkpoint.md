@@ -4,7 +4,9 @@ The Rust/Node-API runtime remains an integration prototype; the shipped Rust CLI
 still uses the legacy execution path. Running CLI help does not prove extension
 integration or a clean build (E128 overstated both).
 
-Current work: unified execution path remains the priority. The latest change fixes
+Current work: unified execution path remains the priority.
+
+Latest verified unified-entry results: E145 live original read, E146 live original write, E147 fresh-process write/read resume, E148 unchanged protected extension load, and E149 fresh-process write/edit resume. E144 remains the pre-fix failure that exposed incorrect tool registration. The new entry is still experimental and has not replaced the legacy CLI. The latest change fixes
 live harness acceptance/reporting: per-scenario file checks, byte-exact text (no
 trim), and unknown-stage rejection. Reproduce offline counterexamples with
 `node --test experiments/native-live-acceptance.test.mjs`.
