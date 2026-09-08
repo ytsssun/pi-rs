@@ -253,3 +253,8 @@ Verified E097: rebuilt native addon and independently exercised `queue_create`, 
 - Native fixture verifies stream handle creation, producer status query, blocking event consumption, terminal delivery, and close.
 - Evidence: `python3 scripts/build-native-session.py && node experiments/native-fixture-stream.mjs` => all flags true.
 - This remains deterministic fixture coverage; live provider handle is not yet exposed.
+
+### E103 — live native provider stream smoke (verified)
+- Loaded existing environment credentials without printing them; invoked `provider_stream_start` with the configured low-cost model and a minimal request.
+- Evidence: native addon rebuilt; Node observed 4 queued events, terminal=true, elapsed 1677 ms, process exited 0.
+- Event payloads were intentionally not persisted; this proves transport/queue lifecycle only, not coding-task quality or Pi compatibility.
