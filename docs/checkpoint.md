@@ -1,5 +1,7 @@
 # Current checkpoint
 
+E185 records three independent live actual-CLI write → fresh-process resume → edit successes with exact external assertions and no steering.
+
 E182 verifies exact projected toolResult truncation at a fixed limit, including the canonical-retained marker, while the persisted canonical result remains complete.
 
 E180 verifies a live long-read run with context-tool-chars=20 completes and persists a session. It does not yet expose an independent assertion of the exact model-view bytes; context editing correctness remains partially verified.
