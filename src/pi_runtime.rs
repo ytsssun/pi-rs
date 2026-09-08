@@ -153,6 +153,12 @@ impl PiRuntime {
             self.tool_updates.push(update);
             return Ok(json!({"type":"accepted","toolCallId":call["id"],"updateCount":self.tool_updates.len()}));
         }
+        if op == "mark_in_flight" {
+            let name=request["toolName"].as_str().context("toolName required")?;
+            if !matches!(name,"write"|"edit"|"bash") { bail!("in-flight marker requires mutation tool"); }
+            Self::append(store,json!({"type":"custom","customType":"pi-rs.in-flight.v1","data":{"requestId":request["requestId"],"toolCallId":request["toolCallId"],"toolName":name,"state":"pending"}}),timestamp)?;
+            return Ok(json!({"type":"marked"}));
+        }
         let expected_kind = if op == "model_result" {
             "model"
         } else if op == "tool_result" {

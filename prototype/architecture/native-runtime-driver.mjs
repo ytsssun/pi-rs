@@ -21,6 +21,7 @@ export async function drive({manager,host,prompt,stream,trace=[],onToolUpdate=()
       trace.push({type:'tool_start',requestId,tool:action.call?.name});
       const call=action.call;let result,isError=false;
       try {
+        if(['write','edit','bash'].includes(call.name)) step({event:'mark_in_flight',requestId,toolCallId:call.id,toolName:call.name});
         if(call.skipError)throw Error(call.skipError); // Rust rejected truncated call.
         const registered=host.runner.getAllRegisteredTools().find(t=>t.definition.name===call.name);
         if(!registered)throw Error(`Tool ${call.name} not found`);
