@@ -337,3 +337,7 @@ Streaming and synchronous HTTP requests now use the same Rust `chat_request` enc
 
 ### Sequential result interception correction
 The parameter-mutation experiment now registers a tool_result interceptor and checks exact persisted replacement content in sequential/parallel and valid/invalid-input combinations. Before the fix, sequential execution failed with no result hook calls (`[]` versus `[a,b]`). The driver now invokes the unchanged ExtensionRunner result interceptor before sending the result to Rust. Both `node experiments/native-batch-input-mutation.mjs` and `node experiments/native-batch-hook-abort.mjs` pass. Deterministic evidence only; remaining event lifecycle and termination parity are not implied.
+
+### E120 — live protected extension runtime block (verified)
+- Fresh protected live run with unchanged `protected-paths.ts` loaded in the Rust-driven harness passed: no `.env` was created, one attempted write produced a persisted toolResult, and two assistant messages were persisted.
+- External check reported expected/actual null with `passed:true`; this scenario intentionally asserts absence of the protected file.
