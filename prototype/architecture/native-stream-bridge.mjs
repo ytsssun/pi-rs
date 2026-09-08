@@ -24,3 +24,9 @@ export function assembleNativeQueue(request, handle) {
 export function runtimeCalls(canonical) {
   return (canonical.content ?? []).filter(x => x.type === 'toolCall').map(x => ({ id: x.id, name: x.name, arguments: x.arguments }));
 }
+
+export function toolResultMessages(calls, results) {
+  const assistant = { role: 'assistant', content: null, tool_calls: calls.map(c => ({ id: c.id, type: 'function', function: { name: c.name, arguments: JSON.stringify(c.arguments) } })) };
+  const tools = results.map(r => ({ role: 'tool', tool_call_id: r.toolCallId, content: (r.content ?? []).map(x => x.text ?? '').join('') }));
+  return [assistant, ...tools];
+}
