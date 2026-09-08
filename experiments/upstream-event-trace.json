@@ -13,14 +13,43 @@
     },
     {
       "type": "tool_start",
-      "tool": "echo",
-      "callId": "call-1"
+      "tool": "todo",
+      "callId": "a"
     },
     {
       "type": "tool_result",
-      "tool": "echo",
-      "callId": "call-1",
+      "tool": "todo",
+      "callId": "a",
       "isError": false
+    },
+    {
+      "type": "tool_start",
+      "tool": "long_output",
+      "callId": "long"
+    },
+    {
+      "type": "tool_result",
+      "tool": "long_output",
+      "callId": "long",
+      "isError": false
+    },
+    {
+      "type": "tool_start",
+      "tool": "explode",
+      "callId": "fail"
+    },
+    {
+      "type": "tool_result",
+      "tool": "explode",
+      "callId": "fail",
+      "isError": true
+    },
+    {
+      "type": "model_start"
+    },
+    {
+      "type": "model_result",
+      "stopReason": "stop"
     },
     {
       "type": "turn_end"

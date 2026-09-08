@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import {spawnSync} from 'node:child_process';
 import {readFileSync} from 'node:fs';
+spawnSync(process.execPath,['experiments/upstream-event-trace.mjs'],{encoding:'utf8'});
 const expected=JSON.parse(readFileSync(new URL('./upstream-event-trace.json',import.meta.url))).trace;
 const run=spawnSync(process.execPath,['--import','./vendor/pi-mono/node_modules/tsx/dist/loader.mjs','experiments/native-runtime.mjs'],{encoding:'utf8',env:{...process.env,TSX_TSCONFIG_PATH:'vendor/pi-mono/tsconfig.json'}});
 assert.equal(run.status,0,run.stderr);
