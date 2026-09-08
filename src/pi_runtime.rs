@@ -160,7 +160,9 @@ impl PiRuntime {
             return self.next(store);
         }
         if op == "batch_result" {
-            let (batch_id, calls) = self.batch.take().context("no pending batch")?;
+            let (batch_id, calls) = self.batch.as_ref().context("no pending batch")?;
+            let batch_id = batch_id.clone();
+            let calls = calls.clone();
             if request["batchId"] != batch_id { bail!("stale or mismatched batch"); }
             let results = request["results"].as_array().context("results array required")?;
             if results.len() != calls.len() { bail!("batch result count mismatch"); }
@@ -177,6 +179,7 @@ impl PiRuntime {
             }
             if !by_id.is_empty() { bail!("unknown batch result requestId"); }
             self.waiting = None;
+            self.batch = None;
             return self.next(store);
         }
         if op == "tool_update" {
