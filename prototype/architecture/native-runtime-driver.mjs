@@ -24,7 +24,11 @@ export async function drive({manager,host,prompt,stream,trace=[]}) {
         const registered=host.runner.getAllRegisteredTools().find(t=>t.definition.name===call.name);
         if(!registered)throw Error(`Tool ${call.name} not found`);
         const tool=wrapRegisteredTool(registered,host.runner);
-        result=await tool.execute(call.id,validateToolArguments(tool,call),new AbortController().signal);
+        result=await tool.execute(call.id,validateToolArguments(tool,call),new AbortController().signal,async update=>{
+          const accepted=step({event:'tool_update',requestId:action.requestId,update});
+          if(accepted.type!=='accepted') throw Error('native runtime rejected tool update');
+          trace.push({type:'tool_update',tool:call.name});
+        });
       } catch(error) {isError=true;result={content:[{type:'text',text:error instanceof Error?error.message:String(error)}],details:{}};}
       action=step({event:'tool_result',requestId:action.requestId,result,isError});
       trace.push({type:'tool_result',requestId:action.requestId,tool:call.name,isError});
