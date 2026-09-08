@@ -54,21 +54,19 @@ export async function drive({manager,host,prompt,stream,trace=[],onToolUpdate=()
         const args=hookEvent.input;
         prepared.push(hook?.block ? {entry,call,immediate:{content:[{type:'text',text:hook.reason||'Tool execution was blocked'}],terminate:hook.terminate===true}} : {entry,call,tool,args});
         } catch(error) {
-          prepared.push({entry,call,immediate:{content:[{type:'text',text:error instanceof Error?error.message:String(error)}]}});
+          prepared.push({entry,call,args:call.arguments??{},immediate:{content:[{type:'text',text:error instanceof Error?error.message:String(error)}]}});
         }
       }
       const runOne=async ({entry,call,tool,args,immediate})=>{
-        if(immediate) {
-          trace.push({type:'tool_result',requestId:entry.requestId,tool:call.name,isError:true});
-          return {requestId:entry.requestId,...immediate,isError:true};
-        }
-        let result,isError=false;
+        let result=immediate,isError=Boolean(immediate);
         try {
+          if(!immediate) {
           if(['write','edit','bash'].includes(call.name)) step({event:'mark_in_flight',requestId:entry.requestId,toolCallId:call.id,toolName:call.name});
           result=await executeWithUpdates(tool,call.id,args,new AbortController().signal,async update=>{
             trace.push({type:'tool_update',tool:call.name});
             await onToolUpdate({toolCallId:call.id,toolName:call.name,partialResult:update,requestId:entry.requestId});
           });
+          }
         } catch(error) { isError=true; result={content:[{type:'text',text:error instanceof Error?error.message:String(error)}],details:{}}; }
         const hooked=await host.runner.emitToolResult({type:'tool_result',toolCallId:call.id,toolName:call.name,input:args,content:result.content??[],details:result.details,isError,usage:result.usage});
         if(hooked){ result.content=hooked.content??result.content; result.details=hooked.details??result.details; isError=hooked.isError??isError; }

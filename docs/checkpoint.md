@@ -207,3 +207,5 @@ Verified E083: `experiments/native-batch-input-mutation.mjs` proves validation b
 Verified E084: invalid batch arguments become per-call error outcomes; a valid peer executes and the model continues. Preflight now runs in source order rather than Promise.all. Reproduce with `TSX_TSCONFIG_PATH=vendor/pi-mono/tsconfig.json node --import ./vendor/pi-mono/node_modules/tsx/dist/loader.mjs experiments/native-batch-input-mutation.mjs`. Existing sequential fixture passes. Remaining correction: previous records conflated per-tool hook block with AbortSignal cancellation; full batch compatibility is not verified.
 
 Tested E086: native batch driver forwards tool `usage` and `terminate` fields into Rust batch_result. Input mutation/invalid argument fixture and syntax checks pass. Live terminate remains unverified.
+
+Verified E087: immediate batch outcomes now traverse Pi `tool_result` hooks before Rust persistence, matching upstream prepared-tool flow. Existing hook-abort and input-mutation fixtures pass; dedicated result-hook error behavior remains open.
