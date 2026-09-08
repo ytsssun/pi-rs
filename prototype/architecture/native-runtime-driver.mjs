@@ -6,9 +6,9 @@ import {validateToolArguments} from '../../vendor/pi-mono/packages/ai/src/utils/
 export async function drive({manager,host,prompt,stream,trace=[]}) {
   const step=payload=>request({op:'runtime',handle:manager.handle,...payload});
   let action=step({event:'begin',prompt});
+  trace.push({type:'turn_start'});
   for(let count=0;count<32;count++) {
-    trace.push({type:action.type,requestId:action.requestId,tool:action.call?.name});
-    if(action.type==='done')return {action,trace};
+    if(action.type==='done') { trace.push({type:'turn_end'}); return {action,trace}; }
     if(action.type==='model') {
       trace.push({type:'model_start',requestId:action.requestId});
       const messages=await host.runner.emitContext(action.contextEntries.flatMap(sessionEntryToContextMessages));
