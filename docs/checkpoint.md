@@ -193,3 +193,5 @@ Verified E078: native batch abort fixture now has Pi `tool_result` hook rewrite 
 F079 proposed: native provider adapter currently uses synchronous Rust `provider_chat` and emits only a terminal stream event. True token/tool streaming remains an explicit compatibility gap; no latency or end-to-end performance claim is made.
 
 Verified E081: deterministic stream assembler covers ordered text deltas, incremental tool JSON, terminal done/error, EOF without terminal rejection, and post-terminal rejection. This is a JS seam fixture only; Rust nonblocking transport and live streaming remain unimplemented.
+
+Tested E082: batch preflight now preserves Pi's mutable `tool_call` input object for execution, including in-place hook mutations, without revalidation afterward. Existing integration and syntax checks pass; a dedicated mutation fixture remains open.
