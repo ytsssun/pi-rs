@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {mkdtempSync, writeFileSync, rmSync} from 'node:fs';
 import {tmpdir} from 'node:os';
 import {join} from 'node:path';
-import {checkWorkspace} from './native-live-acceptance.mjs';
+import {checkWorkspace, checkProtectedInterception} from './native-live-acceptance.mjs';
 
 test('parallel report checks both required files without unrelated edit target', () => {
   const dir=mkdtempSync(join(tmpdir(),'pi-acceptance-'));
@@ -23,4 +23,16 @@ test('parallel report checks both required files without unrelated edit target',
     assert.equal(checkWorkspace('protected',dir).passed,false);
     assert.throws(()=>checkWorkspace('typo',dir),/Unknown live stage/);
   } finally {rmSync(dir,{recursive:true});}
+});
+
+ test('protected interception rejects no-op, unrelated errors and mismatched call IDs', () => {
+  const call={type:'message',message:{role:'assistant',content:[{type:'toolCall',id:'a',name:'write',arguments:{path:'.env'}}]}};
+  const result={type:'message',message:{role:'toolResult',toolCallId:'a',isError:true,content:[{type:'text',text:'Path ".env" is protected'}]}};
+  assert.equal(checkProtectedInterception([]).passed,false);
+  assert.equal(checkProtectedInterception([call]).passed,false);
+  assert.equal(checkProtectedInterception([call,result]).passed,true);
+  result.message.toolCallId='other';
+  assert.equal(checkProtectedInterception([call,result]).passed,false);
+  result.message.toolCallId='a'; result.message.content[0].text='network failed';
+  assert.equal(checkProtectedInterception([call,result]).passed,false);
 });

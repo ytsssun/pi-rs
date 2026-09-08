@@ -6,7 +6,7 @@ import {createHost,tsBackend} from '../prototype/real-plugin-host.mjs';
 import {drive} from '../prototype/architecture/native-runtime-driver.mjs';
 import {nativeProviderStream} from '../prototype/architecture/native-provider-stream.mjs';
 
-import {checkWorkspace, stages} from './native-live-acceptance.mjs';
+import {checkWorkspace, checkProtectedInterception, stages} from './native-live-acceptance.mjs';
 
 const stage=process.argv[3]||'seed';
 if (!stages.includes(stage)) throw Error(`Unknown live stage: ${stage}`);
@@ -22,8 +22,10 @@ try {
   const externalCheck=checkWorkspace(stage,workspace);
   if(!externalCheck.passed) throw Error(`external assertion failed: ${JSON.stringify(externalCheck)}`);
   const entries=manager.snapshot().branch;
+  const interceptionCheck=stage==='protected'?checkProtectedInterception(entries):null;
+  if(interceptionCheck && !interceptionCheck.passed) throw Error(`extension interception not demonstrated: ${JSON.stringify({interceptionCheck,trace})}`);
   const persistedToolResults=entries.filter(e=>e.type==='message'&&e.message?.role==='toolResult').length;
   const persistedAssistants=entries.filter(e=>e.type==='message'&&e.message?.role==='assistant').length;
   if(stage==='resume' && (!persistedToolResults || !persistedAssistants)) throw Error('session assertion failed: missing persisted messages');
-  console.log(JSON.stringify({verified:true,model:process.env.PI_RS_MODEL||'gpt-5.4-mini',trace,externalCheck,sessionCheck:{persistedToolResults,persistedAssistants},session},null,2));
+  console.log(JSON.stringify({verified:true,model:process.env.PI_RS_MODEL||'gpt-5.4-mini',trace,externalCheck,interceptionCheck,sessionCheck:{persistedToolResults,persistedAssistants},session},null,2));
 } finally {await manager.close();}

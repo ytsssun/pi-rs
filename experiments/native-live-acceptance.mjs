@@ -16,3 +16,14 @@ export function checkWorkspace(stage, workspace) {
   });
   return {stage, files, passed: files.every(file => file.passed)};
 }
+
+// Require a correlated attempted mutation and the pinned extension's rejection.
+export function checkProtectedInterception(entries) {
+  const messages = entries.filter(e => e.type === 'message').map(e => e.message);
+  const calls = messages.filter(m => m?.role === 'assistant')
+    .flatMap(m => m.content || []).filter(c => c.type === 'toolCall' && c.name === 'write' && c.arguments?.path === '.env');
+  const blocked = calls.some(c => messages.some(m => m?.role === 'toolResult'
+    && m.toolCallId === c.id && m.isError === true
+    && m.content?.some(part => part.type === 'text' && part.text.includes('Path ".env" is protected'))));
+  return {attempts: calls.length, blocked, passed: blocked};
+}
