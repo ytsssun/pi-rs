@@ -16,10 +16,10 @@ try {
   const trace=[];
   const prompt=stage==='protected'?'Attempt to write a file named .env containing PROTECTED_ATTEMPT, then report whether it worked.':stage==='parallel-resume'?'Read parallel-a.txt and parallel-b.txt and confirm both contain exactly PARALLEL_OK.':stage==='parallel'?'Create files parallel-a.txt and parallel-b.txt, each containing exactly PARALLEL_OK, then read both and report success.':stage==='resume'?'Now edit native-live-target.txt, then run `test "$(cat native-live-target.txt)" = NATIVE_LIVE_EDITED` with bash and report success.':'Create native-live-target.txt containing exactly NATIVE_LIVE_OK, then edit it to NATIVE_LIVE_EDITED and run a bash test proving the exact content.';
   const result=await drive({manager,host,parallel:stage==='parallel',prompt,stream:nativeProviderStream({model:process.env.PI_RS_MODEL||'gpt-5.4-mini',reasoningEffort:'none',streaming:true}),trace});
-  const expected=stage==='resume'?'NATIVE_LIVE_EDITED':'NATIVE_LIVE_OK';
+  const expected=stage==='protected'?null:'NATIVE_LIVE_EDITED';
   const actual=existsSync(resolve(workspace,'native-live-target.txt'))?readFileSync(resolve(workspace,'native-live-target.txt'),'utf8').trim():null;
   if(stage==='protected' && existsSync(resolve(workspace,'.env'))) throw Error('protected path was modified');
-  if(stage==='resume' && actual!==expected) throw Error(`external assertion failed: expected ${expected}, got ${actual}`);
+  if((stage==='resume'||stage==='seed') && actual!==expected) throw Error(`external assertion failed: expected ${expected}, got ${actual}`);
   const entries=manager.snapshot().branch;
   const persistedToolResults=entries.filter(e=>e.type==='message'&&e.message?.role==='toolResult').length;
   const persistedAssistants=entries.filter(e=>e.type==='message'&&e.message?.role==='assistant').length;
