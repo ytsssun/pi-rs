@@ -287,3 +287,9 @@ E108's claim that converting a tool-call finish into `stop` was a correct fix is
 
 ### Shared provider request encoding
 Streaming and synchronous HTTP requests now use the same Rust `chat_request` encoder. Pi tool definitions and canonical assistant/toolResult messages no longer bypass translation in streaming. Streaming requests request usage explicitly. Verified by `cargo test --locked --lib provider` (2 passed), including exact tool-call ID, arguments and toolResult encoding. This corrects E105's attribution: callers using the Pi-shaped tool schema were valid at the Pi boundary; the streaming implementation lacked conversion. Live runtime integration remains open.
+
+### E109 — live streaming runtime tool loop (verified)
+- Added opt-in `streaming:true` to the existing `nativeProviderStream`; it starts the native provider handle, consumes the queue through the bridge, and returns the canonical assistant message to the existing Rust-driven runtime loop.
+- Independent live run: `node --env-file=.env --import ./vendor/pi-mono/node_modules/tsx/dist/loader.mjs experiments/native-stream-runtime-live.mjs` after native rebuild.
+- Evidence: model `gpt-5.4-mini`, 2 model turns, 1 real `echo` tool execution with exact `STREAM_RUNTIME_OK`, persisted toolResult, final assistant `stop`, exit 0, `humanInterventions:0`; usage recorded for both assistant turns.
+- This verifies one live tool loop and persistence in-process. Cross-process resume from this streaming path, broader tool safety, and full plugin compatibility remain open.
