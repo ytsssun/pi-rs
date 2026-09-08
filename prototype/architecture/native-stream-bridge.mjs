@@ -15,7 +15,7 @@ export function assembleNativeQueue(request, handle) {
   for (;;) {
     const event = request({ op: 'queue_poll', handle, wait: true });
     if (event == null) break;
-    if (event.terminal) { if (event.value?.type === 'error') throw Error(event.value.message ?? 'provider stream error'); break; }
+    if (event.terminal) { if (event.value?.type === 'error') throw Error(event.value.message ?? 'provider stream error'); chunks.push({ choices: [{ delta: {}, finish_reason: 'stop' }] }); break; }
     chunks.push(event.value);
   }
   return assembleOpenAIChunks(chunks);
