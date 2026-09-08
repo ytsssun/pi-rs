@@ -2,6 +2,12 @@
 
 An experimental Rust coding-agent runtime with narrowly tested Pi compatibility. It can change files, execute tests, save a session, exit and continue a new user turn. Real OpenAI model coding and cross-process continuation have been independently verified on small fixed tasks. The first Luna baseline completed 8/9 tasks fully; one run omitted testing its new behavior despite correct code. See [live review](experiments/live-luna-review.md) and [current checkpoint](docs/checkpoint.md) for retry status and limitations. This is not yet a drop-in Pi replacement.
 
+## Direction
+
+The project rewrites **Pi's core runtime**, while keeping the existing TypeScript/Node.js host as the compatibility boundary for the Pi ecosystem. Rust owns the session tree, context projection, runtime state machine and recovery; the host continues to load extensions, hold plugin objects and closures, dispatch UI events, and adapt providers. Node-API is the current seam because it preserves JavaScript identity and lets existing plugins run without a rewrite. It is an implementation boundary, not a claim that every Pi subsystem must remain in TypeScript.
+
+The next milestone is **native event and tool-hook conformance**: reproduce the pinned Pi agent/turn/message/tool event ordering, async update barriers, and tool-failure behavior in the Rust runtime while invoking the unchanged JS extension host. The acceptance cases and known gaps are tracked in [the checkpoint](docs/checkpoint.md); passing fixtures will not be treated as full Pi compatibility.
+
 ## Run the coding scenario
 
 Requirements: Unix, Rust (pinned by rust-toolchain.toml), Python 3, Git; Bash for command tools. Add the installed Cargo directory to PATH.
