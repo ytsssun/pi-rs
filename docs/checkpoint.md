@@ -187,3 +187,5 @@ Verified E076: native batch `tool_result` hook events now match Pi's declared sh
 E076 is superseded: strengthening the abort fixture to assert full tool_result event shape exposed that only one blocked outcome reached the hook, contrary to the two-result expectation. No full event-shape compatibility claim is made; investigate before retrying.
 
 Verified E077: blocked batch entries now retain validated arguments and tool metadata. The full tool_result event-shape abort fixture passes with both outcomes observed in source order and zero execution; prior E076 failure was caused by missing metadata on propagated blocked entries.
+
+Verified E078: native batch abort fixture now has Pi `tool_result` hook rewrite blocked content; rebuilt run confirms both rewritten values persist in canonical Rust session messages in source order, while tools execute zero times.
