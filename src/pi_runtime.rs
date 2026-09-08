@@ -14,6 +14,11 @@ impl PiRuntime {
     pub fn is_waiting(&self) -> bool {
         self.waiting.is_some()
     }
+    /// Returns the action kind currently awaiting host completion.
+    /// This is intentionally read-only so Node-API hosts can enforce event ordering.
+    pub fn pending_kind(&self) -> Option<&str> {
+        self.waiting.as_ref().map(|(kind, _)| kind.as_str())
+    }
     fn append(store: &mut PiSessionStore, payload: Value, timestamp: &str) -> Result<Value> {
         let snapshot = store.snapshot()?;
         let entries = snapshot["entries"].as_array().unwrap();
