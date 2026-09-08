@@ -1,0 +1,30 @@
+{
+  "status": "tested",
+  "source": "vendor/pi-mono/packages/coding-agent/src/core/event-bus.ts",
+  "sha256": "fe5c39a57081fb9674c5bdc8c4bc6779bb8524c8895afc337af5ea517bdc71a2",
+  "original": {
+    "sameObject": true,
+    "count": 1,
+    "order": [
+      "handler",
+      "after emit"
+    ]
+  },
+  "naiveJson": {
+    "sameObject": false,
+    "count": 0,
+    "order": [
+      "handler",
+      "after emit"
+    ]
+  },
+  "hostLocal": {
+    "sameObject": true,
+    "count": 1,
+    "order": [
+      "handler",
+      "after emit"
+    ]
+  },
+  "conclusion": "JSON-copy crossing loses reference/mutation semantics. Keeping this bus entirely in the JS host preserves this example. Not proof against every IPC/native architecture or proof of full plugin compatibility."
+}

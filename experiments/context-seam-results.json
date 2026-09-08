@@ -1,0 +1,33 @@
+{
+  "status": "tested",
+  "upstream": "9767ba275f3e9a5ee0f5c5342249b629ab1b2282",
+  "source": "vendor/pi-mono/packages/agent/src/agent-loop.ts",
+  "sha256": "1e16404a231912fbd7643d8317b15ec4cc6245ed8cedc37582a31d430a1cc6ac",
+  "cases": [
+    {
+      "limit": null,
+      "equal": true,
+      "canonicalPreserved": true,
+      "transformBeforeConversion": true
+    },
+    {
+      "limit": 0,
+      "equal": true,
+      "canonicalPreserved": true,
+      "transformBeforeConversion": true
+    },
+    {
+      "limit": 2,
+      "equal": true,
+      "canonicalPreserved": true,
+      "transformBeforeConversion": true
+    },
+    {
+      "limit": 100,
+      "equal": true,
+      "canonicalPreserved": true,
+      "transformBeforeConversion": true
+    }
+  ],
+  "scope": "Unchanged upstream request function with appended export, unused dependency guards and scripted stream; custom TS transform versus real Rust projection. Not full loop, plugin loading, persistence, provider schema or performance validation."
+}
