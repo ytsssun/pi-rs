@@ -341,3 +341,6 @@ The parameter-mutation experiment now registers a tool_result interceptor and ch
 ### E120 — live protected extension runtime block (verified)
 - Fresh protected live run with unchanged `protected-paths.ts` loaded in the Rust-driven harness passed: no `.env` was created, one attempted write produced a persisted toolResult, and two assistant messages were persisted.
 - External check reported expected/actual null with `passed:true`; this scenario intentionally asserts absence of the protected file.
+
+## Latest verified progress (E122)
+The pinned upstream async tool contract and native sink rejection probe both pass. Partial updates are ordered and awaited before executor settlement; late updates are ignored; thrown tools, cooperative abort, and sink rejection are preserved. This remains a prepared-tool/bridge probe, not proof that the full Rust agent loop is wired to every async extension path.
