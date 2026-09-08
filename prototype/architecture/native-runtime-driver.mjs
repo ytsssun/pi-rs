@@ -62,6 +62,8 @@ export async function drive({manager,host,prompt,stream,trace=[],onToolUpdate=()
             await onToolUpdate({toolCallId:call.id,toolName:call.name,partialResult:update,requestId:entry.requestId});
           });
         } catch(error) { isError=true; result={content:[{type:'text',text:error instanceof Error?error.message:String(error)}],details:{}}; }
+        const hooked=await host.runner.emitToolResult({toolCallId:call.id,toolName:call.name,result:result,isError});
+        if(hooked){ result.content=hooked.content??result.content; result.details=hooked.details??result.details; isError=hooked.isError??isError; }
         trace.push({type:'tool_result',requestId:entry.requestId,tool:call.name,isError});
         return {requestId:entry.requestId,content:result.content,details:result.details,isError};
       };

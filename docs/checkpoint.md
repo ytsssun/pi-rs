@@ -177,3 +177,5 @@ Verified E071: native batch termination fixture proves mixed terminate flags con
 E071 initial termination fixture was superseded due to a test script field typo. Verified E072 after correction: mixed terminate flags continue to model; all terminate=true returns done.
 
 Verified E073: native batch preflight now supplies Pi-compatible `tool_call` event `input` (retaining args for internal compatibility). The hook-abort fixture asserts input presence; rebuilt native addon passes zero-execution/source-order checks.
+
+Tested E074: native batch execution now invokes Pi `ExtensionRunner.emitToolResult` and applies returned result mutations before Rust persistence. Existing integration and syntax checks pass; dedicated result-hook mutation/throw fixture remains open.
