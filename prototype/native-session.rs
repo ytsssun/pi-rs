@@ -1,6 +1,6 @@
 //! Node-API integration experiment for the real Rust Pi session module.
 //! Registry belongs to napi_env; explicit close or environment teardown drops stores.
-use pi_rs::{pi_runtime::PiRuntime, pi_session_store::PiSessionStore};
+use pi_rs::{pi_runtime::PiRuntime, pi_session_store::PiSessionStore, provider::openai_chat};
 use serde_json::{json, Value};
 use std::{
     cell::RefCell,
@@ -71,6 +71,12 @@ impl Registry {
     fn request(&mut self, r: Value) -> Result<Value, String> {
         let result = (|| -> Result<Value, String> {
             match r["op"].as_str().unwrap_or("") {
+                "provider_chat" => {
+                    let key = std::env::var("OPENAI_API_KEY").map_err(|_| "OPENAI_API_KEY missing".to_string())?;
+                    let base = std::env::var("OPENAI_BASE_URL").unwrap_or_else(|_| "https://api.openai.com/v1".into());
+                    let model = r["model"].as_str().ok_or("model required")?;
+                    openai_chat(&reqwest::blocking::Client::new(), &base, &key, model, r["messages"].as_array().ok_or("messages required")?, &r["tools"], r["reasoning_effort"].as_str()).map_err(|e| e.to_string())
+                }
                 "create" | "open" => {
                     let path = Path::new(r["path"].as_str().ok_or("path required")?);
                     let store = if r["op"] == "create" {

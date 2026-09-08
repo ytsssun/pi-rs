@@ -12,7 +12,7 @@ for line in build.stdout.splitlines():
         for filename in record['filenames']:
             if filename.endswith('.rlib'): artifacts[record['target']['name']]=filename
 args=['rustc','--edition','2021','--crate-type','cdylib','-C','panic=abort','-L','dependency='+str(root/'target/debug/deps')]
-for name in ['pi_rs','serde_json']: args+=['--extern',name+'='+artifacts[name]]
+for name in ['pi_rs','serde_json','reqwest']: args+=['--extern',name+'='+artifacts[name]]
 if sys.platform=='darwin': args+=['-C','link-arg=-undefined','-C','link-arg=dynamic_lookup']
 elif sys.platform!='linux': raise SystemExit('Only Darwin/Linux build paths configured; platform unverified')
 args+=['prototype/native-session.rs','-o','target/native-session.node']
