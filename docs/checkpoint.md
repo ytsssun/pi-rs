@@ -309,3 +309,7 @@ Streaming and synchronous HTTP requests now use the same Rust `chat_request` enc
 ### E113 — repeated live streaming resume matrix (verified)
 - Three fresh seed/resume pairs passed the harness-owned external file assertion and persisted-message checks.
 - Each resume reported 5 toolResult and 7 assistant messages; no manual intervention was used. This is a three-run stability sample, not a reliability guarantee.
+
+### E114 — live provider transport error containment (verified)
+- With an intentionally unreachable local base URL, native provider stream returned a terminal error event; no normal completion was emitted.
+- This verifies transport failure containment only; session rollback semantics remain covered by deterministic runtime tests.
