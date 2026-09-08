@@ -176,6 +176,8 @@ impl PiRuntime {
                 let rid = call["requestId"].as_str().unwrap();
                 let result = by_id.remove(rid).context("missing batch result requestId")?;
                 let message = json!({"role":"toolResult","toolCallId":call["id"],"toolName":call["name"],"content":result.get("content").cloned().unwrap_or(json!([])),"details":result["details"],"isError":result["isError"].as_bool().unwrap_or(false),"timestamp":request["messageTimestamp"].as_u64().unwrap_or(0)});
+                let mut message = message;
+                if let Some(usage) = result.get("usage") { message["usage"] = usage.clone(); }
                 Self::append(store, json!({"type":"message","message":message}), timestamp)?;
             }
             if !by_id.is_empty() { bail!("unknown batch result requestId"); }

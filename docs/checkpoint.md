@@ -213,3 +213,5 @@ Verified E087: immediate batch outcomes now traverse Pi `tool_result` hooks befo
 Verified E088: immediate blocked outcomes retain input and traverse Pi `tool_result`; fixture accepts completion-order hook callbacks while asserting canonical persistence source order. This corrected an overstrict test assumption about parallel hook event order.
 
 Verified E089: corrected immediate result-hook fixture passes after native rebuild. Per-tool block leaves the peer executable; both result hooks receive complete Pi-shaped events and hook mutations persist in canonical source order. Parallel hook callback order is not constrained.
+
+Verified E090: tool_result hook `usage` now propagates through native driver and Rust batch_result into canonical session messages. Abort fixture asserts usage on both source-ordered outcomes; native rebuild and cargo tests pass.
