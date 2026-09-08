@@ -1,0 +1,274 @@
+{
+  "upstream": "9767ba275f3e9a5ee0f5c5342249b629ab1b2282",
+  "pluginSha256": "3ed3203385bcd621b4e3071ce815cf6a841aa5857bd7a5c83f7aff16be9ea7cf",
+  "calls": [
+    {
+      "name": "tool_search",
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "Success. Found 1 matching tool(s)"
+          }
+        ],
+        "details": {
+          "matches": [
+            "Calculator"
+          ],
+          "added": [
+            "Calculator"
+          ]
+        },
+        "addedToolNames": [
+          "Calculator"
+        ]
+      }
+    },
+    {
+      "name": "Calculator",
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "42"
+          }
+        ],
+        "details": {}
+      }
+    }
+  ],
+  "trace": [
+    {
+      "request": {
+        "op": "set_tools",
+        "names": [
+          "tool_search"
+        ]
+      },
+      "response": null
+    },
+    {
+      "request": {
+        "op": "start"
+      },
+      "response": null
+    },
+    {
+      "request": {
+        "op": "snapshot"
+      },
+      "response": {
+        "active": [
+          "tool_search"
+        ],
+        "pending": "search-1"
+      }
+    },
+    {
+      "request": {
+        "op": "get_tools"
+      },
+      "response": [
+        "tool_search"
+      ]
+    },
+    {
+      "request": {
+        "op": "get_tools"
+      },
+      "response": [
+        "tool_search"
+      ]
+    },
+    {
+      "request": {
+        "op": "set_tools",
+        "names": [
+          "tool_search",
+          "Calculator"
+        ]
+      },
+      "response": null
+    },
+    {
+      "request": {
+        "op": "get_tools"
+      },
+      "response": [
+        "tool_search",
+        "Calculator"
+      ]
+    },
+    {
+      "request": {
+        "op": "complete",
+        "id": "search-1",
+        "result": {
+          "content": [
+            {
+              "type": "text",
+              "text": "Success. Found 1 matching tool(s)"
+            }
+          ],
+          "details": {
+            "matches": [
+              "Calculator"
+            ],
+            "added": [
+              "Calculator"
+            ]
+          },
+          "addedToolNames": [
+            "Calculator"
+          ]
+        }
+      },
+      "response": null
+    },
+    {
+      "request": {
+        "op": "snapshot"
+      },
+      "response": {
+        "active": [
+          "tool_search",
+          "Calculator"
+        ],
+        "pending": "calculate-1"
+      }
+    },
+    {
+      "request": {
+        "op": "get_tools"
+      },
+      "response": [
+        "tool_search",
+        "Calculator"
+      ]
+    },
+    {
+      "request": {
+        "op": "get_tools"
+      },
+      "response": [
+        "tool_search",
+        "Calculator"
+      ]
+    },
+    {
+      "request": {
+        "op": "complete",
+        "id": "calculate-1",
+        "result": {
+          "content": [
+            {
+              "type": "text",
+              "text": "42"
+            }
+          ],
+          "details": {}
+        }
+      },
+      "response": null
+    },
+    {
+      "request": {
+        "op": "snapshot"
+      },
+      "response": {
+        "active": [
+          "tool_search",
+          "Calculator"
+        ],
+        "pending": null
+      }
+    },
+    {
+      "request": {
+        "op": "complete",
+        "id": "stale",
+        "result": {}
+      },
+      "error": "invalid operation or callback id"
+    },
+    {
+      "request": {
+        "op": "start"
+      },
+      "response": null
+    },
+    {
+      "request": {
+        "op": "complete",
+        "id": "search-1",
+        "result": {
+          "content": [
+            {
+              "type": "text",
+              "text": "Success. Found 1 matching tool(s)"
+            }
+          ],
+          "details": {
+            "matches": [
+              "Calculator"
+            ],
+            "added": [
+              "Calculator"
+            ]
+          },
+          "addedToolNames": [
+            "Calculator"
+          ]
+        }
+      },
+      "error": "invalid operation or callback id"
+    },
+    {
+      "request": {
+        "op": "snapshot"
+      },
+      "response": {
+        "active": [
+          "tool_search",
+          "Calculator"
+        ],
+        "pending": "search-2"
+      }
+    },
+    {
+      "request": {
+        "op": "complete",
+        "id": "search-2",
+        "error": "injected JS rejection"
+      },
+      "response": null
+    },
+    {
+      "request": {
+        "op": "snapshot"
+      },
+      "response": {
+        "active": [
+          "tool_search",
+          "Calculator"
+        ],
+        "pending": null
+      }
+    }
+  ],
+  "checks": {
+    "nestedSyncReentry": true,
+    "activationVisibleToRustDispatch": true,
+    "unknownCompletionIdRejected": true,
+    "previousInvocationReplayRejected": true,
+    "reportedJsFailureClearsPending": true,
+    "deadKernelSyncCallThrows": true
+  },
+  "limitations": [
+    "scripted Rust dispatcher, not a model-driven agent loop",
+    "synchronous helper process per RPC; no performance claim",
+    "Unix socket prototype only",
+    "no cancellation/update/UI/native binding/Pi session test",
+    "failure is injected, not thrown by upstream plugin"
+  ]
+}

@@ -25,3 +25,12 @@ Coordinator plus one newly active replacement verifier (2 active, cap4); previou
 Final retry matrix: 64 responses with usage, 61719 input tokens and 5538 completion tokens (provider-reported, no invoice claim). 7/9 independent successes,2 failed tasks. Export: experiments/live-retry-results.json. No missing response usage in this matrix.
 
 Architecture cycle2: coordinator plus1 worker, at most2 active (cap4). npm ci installed320 pinned dependencies with scripts disabled; public catalog hydration required actual loader imports. No credentials or live project-model calls. Native agent usage unavailable. Positive and negative deterministic probes independently rerun. No performance claims.
+
+### Callback reentry architecture cycle
+
+Coordinator plus one independent source/runtime reviewer (cap4,2used). Reviewer
+finding about registered-tool activation metadata changed coordinator experiment
+before final verification. No user intervention, new dependencies, model calls or
+API spend. Agent token usage unavailable; build/probe command duration is not an
+agent-performance benchmark. Next work derives from uncovered callback semantics,
+not another repeat of successful activation cases.

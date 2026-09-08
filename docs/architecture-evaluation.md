@@ -158,3 +158,53 @@ Native binding is still an unevaluated alternative. No throughput/latency/RSS
 measurement or performance benefit has been claimed. Upstream dependencies are
 experimental dev dependencies in ignored vendor, not a new distribution bundle.
 Setup/version/hydrated-catalog limits: docs/real-plugin-host.md.
+
+## Live Rust callback reentry (starting f4bcc19)
+
+`examples/callback_kernel.rs` now holds tool activation state in one live Rust
+process and initiates two scripted JS tool calls. `experiments/callback-reentry.mjs`
+loads the unchanged pinned Kimi plugin through the actual loader/runner and invokes
+actual `wrapRegisteredTool`. While a callback is pending, synchronous plugin
+get/set calls connect to the same Rust server through a bounded helper process.
+Rust observes Calculator activation before dispatching it. No shadow JS registry.
+The wrapper's `addedToolNames` metadata is asserted, as is the upstream demo's42.
+
+This supplies evidence that synchronous plugin APIs do not inherently require the
+core state/dispatcher to remain TS. It does **not** select this transport: helper
+process creation is deliberately crude, no throughput/latency claim is made, and
+there is no live model-driven loop, native binding comparison, cancellation,
+partial updates, UI or Pi session persistence in this experiment.
+
+Additional checks: mismatched completion ID is rejected, injected JS failure clears
+pending callback, and a sync call after confirmed kernel termination throws.
+These are not evidence of rollback, transparent recovery or cancellation during a
+blocked call. RPC read/write limits2seconds, parent helper deadline3seconds, callback
+deadline5seconds; Unix-only experiment, no new dependency. Each run removes its
+socket directory and terminates its child. Results and trace are in
+`experiments/callback-reentry-results.json`.
+
+Independent source review found previous direct `definition.execute` probes bypassed
+upstream registered-tool wrapper metadata, and their original-loop bridge dropped
+call ID/signal/update parameters. Previous narrow activation/context observations
+remain valid; they never established complete tool execution equivalence. The new
+probe uses the original wrapper. See `docs/callback-contract-review.md`.
+
+Reproduce (no credentials):
+```
+export PATH="$HOME/.cargo/bin:$PATH"
+cargo build --locked --example callback_kernel
+TSX_TSCONFIG_PATH=vendor/pi-mono/tsconfig.json node --import ./vendor/pi-mono/node_modules/tsx/dist/loader.mjs experiments/callback-reentry.mjs
+```
+Use dependency setup in `docs/real-plugin-host.md`. Next: cancellation/update
+ordering across a genuinely pending async JS tool, including failure/death; then
+native-binding comparison and remaining full-compatibility inventory. Keeping JS
+closures/UI in their native host is plausible; full compatibility remains unproven.
+
+Independent replay counterexample: initial dispatcher reused `search`/`calculate`
+IDs and accepted a previous invocation's completion after another start. That
+invalidated the broad stale-completion assertion (which only tried an unknown ID).
+Fixed with checked monotonically increasing per-process generation IDs and an
+explicit replay of the first real completion during the second invocation;
+rejection must leave the pending invocation unchanged. IDs are not durable across
+process restarts; recovery/transport reconnect remains unimplemented. Preserve
+pre-fix reproduction in callback-contract-review.md.

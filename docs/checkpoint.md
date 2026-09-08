@@ -1,5 +1,23 @@
 # Current checkpoint — core-only Rust architecture evaluation
 
+## Latest verified state and immediate next step
+
+At f4bcc19 plus this cycle, live persistent Rust dispatch/state successfully calls
+unchanged Pi Kimi tools through actual loader/runner/wrapRegisteredTool; nested
+synchronous get/set reenters the same process and activation is visible to Rust.
+Unknown and previous-invocation completion rejection, injected failure cleanup
+and post-death RPC error pass. Reviewer caught reused callback IDs accepting old
+results; per-process generation IDs now fix the reproduced case. Cross-process
+identity/recovery remains untested.
+Reproduce: `cargo build --locked --example callback_kernel`, then
+`TSX_TSCONFIG_PATH=vendor/pi-mono/tsconfig.json node --import ./vendor/pi-mono/node_modules/tsx/dist/loader.mjs experiments/callback-reentry.mjs`.
+Evidence: experiments/callback-reentry-results.json and docs/callback-contract-review.md.
+This is scripted dispatch with a helper per sync RPC, not the model-driven Rust
+loop or selected production transport. No cancellation/update/native/UI/Pi-session
+proof yet. Next test async update/cancel ordering, then native-binding comparison.
+Older direct execution probes missed upstream addedToolNames wrapper metadata;
+new probe asserts it. Historical observations below retain their original scope.
+
 ## Active goal and preserved constraints
 
 User requests a Rust rewrite of only Pi core runtime with unchanged ecosystem
@@ -34,10 +52,9 @@ case); positive probes TS and Rust. See context-chain-counterexample.json.
 
 ## Precise next work
 
-1. Prototype a LIVE Rust-owned loop/state operation calling JS and receiving a
-   synchronous nested core read/write. Current spawnSync one-process-per-operation
-   probe blocks Node and never invokes JS callbacks from Rust, so it cannot choose
-   production transport. Compare callback RPC handling with in-process native
+1. Live scripted Rust dispatcher reentry now passes; extend to model-driven
+   ownership and compare native binding. The older state-only spawnSync probe did not invoke callbacks. The new
+   persistent dispatcher does, but its helper-based transport is still experimental. Compare callback RPC handling with in-process native
    binding; preserve sync return types and avoid two competing authoritative states.
 2. Exercise AbortSignal/update callback propagation and failure/death cleanup with
    actual upstream tool wrappers. The present execute wrapper drops these arguments
