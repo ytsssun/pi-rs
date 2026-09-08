@@ -179,36 +179,7 @@ fn main() -> Result<()> {
             let key = env::var("OPENAI_API_KEY").context("OPENAI_API_KEY missing")?;
             let base =
                 env::var("OPENAI_BASE_URL").unwrap_or_else(|_| "https://api.openai.com/v1".into());
-            let mut request = json!({
-                "model":options["--model"],"messages":messages,"tools":definitions
-            });
-            if let Some(effort) = options.get("--reasoning-effort") {
-                request["reasoning_effort"] = json!(effort);
-            }
-            let response: Value = client
-                .post(format!("{}/chat/completions", base.trim_end_matches('/')))
-                .bearer_auth(key)
-                .json(&request)
-                .send()?
-                .error_for_status()?
-                .json()?;
-            if !matches!(
-                response["choices"][0]["finish_reason"].as_str(),
-                Some("stop" | "tool_calls")
-            ) {
-                bail!("model response incomplete or unsupported finish_reason; no tools executed");
-            }
-            let mut message = response["choices"][0]
-                .get("message")
-                .cloned()
-                .context("missing assistant message")?;
-            if let Some(usage) = response.get("usage") {
-                message
-                    .as_object_mut()
-                    .context("assistant must be object")?
-                    .insert("_provider_usage".into(), usage.clone());
-            }
-            Ok(message)
+            pi_rs::provider::openai_chat(&client, &base, &key, options["--model"].as_str(), messages, &definitions, options.get("--reasoning-effort").map(String::as_str))
         },
     )?;
     println!("{answer}");

@@ -4,6 +4,7 @@ pub mod pi_session_index;
 pub mod edit;
 pub mod read;
 pub mod tools;
+pub mod provider;
 use anyhow::{bail, Context, Result};
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
