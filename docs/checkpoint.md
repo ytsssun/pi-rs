@@ -2,6 +2,20 @@
 
 ## Current verified status
 
+Latest provider check: `python3 scripts/build-native-session.py` then
+`python3 experiments/native-provider-http.py` passes four local HTTP cases through
+Node-API and the shared Rust transport: success/usage, incomplete response, HTTP
+429, and redirect refusal. Native and CLI now share the 120-second/no-redirect
+client configuration. This is not live inference. Native requests still block the
+Node event loop; message-schema conversion and live coding/resume remain open.
+
+Evidence correction: the current `upstream-event-trace.mjs` constructs a handwritten
+trace rather than executing upstream Pi. Its comparison cannot establish upstream
+lifecycle parity. Earlier parity claims based on that comparison are superseded;
+M7 remains incomplete. Likewise the delayed tool fixture awaits its own updates;
+that does not establish a runtime barrier for non-awaiting plugins.
+
+
 Architecture direction: Rust core through Node-API, pinned upstream JS ecosystem
 host unchanged. Architecture assessment now has integrated evidence; this is NOT
 complete Rust rewrite, all-plugin compatibility, production readiness or measured

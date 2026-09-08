@@ -1,7 +1,7 @@
 use anyhow::{bail, Context, Result};
 use pi_rs::{appended_path, run_with_options, Session};
 use serde_json::Value;
-use std::{env, fs, path::Path, time::Duration};
+use std::{env, fs, path::Path};
 fn main() -> Result<()> {
     let args: Vec<String> = env::args().skip(1).collect();
     if args.is_empty() || args.iter().any(|a| a == "--help") {
@@ -152,10 +152,7 @@ fn main() -> Result<()> {
             .unwrap()
             .retain(|t| t["function"]["name"] == "read");
     }
-    let client = reqwest::blocking::Client::builder()
-        .timeout(Duration::from_secs(120))
-        .redirect(reqwest::redirect::Policy::none())
-        .build()?;
+    let client = pi_rs::provider::client()?;
     if context_policy == Some(None) {
         if session.in_flight.is_some() {
             bail!(

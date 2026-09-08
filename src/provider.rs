@@ -2,6 +2,13 @@ use anyhow::{Context, Result, bail};
 use reqwest::blocking::Client;
 use serde_json::{json, Value};
 
+pub fn client() -> Result<Client> {
+    Ok(Client::builder()
+        .timeout(std::time::Duration::from_secs(120))
+        .redirect(reqwest::redirect::Policy::none())
+        .build()?)
+}
+
 /// One bounded OpenAI Chat Completions request shared by CLI and native hosts.
 /// Credentials are read by the caller; this function never logs them.
 pub fn openai_chat(client: &Client, base: &str, key: &str, model: &str, messages: &[Value], tools: &Value, reasoning_effort: Option<&str>) -> Result<Value> {
