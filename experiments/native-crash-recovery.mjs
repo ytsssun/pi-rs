@@ -1,0 +1,10 @@
+import assert from 'node:assert/strict';
+import {spawnSync} from 'node:child_process';
+import {mkdtempSync} from 'node:fs';
+import {tmpdir} from 'node:os'; import {join} from 'node:path';
+import {request} from '../prototype/architecture/native-store-backend.mjs';
+const dir=mkdtempSync(join(tmpdir(),'pi-crash-')); const path=join(dir,'session.json');
+const child=spawnSync(process.execPath,['--input-type=module','-e',`import {createBackend} from './prototype/architecture/native-store-backend.mjs'; const m=await createBackend({path:${JSON.stringify(path)}}); import {request} from './prototype/architecture/native-store-backend.mjs'; request({op:'runtime',handle:m.handle,event:'mark_in_flight',requestId:'r',toolCallId:'c',toolName:'write'}); process.exit(9);`],{encoding:'utf8'});
+assert.equal(child.status,9); const m=await (await import('../prototype/architecture/native-store-backend.mjs')).createBackend({path,mode:'open'});
+assert.throws(()=>request({op:'runtime',handle:m.handle,event:'begin',prompt:'replay'}),/unresolved persisted tool calls/);
+console.log(JSON.stringify({verified:true,childExit:child.status,pendingBlocksReplay:true})); await m.close();
