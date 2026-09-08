@@ -171,3 +171,5 @@ Verified E068: three additional fresh isolated live `gpt-5.6-luna` parallel runs
 Verified E069: a live `gpt-5.6-luna` parallel session was closed and reopened in a fresh process; `parallel-resume` independently read both prior files and completed without replaying writes. External contents remained exact `PARALLEL_OK`. One recovery run, no steering.
 
 Tested E070: Rust batch_result now honors all-results termination semantics: only an all-`terminate:true` batch returns done; mixed outcomes continue to model. Cargo test passes. Native terminate fixture and live validation remain open.
+
+Verified E071: native batch termination fixture proves mixed terminate flags continue to model, while all results requesting termination return done.
