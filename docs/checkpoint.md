@@ -175,3 +175,5 @@ Tested E070: Rust batch_result now honors all-results termination semantics: onl
 Verified E071: native batch termination fixture proves mixed terminate flags continue to model, while all results requesting termination return done.
 
 E071 initial termination fixture was superseded due to a test script field typo. Verified E072 after correction: mixed terminate flags continue to model; all terminate=true returns done.
+
+Verified E073: native batch preflight now supplies Pi-compatible `tool_call` event `input` (retaining args for internal compatibility). The hook-abort fixture asserts input presence; rebuilt native addon passes zero-execution/source-order checks.

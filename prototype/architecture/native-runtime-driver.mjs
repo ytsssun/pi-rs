@@ -46,7 +46,7 @@ export async function drive({manager,host,prompt,stream,trace=[],onToolUpdate=()
         const registered=host.runner.getAllRegisteredTools().find(t=>t.definition.name===call.name);
         if(!registered) throw Error(`Tool ${call.name} not found`);
         const tool=wrapRegisteredTool(registered,host.runner);
-        const hook=await host.runner.emitToolCall({toolCallId:call.id,toolName:call.name,args:call.arguments});
+        const hook=await host.runner.emitToolCall({toolCallId:call.id,toolName:call.name,args:call.arguments,input:call.arguments});
         if(hook?.block) return {entry,call,blocked:hook.block};
         return {entry,call,tool,args:validateToolArguments(tool,call)};
       }));
