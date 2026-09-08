@@ -77,3 +77,7 @@ docs/architecture-evaluation.md, docs/plugin-seams.md, docs/architecture-decisio
 Board T029 integrated fixture milestone tested; architecture assessment T022 closed
 with explicit full-product limits. Subsequent work follows the project goal, not
 an invented claim that the complete coding agent already replaces Pi.
+
+## Execution continuity
+
+The project checkpoint and append-only board are the durable recovery mechanism. The Codex goal is active for this task, but a completed turn does not itself guarantee background execution: the app/user or an explicitly configured heartbeat must start another turn. Worker completion can notify the coordinator while this task is active; it cannot revive an exited process. On abnormal exit, resume from `git status`, the latest checkpoint, and `python3 scripts/board.py list`; never infer work from chat claims. No herdr executable or existing project automation was found in this environment.
