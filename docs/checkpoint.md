@@ -225,3 +225,5 @@ Verified E093: Rust `SseDecoder` now buffers split chunks and emits multiple com
 Verified E094: Rust SseDecoder handles standard CRLF event separators in addition to LF, with unit coverage. This remains parser groundwork, not live streaming transport.
 
 Verified E096: independently reran bounded Rust `StreamQueue` targeted tests and full cargo suite. Capacity, terminal exactly-once, wait wakeup, close, and post-close rejection pass. Queue is not yet exposed through Node-API or connected to HTTP provider.
+
+Verified E097: rebuilt native addon and independently exercised `queue_create`, `queue_push`, `queue_poll`, and `queue_close`; ordered event and terminal propagation pass. Queue is not connected to HTTP provider or an asynchronous producer yet.
