@@ -243,3 +243,8 @@ Verified E097: rebuilt native addon and independently exercised `queue_create`, 
 - Rebuilt addon to `target/native-session.node` and exercised `queue_push_batch` from Node.
 - Evidence: ordered delta then terminal event observed through `queue_poll`; no error.
 - This is a deterministic native fixture; live HTTP provider producer remains open.
+
+### E101 — reproducible Node producer fixture (verified)
+- `python3 scripts/build-native-session.py && node experiments/native-batch-producer.mjs` passed.
+- Node can publish ordered events and terminal state through the native queue seam.
+- This remains fixture-only; no network or background provider handle is exposed yet.
