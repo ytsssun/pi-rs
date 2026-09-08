@@ -164,11 +164,18 @@ impl PiRuntime {
             if request["batchId"] != batch_id { bail!("stale or mismatched batch"); }
             let results = request["results"].as_array().context("results array required")?;
             if results.len() != calls.len() { bail!("batch result count mismatch"); }
-            for (call, result) in calls.iter().zip(results) {
-                if result["requestId"] != call["requestId"] { bail!("batch result requestId mismatch"); }
+            let mut by_id = std::collections::HashMap::new();
+            for result in results {
+                let rid = result["requestId"].as_str().context("batch result requestId required")?;
+                if by_id.insert(rid.to_string(), result).is_some() { bail!("duplicate batch result requestId"); }
+            }
+            for call in &calls {
+                let rid = call["requestId"].as_str().unwrap();
+                let result = by_id.remove(rid).context("missing batch result requestId")?;
                 let message = json!({"role":"toolResult","toolCallId":call["id"],"toolName":call["name"],"content":result.get("content").cloned().unwrap_or(json!([])),"details":result["details"],"isError":result["isError"].as_bool().unwrap_or(false),"timestamp":request["messageTimestamp"].as_u64().unwrap_or(0)});
                 Self::append(store, json!({"type":"message","message":message}), timestamp)?;
             }
+            if !by_id.is_empty() { bail!("unknown batch result requestId"); }
             self.waiting = None;
             return self.next(store);
         }
