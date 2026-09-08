@@ -48,7 +48,7 @@ export async function drive({manager,host,prompt,stream,trace=[],onToolUpdate=()
         const tool=wrapRegisteredTool(registered,host.runner);
         return {entry,call,tool,args:validateToolArguments(tool,call)};
       });
-      const results=await Promise.all(prepared.map(async ({entry,call,tool,args})=>{
+      const runOne=async ({entry,call,tool,args})=>{
         let result,isError=false;
         try {
           result=await executeWithUpdates(tool,call.id,args,new AbortController().signal,async update=>{
@@ -58,7 +58,11 @@ export async function drive({manager,host,prompt,stream,trace=[],onToolUpdate=()
         } catch(error) { isError=true; result={content:[{type:'text',text:error instanceof Error?error.message:String(error)}],details:{}}; }
         trace.push({type:'tool_result',requestId:entry.requestId,tool:call.name,isError});
         return {requestId:entry.requestId,content:result.content,details:result.details,isError};
-      }));
+      };
+      const sequential=prepared.some(({tool})=>tool.definition.executionMode==='sequential');
+      const results=[];
+      if(sequential) for(const item of prepared) results.push(await runOne(item));
+      else results.push(...await Promise.all(prepared.map(runOne)));
       action=step({event:'batch_result',batchId:action.batchId,results,messageTimestamp:Date.now()});
     } else throw Error('unknown Rust action '+action.type);
   }
