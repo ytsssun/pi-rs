@@ -169,3 +169,5 @@ Verified E067: live `gpt-5.6-luna` with existing `.env` completed the opt-in par
 Verified E068: three additional fresh isolated live `gpt-5.6-luna` parallel runs passed (3/3). Each produced two batch phases and exact external `PARALLEL_OK` contents for both files, with no steering. This is narrow scenario reliability evidence, not general Pi compatibility or performance evidence.
 
 Verified E069: a live `gpt-5.6-luna` parallel session was closed and reopened in a fresh process; `parallel-resume` independently read both prior files and completed without replaying writes. External contents remained exact `PARALLEL_OK`. One recovery run, no steering.
+
+Tested E070: Rust batch_result now honors all-results termination semantics: only an all-`terminate:true` batch returns done; mixed outcomes continue to model. Cargo test passes. Native terminate fixture and live validation remain open.

@@ -171,6 +171,7 @@ impl PiRuntime {
                 let rid = result["requestId"].as_str().context("batch result requestId required")?;
                 if by_id.insert(rid.to_string(), result).is_some() { bail!("duplicate batch result requestId"); }
             }
+            let all_terminate = results.iter().all(|r| r["terminate"].as_bool().unwrap_or(false));
             for call in &calls {
                 let rid = call["requestId"].as_str().unwrap();
                 let result = by_id.remove(rid).context("missing batch result requestId")?;
@@ -180,6 +181,9 @@ impl PiRuntime {
             if !by_id.is_empty() { bail!("unknown batch result requestId"); }
             self.waiting = None;
             self.batch = None;
+            if all_terminate {
+                return Ok(json!({"type":"done","reason":"all_tools_terminated"}));
+            }
             return self.next(store);
         }
         if op == "tool_update" {
