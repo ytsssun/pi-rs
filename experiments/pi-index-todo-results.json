@@ -1,0 +1,67 @@
+{
+  "runs": [
+    {
+      "restored": {
+        "action": "list",
+        "todos": [
+          {
+            "done": false,
+            "id": 1,
+            "text": "alpha"
+          }
+        ],
+        "nextId": 2
+      },
+      "continued": {
+        "action": "add",
+        "todos": [
+          {
+            "done": false,
+            "id": 1,
+            "text": "alpha"
+          },
+          {
+            "id": 2,
+            "text": "gamma",
+            "done": false
+          }
+        ],
+        "nextId": 3
+      },
+      "rustReads": 1
+    },
+    {
+      "restored": {
+        "action": "list",
+        "todos": [
+          {
+            "done": false,
+            "id": 1,
+            "text": "alpha"
+          }
+        ],
+        "nextId": 2
+      },
+      "continued": {
+        "action": "add",
+        "todos": [
+          {
+            "done": false,
+            "id": 1,
+            "text": "alpha"
+          },
+          {
+            "id": 2,
+            "text": "gamma",
+            "done": false
+          }
+        ],
+        "nextId": 3
+      },
+      "rustReads": 1
+    }
+  ],
+  "distinctProcesses": true,
+  "fixtureFileUnchanged": true,
+  "scope": "Unchanged Todo session_start reconstructs from Rust getBranch; continues in plugin memory. No TS SessionManager instantiated, no persisted writes or model call."
+}

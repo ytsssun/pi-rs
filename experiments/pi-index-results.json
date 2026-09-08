@@ -1,0 +1,258 @@
+{
+  "upstreamCommit": "9767ba275f3e9a5ee0f5c5342249b629ab1b2282",
+  "upstreamSourceSha256": "57bc70a751567b96c057535766240ae52d9b76d9013ea78049d74dc3b654e915",
+  "fixtureSha256": "a8733eb69223141bbec377686c7a6c6695a6f194ec6e4df234d9be0e3c1bb6c8",
+  "modelCalls": 0,
+  "results": [
+    {
+      "name": "header-only",
+      "status": "verified",
+      "branch": [],
+      "context": []
+    },
+    {
+      "name": "default-last-branch-unknown-custom",
+      "status": "verified",
+      "branch": [
+        "root",
+        "custom",
+        "future",
+        "fork-b"
+      ],
+      "context": [
+        "root",
+        "custom",
+        "future",
+        "fork-b"
+      ]
+    },
+    {
+      "name": "explicit-first-fork",
+      "status": "verified",
+      "branch": [
+        "root",
+        "custom",
+        "fork-a"
+      ],
+      "context": [
+        "root",
+        "custom",
+        "fork-a"
+      ]
+    },
+    {
+      "name": "explicit-custom-leaf",
+      "status": "verified",
+      "branch": [
+        "root",
+        "custom"
+      ],
+      "context": [
+        "root",
+        "custom"
+      ]
+    },
+    {
+      "name": "null-leaf-before-root",
+      "status": "verified",
+      "branch": [],
+      "context": []
+    },
+    {
+      "name": "unknown-leaf-distinct-branch-context-fallback",
+      "status": "verified",
+      "branch": [],
+      "context": [
+        "root",
+        "custom",
+        "future",
+        "fork-b"
+      ]
+    },
+    {
+      "name": "empty-leaf-distinct-branch-context-fallback",
+      "status": "verified",
+      "branch": [],
+      "context": [
+        "root",
+        "custom",
+        "future",
+        "fork-b"
+      ]
+    },
+    {
+      "name": "empty-id-is-not-a-truthy-leaf",
+      "status": "verified",
+      "branch": [],
+      "context": [
+        "last"
+      ]
+    },
+    {
+      "name": "default-empty-id-branch-versus-context",
+      "status": "verified",
+      "branch": [],
+      "context": [
+        ""
+      ]
+    },
+    {
+      "name": "missing-parent-terminates",
+      "status": "verified",
+      "branch": [
+        "orphan",
+        "last"
+      ],
+      "context": [
+        "orphan",
+        "last"
+      ]
+    },
+    {
+      "name": "duplicate-id-last-definition-index",
+      "status": "verified",
+      "branch": [
+        "root",
+        "leaf"
+      ],
+      "context": [
+        "root",
+        "leaf"
+      ]
+    },
+    {
+      "name": "compaction-keeps-range",
+      "status": "verified",
+      "branch": [
+        "a",
+        "b",
+        "c",
+        "d",
+        "e"
+      ],
+      "context": [
+        "d",
+        "b",
+        "c",
+        "e"
+      ]
+    },
+    {
+      "name": "compaction-missing-kept-entry",
+      "status": "verified",
+      "branch": [
+        "a",
+        "b",
+        "c"
+      ],
+      "context": [
+        "b",
+        "c"
+      ]
+    },
+    {
+      "name": "latest-compaction-wins",
+      "status": "verified",
+      "branch": [
+        "a",
+        "b",
+        "c",
+        "d",
+        "e"
+      ],
+      "context": [
+        "d",
+        "c",
+        "e"
+      ]
+    },
+    {
+      "name": "kept-entry-after-compaction-is-not-pre-kept-range",
+      "status": "verified",
+      "branch": [
+        "a",
+        "b",
+        "c"
+      ],
+      "context": [
+        "b",
+        "c"
+      ]
+    },
+    {
+      "name": "settings-before-compaction-retained",
+      "status": "verified",
+      "branch": [
+        "a",
+        "b",
+        "c",
+        "d",
+        "e"
+      ],
+      "context": [
+        "d",
+        "e"
+      ]
+    },
+    {
+      "name": "branch-local-settings",
+      "status": "verified",
+      "branch": [
+        "a",
+        "b"
+      ],
+      "context": [
+        "a",
+        "b"
+      ]
+    },
+    {
+      "name": "null-missing-content-host-conversion",
+      "status": "verified",
+      "branch": [
+        "a",
+        "b",
+        "c",
+        "d",
+        "f"
+      ],
+      "context": [
+        "a",
+        "b",
+        "c",
+        "d",
+        "f"
+      ]
+    },
+    {
+      "name": "malformed-lines-skipped-unterminated-final-line",
+      "status": "verified",
+      "branch": [
+        "a",
+        "b"
+      ],
+      "context": [
+        "a",
+        "b"
+      ]
+    },
+    {
+      "name": "legacy-v2-migration-unimplemented",
+      "status": "verified-rejection-not-parity"
+    },
+    {
+      "name": "missing-entry-id",
+      "status": "verified-rejection-not-parity"
+    },
+    {
+      "name": "cyclic-parent-chain",
+      "status": "verified-rejection-not-parity"
+    }
+  ],
+  "limits": [
+    "Deterministic v3 read/index fixtures only; no model calls.",
+    "No legacy migrations, append/file repair equivalence, UI, full SessionManager surface, or full plugin compatibility claim.",
+    "Message conversion intentionally stays in original JS.",
+    "Cycles and missing IDs require bounded Rust rejection, not parity with unbounded/permissive upstream traversal."
+  ]
+}

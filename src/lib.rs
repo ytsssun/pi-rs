@@ -1,3 +1,4 @@
+pub mod pi_session_index;
 pub mod edit;
 pub mod read;
 pub mod tools;

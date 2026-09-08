@@ -59,3 +59,11 @@ persistence and delayed first flush obligations; coordinator experiment already
 uses durable branch child, reviewer independently reproduced counterexamples and
 ran combined tests. No new dependencies, user intervention, live model calls or
 credentials. Agent usage unavailable; no benchmark claims.
+
+### Rust Pi read index (starting63c7e79)
+
+Coordinator+independent fixture/review worker,2active cap4. Worker-owned upstream
+oracle consumed unchanged; added empty-ID counterexample changed implementation.
+Coordinator tested unchanged Todo with Rust branch reader. No user intervention,
+new dependencies, live model calls or credentials. Agent usage unavailable. No
+performance claims; existing cargo tests are local/fixture tests, not live-model E2E.
