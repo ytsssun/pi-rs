@@ -1,6 +1,6 @@
 # Current checkpoint
 
-Current correction (E174): protected live acceptance now requires a correlated attempted write and extension rejection; file absence alone cannot pass. Deterministic counterexamples pass; live rerun of this gate is pending. E168/E169/E172 used the custom-tool native harness, not the original-tool CLI. E169 resumed reads were sequential. Next: validate this gate against persisted live sessions, then move these acceptance cases onto the actual CLI.
+Current correction (E174): protected live acceptance now requires a correlated attempted write and extension rejection; file absence alone cannot pass. Deterministic counterexamples pass; live rerun of this gate is pending. E168/E169/E172 used the custom-tool native harness, not the original-tool CLI. E169 resumed reads were sequential. Next: validate this gate against persisted live sessions, then move these acceptance cases onto the actual CLI. E177 additionally verifies the same unchanged extension allows a safe live write with exact external content.
 
 The Rust/Node-API runtime now has a live unified entry with original Pi tools: E145/E146/E147/E149/E150/E153 passed under independent external checks. It remains an integration prototype; the shipped Rust CLI
 still uses the legacy execution path. Running CLI help does not prove extension
