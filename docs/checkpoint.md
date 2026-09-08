@@ -215,3 +215,5 @@ Verified E088: immediate blocked outcomes retain input and traverse Pi `tool_res
 Verified E089: corrected immediate result-hook fixture passes after native rebuild. Per-tool block leaves the peer executable; both result hooks receive complete Pi-shaped events and hook mutations persist in canonical source order. Parallel hook callback order is not constrained.
 
 Verified E090: tool_result hook `usage` now propagates through native driver and Rust batch_result into canonical session messages. Abort fixture asserts usage on both source-ordered outcomes; native rebuild and cargo tests pass.
+
+Verified E091: independent regression matrix passed after recent hook and result-path changes: native rebuild; batch ID/order, termination, input mutation/invalid outcome, per-tool block/result hooks; stream assembler; and `/Users/stevensun/.cargo/bin/cargo test --locked`. This matrix contains no live model call.
