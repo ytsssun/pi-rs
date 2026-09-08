@@ -7,4 +7,8 @@ const dir=mkdtempSync(join(tmpdir(),'pi-crash-')); const path=join(dir,'session.
 const child=spawnSync(process.execPath,['--input-type=module','-e',`import {createBackend} from './prototype/architecture/native-store-backend.mjs'; const m=await createBackend({path:${JSON.stringify(path)}}); import {request} from './prototype/architecture/native-store-backend.mjs'; request({op:'runtime',handle:m.handle,event:'mark_in_flight',requestId:'r',toolCallId:'c',toolName:'write'}); process.exit(9);`],{encoding:'utf8'});
 assert.equal(child.status,9); const m=await (await import('../prototype/architecture/native-store-backend.mjs')).createBackend({path,mode:'open'});
 assert.throws(()=>request({op:'runtime',handle:m.handle,event:'begin',prompt:'replay'}),/unresolved persisted tool calls/);
-console.log(JSON.stringify({verified:true,childExit:child.status,pendingBlocksReplay:true})); await m.close();
+const resolved=request({op:'runtime',handle:m.handle,event:'resolve_in_flight',requestId:'r',toolCallId:'c',toolName:'write',outcome:'inspected after crash'});
+assert.equal(resolved.type,'resolved');
+const resumed=request({op:'runtime',handle:m.handle,event:'begin',prompt:'continue after resolution'});
+assert.equal(resumed.type,'model');
+console.log(JSON.stringify({verified:true,childExit:child.status,pendingBlocksReplay:true,explicitResolution:true,resumed:true})); await m.close();
