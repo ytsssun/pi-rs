@@ -3,7 +3,7 @@ import {request} from './native-store-backend.mjs';
 import {sessionEntryToContextMessages} from '../../vendor/pi-mono/packages/coding-agent/src/core/session-manager.ts';
 import {wrapRegisteredTool} from '../../vendor/pi-mono/packages/coding-agent/src/core/extensions/wrapper.ts';
 import {validateToolArguments} from '../../vendor/pi-mono/packages/ai/src/utils/validation.ts';
-export async function drive({manager,host,prompt,stream,trace=[],onToolUpdate=()=>{}}) {
+export async function drive({manager,host,prompt,stream,trace=[],onToolUpdate=()=>{},propagateUpdateErrors=false}) {
   const step=payload=>request({op:'runtime',handle:manager.handle,...payload});
   let action=step({event:'begin',prompt});
   trace.push({type:'turn_start'});
@@ -28,10 +28,11 @@ export async function drive({manager,host,prompt,stream,trace=[],onToolUpdate=()
         result=await tool.execute(call.id,validateToolArguments(tool,call),new AbortController().signal,async update=>{
           const accepted=step({event:'tool_update',requestId,update});
           if(accepted.type!=='accepted') throw Error('native runtime rejected tool update');
-          await onToolUpdate({toolCallId:call.id,toolName:call.name,partialResult:update,requestId});
+          try { await onToolUpdate({toolCallId:call.id,toolName:call.name,partialResult:update,requestId}); }
+          catch (error) { error.__piRsUpdateSink = true; throw error; }
           trace.push({type:'tool_update',tool:call.name});
         });
-      } catch(error) {isError=true;result={content:[{type:'text',text:error instanceof Error?error.message:String(error)}],details:{}};}
+      } catch(error) { if(propagateUpdateErrors && error?.__piRsUpdateSink) throw error; isError=true;result={content:[{type:'text',text:error instanceof Error?error.message:String(error)}],details:{}};}
       action=step({event:'tool_result',requestId,result,isError});
       trace.push({type:'tool_result',requestId,tool:call.name,isError});
     } else throw Error('unknown Rust action '+action.type);
