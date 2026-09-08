@@ -67,7 +67,7 @@ export async function createHost(backend, { factories = [], cwd = process.cwd(),
     assert.ok(definition, `unregistered tool: ${name}`);
     return { name, description: definition.description, parameters: definition.parameters };
   });
-  return { runner, eventBus, errors, execute, requestTools, runtime: loaded.runtime };
+  return { runner, eventBus, errors, execute, requestTools, runtime: loaded.runtime, actions };
 }
 
 export async function exercise(backend = tsBackend()) {
