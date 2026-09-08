@@ -348,3 +348,5 @@ The pinned upstream async tool contract and native sink rejection probe both pas
 E123 verifies the barrier in the integrated native runtime driver: continuation waits for async update sinks, late updates are ignored, and sink rejection (including undefined rejection) prevents the next model call. Full provider and crash-recovery coverage remain open.
 
 E124 revalidated durable unresolved-tool recovery across process boundaries: abrupt child exit leaves a marker, reopening blocks replay, and explicit resolution enables a new turn. Actual crash during live provider execution remains open.
+
+E126 is a fresh live regression pass for native streaming runtime coding: gpt-5.4-mini completed a two-turn model/tool loop with one tool execution, persisted usage, and zero human intervention. This is one run and does not establish reliability or performance.
