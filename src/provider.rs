@@ -16,7 +16,14 @@ pub fn openai_chat(client: &Client, base: &str, key: &str, model: &str, messages
         if tool.get("function").is_some() { return tool.clone(); }
         json!({"type":"function","function":{"name":tool["name"],"description":tool["description"],"parameters":tool["parameters"]}})
     }).collect();
-    let mut request = json!({"model": model, "messages": messages, "tools": openai_tools});
+    let openai_messages: Vec<Value> = messages.iter().map(|m| {
+        let role=m["role"].as_str().unwrap_or("");
+        if role=="user" { let content=m["content"].as_str().map(|s|json!(s)).unwrap_or_else(||json!(m["content"].as_array().map(|a|a.iter().filter_map(|b|b["text"].as_str()).collect::<Vec<_>>().join("")))); return json!({"role":"user","content":content}); }
+        if role=="toolResult" { return json!({"role":"tool","tool_call_id":m["toolCallId"],"content":m["content"].as_array().map(|a|a.iter().filter_map(|b|b["text"].as_str()).collect::<Vec<_>>().join("")).unwrap_or_default()}); }
+        if role=="assistant" { let calls=m["content"].as_array().map_or(&[][..], |v| &v[..]).iter().filter(|b|b["type"]=="toolCall").map(|b|json!({"id":b["id"],"type":"function","function":{"name":b["name"],"arguments":b["arguments"].to_string()}})).collect::<Vec<_>>(); if !calls.is_empty(){return json!({"role":"assistant","content":null,"tool_calls":calls});} }
+        m.clone()
+    }).collect();
+    let mut request = json!({"model": model, "messages": openai_messages, "tools": openai_tools});
     if let Some(effort) = reasoning_effort { request["reasoning_effort"] = json!(effort); }
     let response: Value = client.post(format!("{}/chat/completions", base.trim_end_matches('/')))
         .bearer_auth(key).json(&request).send()?.error_for_status()?.json()?;
