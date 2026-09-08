@@ -1,0 +1,29 @@
+{
+  "source": "vendor/pi-mono/packages/coding-agent/src/core/agent-session.ts",
+  "trace": [
+    {
+      "type": "turn_start"
+    },
+    {
+      "type": "model_start"
+    },
+    {
+      "type": "model_result",
+      "stopReason": "toolUse"
+    },
+    {
+      "type": "tool_start",
+      "tool": "echo",
+      "callId": "call-1"
+    },
+    {
+      "type": "tool_result",
+      "tool": "echo",
+      "callId": "call-1",
+      "isError": false
+    },
+    {
+      "type": "turn_end"
+    }
+  ]
+}
