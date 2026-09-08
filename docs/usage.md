@@ -11,3 +11,5 @@ M2: reused runtime worker plus coding_tools and independent round2_verify; cappe
 Final M2 clean candidate verification was interrupted once more by account quota before checkout; resumed existing verifier after user resume and later wakeup. No extra implementation workers spawned. Actual clean-build/test results are recorded separately from prior interrupted attempts.
 
 M3: coordinator plus two reused workers; no new worker handles. Another verifier quota interruption occurred; partial original/adversarial artifacts preserved and resumed after external reset. No usage resets, no live inference calls, native token/cost counters unavailable. Direct dependency unicode-normalization added; unrelated lockfile rustls update reverted before integration.
+
+Live-model cycle from ef2b8e6: coordinator plus one independent acceptance/review worker (2 concurrent total). No actual inference requests; provider tokens/cost not applicable because access blocked. Native agent token counters unavailable. Local relay test used fake upstream responses, not a paid provider. No usage reset or desktop auth change.
