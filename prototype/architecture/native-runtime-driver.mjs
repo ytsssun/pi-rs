@@ -56,6 +56,7 @@ export async function drive({manager,host,prompt,stream,trace=[],onToolUpdate=()
         let result,isError=false;
         try {
           if(blocked) throw Error(blocked);
+          if(['write','edit','bash'].includes(call.name)) step({event:'mark_in_flight',requestId:entry.requestId,toolCallId:call.id,toolName:call.name});
           result=await executeWithUpdates(tool,call.id,args,new AbortController().signal,async update=>{
             trace.push({type:'tool_update',tool:call.name});
             await onToolUpdate({toolCallId:call.id,toolName:call.name,partialResult:update,requestId:entry.requestId});
