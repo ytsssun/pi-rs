@@ -1,0 +1,196 @@
+{
+  "upstream": "9767ba275f3e9a5ee0f5c5342249b629ab1b2282",
+  "pluginSha256": "e46824d00217e25242c186d41837cc84ca81b23f978500323448502a9a424ee2",
+  "results": [
+    {
+      "kind": "ts",
+      "projected": {
+        "limit": 2,
+        "texts": [
+          "Ad\n[context view truncated; canonical result retained]"
+        ],
+        "canonicalTexts": [
+          "Added todo #1: alpha"
+        ]
+      },
+      "resumed": {
+        "restored": {
+          "action": "list",
+          "todos": [
+            {
+              "id": 1,
+              "text": "alpha",
+              "done": false
+            }
+          ],
+          "nextId": 2
+        },
+        "continued": {
+          "action": "add",
+          "todos": [
+            {
+              "id": 1,
+              "text": "alpha",
+              "done": false
+            },
+            {
+              "id": 2,
+              "text": "gamma",
+              "done": false
+            }
+          ],
+          "nextId": 3
+        },
+        "projected": {
+          "limit": 2,
+          "texts": [
+            "Ad\n[context view truncated; canonical result retained]"
+          ],
+          "canonicalTexts": [
+            "Added todo #1: alpha"
+          ]
+        },
+        "reset": {
+          "limit": null,
+          "texts": [
+            "Added todo #1: alpha",
+            "Added todo #2: gamma"
+          ],
+          "canonicalTexts": [
+            "Added todo #1: alpha",
+            "Added todo #2: gamma"
+          ]
+        }
+      },
+      "reopened": {
+        "details": {
+          "action": "list",
+          "todos": [
+            {
+              "id": 1,
+              "text": "alpha",
+              "done": false
+            },
+            {
+              "id": 2,
+              "text": "gamma",
+              "done": false
+            }
+          ],
+          "nextId": 3
+        },
+        "view": {
+          "limit": null,
+          "texts": [
+            "Added todo #1: alpha",
+            "Added todo #2: gamma"
+          ],
+          "canonicalTexts": [
+            "Added todo #1: alpha",
+            "Added todo #2: gamma"
+          ]
+        }
+      },
+      "distinctProcess": true,
+      "canonicalFilePrefixPreserved": true
+    },
+    {
+      "kind": "rust",
+      "projected": {
+        "limit": 2,
+        "texts": [
+          "Ad\n[context view truncated; canonical result retained]"
+        ],
+        "canonicalTexts": [
+          "Added todo #1: alpha"
+        ]
+      },
+      "resumed": {
+        "restored": {
+          "action": "list",
+          "todos": [
+            {
+              "id": 1,
+              "text": "alpha",
+              "done": false
+            }
+          ],
+          "nextId": 2
+        },
+        "continued": {
+          "action": "add",
+          "todos": [
+            {
+              "id": 1,
+              "text": "alpha",
+              "done": false
+            },
+            {
+              "id": 2,
+              "text": "gamma",
+              "done": false
+            }
+          ],
+          "nextId": 3
+        },
+        "projected": {
+          "limit": 2,
+          "texts": [
+            "Ad\n[context view truncated; canonical result retained]"
+          ],
+          "canonicalTexts": [
+            "Added todo #1: alpha"
+          ]
+        },
+        "reset": {
+          "limit": null,
+          "texts": [
+            "Added todo #1: alpha",
+            "Added todo #2: gamma"
+          ],
+          "canonicalTexts": [
+            "Added todo #1: alpha",
+            "Added todo #2: gamma"
+          ]
+        }
+      },
+      "reopened": {
+        "details": {
+          "action": "list",
+          "todos": [
+            {
+              "id": 1,
+              "text": "alpha",
+              "done": false
+            },
+            {
+              "id": 2,
+              "text": "gamma",
+              "done": false
+            }
+          ],
+          "nextId": 3
+        },
+        "view": {
+          "limit": null,
+          "texts": [
+            "Added todo #1: alpha",
+            "Added todo #2: gamma"
+          ],
+          "canonicalTexts": [
+            "Added todo #1: alpha",
+            "Added todo #2: gamma"
+          ]
+        }
+      },
+      "distinctProcess": true,
+      "canonicalFilePrefixPreserved": true
+    }
+  ],
+  "limits": [
+    "Original TS SessionManager owns file/tree; no Rust session implementation",
+    "Synthetic tool calls, no model/AgentSession orchestration",
+    "One text tool block only, no compaction/malformed files/concurrent writers",
+    "Experiment-specific policy custom entry, not upstream policy feature"
+  ]
+}

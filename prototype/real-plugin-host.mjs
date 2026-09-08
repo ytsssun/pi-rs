@@ -22,14 +22,14 @@ export function tsBackend(initial = []) {
   };
 }
 
-export async function createHost(backend, { factories = [], cwd = process.cwd() } = {}) {
+export async function createHost(backend, { factories = [], cwd = process.cwd(), extensionPaths = [pluginPath], sessionManager = guardedObject('sessionManager') } = {}) {
   const eventBus = createEventBus();
-  const loaded = await loadExtensions([pluginPath], cwd, eventBus);
+  const loaded = await loadExtensions(extensionPaths, cwd, eventBus);
   assert.deepEqual(loaded.errors, [], 'unchanged upstream extension must load');
   for (let i = 0; i < factories.length; i++) {
     loaded.extensions.push(await loadExtensionFromFactory(factories[i], cwd, eventBus, loaded.runtime, `<probe-${i}>`));
   }
-  const runner = new ExtensionRunner(loaded.extensions, loaded.runtime, cwd, guardedObject('sessionManager'), guardedObject('modelRegistry'));
+  const runner = new ExtensionRunner(loaded.extensions, loaded.runtime, cwd, sessionManager, guardedObject('modelRegistry'));
   const errors = [];
   runner.onError(({ event, error }) => errors.push({ event, error }));
   const actions = Object.fromEntries([

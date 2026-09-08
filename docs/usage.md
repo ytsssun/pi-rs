@@ -51,3 +51,11 @@ Text/Theme case and found lone-surrogate loss plus UTF16 FFI declaration mismatc
 coordinator used those findings and fixed both. No user intervention, model calls,
 credentials or dependencies added. Node docs/public local headers inspected. Agent
 token usage unavailable. Native build/probe timings are not performance evidence.
+
+### Real Pi session seam (startingc90c0e4)
+
+Coordinator+independent reviewer,2active/cap4. Source reviewer established branch
+persistence and delayed first flush obligations; coordinator experiment already
+uses durable branch child, reviewer independently reproduced counterexamples and
+ran combined tests. No new dependencies, user intervention, live model calls or
+credentials. Agent usage unavailable; no benchmark claims.
