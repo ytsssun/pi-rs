@@ -1,5 +1,7 @@
 # Current checkpoint
 
+E192 verifies host action thinking-level roundtrip (off → high) through the bound extension runtime; this is in-process state only.
+
 E191 verifies empty fixture input is rejected before session creation, with a clear error and no side effects.
 
 E190 revalidates live actual-CLI write → bash after implementing getThinkingLevel: both tools succeed and an external exact file assertion passes.
