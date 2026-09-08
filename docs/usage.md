@@ -34,3 +34,12 @@ before final verification. No user intervention, new dependencies, model calls o
 API spend. Agent token usage unavailable; build/probe command duration is not an
 agent-performance benchmark. Next work derives from uncovered callback semantics,
 not another repeat of successful activation cases.
+
+### Async tool boundary cycle (starting dc3393c)
+
+Two active agents, cap4. Independent reviewer produced executable upstream-derived
+acceptance reused directly by coordinator; discovered undefined rejection and
+pending-peer failure mismatches, both fixed and independently rerun. No user
+intervention or redundant acceptance implementation. No new dependencies, live
+model calls or credentials. Native agent token accounting unavailable. Host
+execution times are not performance measurements or end-to-end speed claims.

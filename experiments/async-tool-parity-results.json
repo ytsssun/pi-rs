@@ -1,0 +1,422 @@
+{
+  "provenance": {
+    "commit": "9767ba275f3e9a5ee0f5c5342249b629ab1b2282",
+    "sourcePath": "vendor/pi-mono/packages/agent/src/agent-loop.ts",
+    "sha256": "1e16404a231912fbd7643d8317b15ec4cc6245ed8cedc37582a31d430a1cc6ac"
+  },
+  "equal": true,
+  "cases": [
+    {
+      "scenario": "success",
+      "outcome": {
+        "isError": false,
+        "result": {
+          "content": [
+            {
+              "text": "done",
+              "type": "text"
+            }
+          ],
+          "details": {}
+        }
+      },
+      "updates": [
+        {
+          "type": "tool_execution_update",
+          "toolCallId": "call-success",
+          "toolName": "async_success",
+          "args": {
+            "raw": true
+          },
+          "partialResult": {
+            "content": [
+              {
+                "type": "text",
+                "text": "partial-1"
+              }
+            ],
+            "details": {}
+          }
+        },
+        {
+          "type": "tool_execution_update",
+          "toolCallId": "call-success",
+          "toolName": "async_success",
+          "args": {
+            "raw": true
+          },
+          "partialResult": {
+            "content": [
+              {
+                "type": "text",
+                "text": "partial-2"
+              }
+            ],
+            "details": {}
+          }
+        }
+      ],
+      "order": [
+        "tool-settled",
+        "sink-complete-partial-1",
+        "sink-complete-partial-2",
+        "executor-settled"
+      ],
+      "lateUpdatesIgnored": true,
+      "awaitedSinks": true
+    },
+    {
+      "scenario": "throw",
+      "outcome": {
+        "isError": true,
+        "result": {
+          "content": [
+            {
+              "text": "deliberate thrown string",
+              "type": "text"
+            }
+          ],
+          "details": {}
+        }
+      },
+      "updates": [
+        {
+          "type": "tool_execution_update",
+          "toolCallId": "call-throw",
+          "toolName": "async_throw",
+          "args": {
+            "raw": true
+          },
+          "partialResult": {
+            "content": [
+              {
+                "type": "text",
+                "text": "partial-1"
+              }
+            ],
+            "details": {}
+          }
+        },
+        {
+          "type": "tool_execution_update",
+          "toolCallId": "call-throw",
+          "toolName": "async_throw",
+          "args": {
+            "raw": true
+          },
+          "partialResult": {
+            "content": [
+              {
+                "type": "text",
+                "text": "partial-2"
+              }
+            ],
+            "details": {}
+          }
+        }
+      ],
+      "order": [
+        "tool-settled",
+        "sink-complete-partial-1",
+        "sink-complete-partial-2",
+        "executor-settled"
+      ],
+      "lateUpdatesIgnored": true,
+      "awaitedSinks": true
+    },
+    {
+      "scenario": "cooperative-abort",
+      "outcome": {
+        "isError": true,
+        "result": {
+          "content": [
+            {
+              "text": "cancelled: user-stop",
+              "type": "text"
+            }
+          ],
+          "details": {}
+        }
+      },
+      "updates": [
+        {
+          "type": "tool_execution_update",
+          "toolCallId": "call-abort",
+          "toolName": "async_abort",
+          "args": {
+            "raw": true
+          },
+          "partialResult": {
+            "content": [
+              {
+                "type": "text",
+                "text": "observed-abort"
+              }
+            ],
+            "details": {}
+          }
+        }
+      ],
+      "observedReason": "user-stop"
+    },
+    {
+      "scenario": "sink-rejection-with-pending-peer",
+      "executorRejectedWithoutPeer": true,
+      "rejectionReasonType": "undefined"
+    },
+    {
+      "scenario": "sink-rejection-undefined",
+      "executorRejected": true,
+      "rejectionReasonType": "undefined"
+    }
+  ],
+  "traces": [
+    [
+      {
+        "request": {
+          "op": "start"
+        },
+        "response": null
+      },
+      {
+        "request": {
+          "op": "update"
+        },
+        "response": 1
+      },
+      {
+        "request": {
+          "op": "update"
+        },
+        "response": 2
+      },
+      {
+        "request": {
+          "op": "settle",
+          "outcome": {
+            "result": {
+              "content": [
+                {
+                  "type": "text",
+                  "text": "done"
+                }
+              ],
+              "details": {}
+            },
+            "isError": false
+          }
+        },
+        "response": null
+      },
+      {
+        "request": {
+          "op": "update"
+        },
+        "response": null
+      },
+      {
+        "request": {
+          "op": "ack",
+          "id": 1
+        },
+        "response": null
+      },
+      {
+        "request": {
+          "op": "ack",
+          "id": 2
+        },
+        "response": null
+      }
+    ],
+    [
+      {
+        "request": {
+          "op": "start"
+        },
+        "response": null
+      },
+      {
+        "request": {
+          "op": "update"
+        },
+        "response": 1
+      },
+      {
+        "request": {
+          "op": "update"
+        },
+        "response": 2
+      },
+      {
+        "request": {
+          "op": "settle",
+          "outcome": {
+            "result": {
+              "content": [
+                {
+                  "type": "text",
+                  "text": "deliberate thrown string"
+                }
+              ],
+              "details": {}
+            },
+            "isError": true
+          }
+        },
+        "response": null
+      },
+      {
+        "request": {
+          "op": "update"
+        },
+        "response": null
+      },
+      {
+        "request": {
+          "op": "ack",
+          "id": 1
+        },
+        "response": null
+      },
+      {
+        "request": {
+          "op": "ack",
+          "id": 2
+        },
+        "response": null
+      }
+    ],
+    [
+      {
+        "request": {
+          "op": "start"
+        },
+        "response": null
+      },
+      {
+        "request": {
+          "op": "update"
+        },
+        "response": 1
+      },
+      {
+        "request": {
+          "op": "ack",
+          "id": 1
+        },
+        "response": null
+      },
+      {
+        "request": {
+          "op": "settle",
+          "outcome": {
+            "result": {
+              "content": [
+                {
+                  "type": "text",
+                  "text": "cancelled: user-stop"
+                }
+              ],
+              "details": {}
+            },
+            "isError": true
+          }
+        },
+        "response": null
+      }
+    ],
+    [
+      {
+        "request": {
+          "op": "start"
+        },
+        "response": null
+      },
+      {
+        "request": {
+          "op": "update"
+        },
+        "response": 1
+      },
+      {
+        "request": {
+          "op": "update"
+        },
+        "response": 2
+      },
+      {
+        "request": {
+          "op": "reject",
+          "id": 1
+        },
+        "response": null
+      },
+      {
+        "request": {
+          "op": "settle",
+          "outcome": {
+            "result": {
+              "content": [
+                {
+                  "type": "text",
+                  "text": "tool-succeeded"
+                }
+              ],
+              "details": {}
+            },
+            "isError": false
+          }
+        },
+        "response": null
+      }
+    ],
+    [
+      {
+        "request": {
+          "op": "start"
+        },
+        "response": null
+      },
+      {
+        "request": {
+          "op": "update"
+        },
+        "response": 1
+      },
+      {
+        "request": {
+          "op": "reject",
+          "id": 1
+        },
+        "response": null
+      },
+      {
+        "request": {
+          "op": "settle",
+          "outcome": {
+            "result": {
+              "content": [
+                {
+                  "type": "text",
+                  "text": "tool-succeeded"
+                }
+              ],
+              "details": {}
+            },
+            "isError": false
+          }
+        },
+        "response": null
+      }
+    ]
+  ],
+  "scope": "Five deterministic prepared-tool cases using actual upstream loader/runner/wrapper; Rust owns update acceptance and completion acknowledgment barrier.",
+  "limitations": [
+    "One Rust process per invocation, not integrated agent runtime",
+    "JS retains original AbortSignal; no Rust-originated cancellation protocol",
+    "JSON tool outcomes; arbitrary JS identity and values untested",
+    "Synchronous sink throw, process death during drain, admission and recovery untested",
+    "No provider call, native binding, UI, Pi SessionManager or performance claim"
+  ]
+}
