@@ -221,3 +221,5 @@ Verified E091: independent regression matrix passed after recent hook and result
 Verified E092: Rust provider module now has a tested SSE data payload parser (multiline data, `[DONE]`, empty/invalid payload errors). This is parser groundwork only; the active transport remains blocking and native live streaming is not implemented.
 
 Verified E093: Rust `SseDecoder` now buffers split chunks and emits multiple complete SSE events, including `[DONE]`, while rejecting incomplete final events. Provider transport remains blocking; this is parser-only groundwork.
+
+Verified E094: Rust SseDecoder handles standard CRLF event separators in addition to LF, with unit coverage. This remains parser groundwork, not live streaming transport.

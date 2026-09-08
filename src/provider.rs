@@ -14,7 +14,7 @@ pub fn parse_sse_data(data: &str) -> Result<Option<Value>> {
 pub struct SseDecoder { buffer: String }
 impl SseDecoder {
     pub fn push(&mut self, chunk: &str) -> Result<Vec<Option<Value>>> {
-        self.buffer.push_str(chunk);
+        self.buffer.push_str(&chunk.replace("\r\n", "\n"));
         let mut out = Vec::new();
         while let Some(pos) = self.buffer.find("\n\n") {
             let event = self.buffer[..pos].to_string(); self.buffer.drain(..pos + 2);
@@ -71,5 +71,6 @@ mod tests {
         let events = decoder.push("1}\n\ndata: [DONE]\n\n").unwrap();
         assert_eq!(events.len(), 2); assert_eq!(events[0].as_ref().unwrap()["a"], 1); assert!(events[1].is_none());
         assert!(decoder.finish().is_ok());
+        let mut crlf = SseDecoder::default(); assert_eq!(crlf.push("data: {\"ok\":true}\r\n\r\n").unwrap().len(), 1);
     }
 }
