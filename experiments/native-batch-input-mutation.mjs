@@ -16,9 +16,16 @@ try {
     pi.on('tool_call',event=>{assert.equal(event.type,'tool_call');assert.equal(typeof event.input.value,'string');hooks.push(event.toolCallId);event.input.value=42;});
    }]});
    let n=0;
-   const stream=async()=>({async *[Symbol.asyncIterator](){},async result(){return ++n===1?{role:'assistant',content:['a','b'].map(id=>({type:'toolCall',id,name:'probe',arguments:{value:invalid?{}:'before'}})),stopReason:'toolUse'}:{role:'assistant',content:[],stopReason:'stop'};}});
-   if(invalid){await assert.rejects(drive({manager,host,prompt:'test',parallel:true,stream}));assert.deepEqual(seen,[]);assert.deepEqual(hooks,[]);}
-   else{await drive({manager,host,prompt:'test',parallel:true,stream});assert.deepEqual(seen,[42,42]);assert.deepEqual(hooks,['a','b']);assert.deepEqual(host.errors,[]);}
+   const stream=async()=>({async *[Symbol.asyncIterator](){},async result(){return ++n===1?{role:'assistant',content:['a','b'].map(id=>({type:'toolCall',id,name:'probe',arguments:{value:invalid&&id==='a'?{}:'before'}})),stopReason:'toolUse'}:{role:'assistant',content:[],stopReason:'stop'};}});
+   await drive({manager,host,prompt:'test',parallel:true,stream});
+   assert.deepEqual(seen,invalid?[42]:[42,42]);
+   assert.deepEqual(hooks,invalid?['b']:['a','b']);
+   assert.deepEqual(host.errors,[]);
+   assert.equal(n,2);
+   const results=manager.snapshot().branch.filter(e=>e.message?.role==='toolResult').map(e=>e.message);
+   assert.deepEqual(results.map(r=>r.toolCallId),['a','b']);
+   assert.deepEqual(results.map(r=>r.isError),[invalid,false]);
+
   }finally{await manager.close();}
  }
  console.log(JSON.stringify({fixture:true,passed:['validate before hooks','execute mutated input without revalidation']}));

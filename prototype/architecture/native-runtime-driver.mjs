@@ -41,8 +41,10 @@ export async function drive({manager,host,prompt,stream,trace=[],onToolUpdate=()
       trace.push({type:'tool_batch_start',batchId:action.batchId,calls:action.calls.length});
       // Preflight the complete batch before admitting any execution. This is
       // required by pinned Pi's parallel agent loop and prevents partial writes.
-      const prepared=await Promise.all(action.calls.map(async entry=>{
+      const prepared=[];
+      for(const entry of action.calls) {
         const call=entry.call??entry;
+        try {
         const registered=host.runner.getAllRegisteredTools().find(t=>t.definition.name===call.name);
         if(!registered) throw Error(`Tool ${call.name} not found`);
         const tool=wrapRegisteredTool(registered,host.runner);
@@ -50,12 +52,18 @@ export async function drive({manager,host,prompt,stream,trace=[],onToolUpdate=()
         const hookEvent={type:'tool_call',toolCallId:call.id,toolName:call.name,input:validated};
         const hook=await host.runner.emitToolCall(hookEvent);
         const args=hookEvent.input;
-        if(hook?.block) return {entry,call,tool,args,blocked:hook.block};
-        return {entry,call,tool,args};
-      }));
+        prepared.push({entry,call,tool,args,blocked:hook?.block});
+        } catch(error) {
+          prepared.push({entry,call,immediate:{content:[{type:'text',text:error instanceof Error?error.message:String(error)}]}});
+        }
+      }
       const batchBlocked=prepared.find(item=>item.blocked)?.blocked;
       if(batchBlocked) for(const item of prepared) item.blocked=batchBlocked;
-      const runOne=async ({entry,call,tool,args,blocked})=>{
+      const runOne=async ({entry,call,tool,args,blocked,immediate})=>{
+        if(immediate) {
+          trace.push({type:'tool_result',requestId:entry.requestId,tool:call.name,isError:true});
+          return {requestId:entry.requestId,...immediate,isError:true};
+        }
         let result,isError=false;
         try {
           if(blocked) throw Error(blocked);
