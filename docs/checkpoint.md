@@ -1,49 +1,56 @@
-# Current checkpoint — M5 live reliability validation in progress
+# Current checkpoint — live retry completed; reliability gate failed
 
-## Current verified state
+## Verified state
 
-M5 milestone: repeatable real-model modify/test/resume reliability, with no TUI, multiplayer, provider expansion or extension work. Acceptance is frozen at 9/9 independent Luna baseline runs before any context trial.
+Main branch; this milestone started at db29a58f956447ce34e87ef05e3b3438237f27d4.
+Luna reasoning none is usable for bounded real coding. Pilot02 independently
+passed. Baseline02 executed all9: **7 independent successes / 2 failures**. Final independent review is in
+experiments/live-retry-review.md and live-retry-verdicts.json. Original baseline01
+was8/9, not overwritten. Retry outcomes are kept separate, never best-of-selected.
+All model requests used existing ignored .env access; no candidate was steered.
 
-Work on `main`, authorized for suitable verified commits/pushes; never force-push.
-Live cycle starting commit: `ef2b8e6a11bb54f5600e30880f19c05d5ce229ad`.
-The Rust CLI supports read/write/edit/bash, native session resume, context-view
-truncation/reset and policy audit. Prior recorded suites include 34 Rust tests
-and bounded pinned-Pi comparisons. These are fixture/local-HTTP or deterministic
-comparisons, not proof of live model coding. This cycle rebuilt successfully;
-new independent acceptance self-check passed, with no live requests.
+## Current decision and next milestone
 
-## Limits and current blocker
+M5 closes the bounded experiment; the9/9 reliability criterion is NOT achieved.
+Context live trial stays unrun. Do not run baseline03 merely to seek green results.
+Follow docs/milestone6-proposed.md: opt-in user-specified completion verification,
+durable outcome through resume, bounded repair on failed checks. This is a new
+runtime intervention, not proof that the model independently chose meaningful
+tests. Keep the frozen M5 criteria and its failures intact.
 
-Live historical attempts remain recorded in `experiments/live-openai-results.json`; current M5 retry is separate. Human-steered attempts remain **0**.
-OpenAI API key is available only through ignored `.env`; it is never committed or printed. Codex desktop login is separate and unchanged. Luna provider configuration requires `--reasoning-effort none` for Chat Completions tools.
-Daily-use readiness remains unverified. Bash has host authority, not a sandbox.
-No full Pi compatibility, integrated extensions, Pi session format, TUI,
-multiplayer or performance advantage is claimed. Prior Node oracle crash has a
-tested mitigation, not a proven root-cause fix.
+First next action: read src/lib.rs session/effect journal and capture a failing
+completion-check counterexample, then freeze the opt-in state transition design.
+No TUI, provider expansion, multiplayer or extension integration in this work.
+Claude API-key route is authorized but no Claude credential/provider established.
 
-## Next steps and exact recovery
+## Reproduction and evidence
 
-1. M5 retry uses `experiments/live-luna-none-pilot-02` then a new baseline output; old 8/9 and all failures remain immutable. Read `experiments/live-model.md` and `experiments/live-acceptance.md` for frozen
-   acceptance and commands. Do not replace live criteria with fixtures.
-2. Obtain the requested access configuration without printing secrets. Build with
-   `export PATH="$HOME/.cargo/bin:$PATH"; cargo build --locked`.
-3. Run a live pilot; independent agent verifies external results AND actual test
-   execution from tool traces before marking the gate reviewed.
-4. Run all three scenarios from clean inputs three times with identical model,
-   endpoint and binary, context off. Preserve each failed run, classify evidence,
-   and re-pilot changed binaries. Only after baseline passes run long-output
-   context/resume trial. No TUI/provider expansion/multiplayer/extensions this cycle.
-5. Keep raw artifacts in ignored `.runs`; commit only reviewed sanitized results.
-   Commit/push current main under existing authorization after verification.
+- `python3 experiments/live_acceptance.py self-check` checks the external verifier,
+  not live inference. Rust34tests and strict clippy previously passed on current
+  executable source; no runtime source changed during this closeout.
+- `python3 experiments/summarize_live.py .runs/live-luna-none-pilot-02 .runs/live-luna-none-baseline-02 --output .runs/retry-accounting.json`
+  reproduces accounting from retained actual response records. Tracked sanitized
+  export: experiments/live-retry-results.json. Missing usage remains unknown.
+- Actual fixed live command used:
+  `python3 experiments/run_live.py --phase baseline --output .runs/live-luna-none-baseline-02 --gate .runs/live-luna-none-pilot-02/summary.json --env-file .env --model gpt-5.6-luna --reasoning-effort none`
+  Output exists and is deliberately non-overwritable; do not run it again unchanged.
+- Current task T020 and handoff records are in docs/board.jsonl; scope and stop
+  rules in docs/milestone5.md. Prior outcomes in live-luna/nano review/verdict files.
 
-Board: `python3 scripts/board.py list --id T018` (live blocked), `--id T019`
-(independent acceptance). Current cycle uses coordinator plus one verifier; cap4.
-Token/cost counters for native agents are unavailable. No live provider usage yet.
-No promise of background continuity: resume from these files when app is running.
-Prior 48-hour scheduler deadline is 2026-09-08 22:53 UTC; do not extend it implicitly.
+## Limits, continuation and collaboration
 
-## Historical evidence
+Supervised disposable-repository trials are possible; unattended daily replacement
+is not established. Model/provider/effort are not bound into native sessions;
+repeat options on resume. Bash has host authority, not sandbox protection. No full
+Pi compatibility, live context quality benefit or speed advantage claimed.
 
-[Historical checkpoints](checkpoint-history.md) preserve prior milestones,
-failures and superseded next steps. [Live-cycle record](../experiments/live-model.md)
-is authoritative for this cycle; append-only `board.jsonl` retains task history.
+Earlier coordinator repeatedly messaged a pending_init worker and ended turns;
+review never happened. This turn replaced it with one running independent verifier
+who completed pilot and matrix review. Coordinator ran/integrated and maintained
+records. Two active roles, cap4. No new orchestration platform. User had to resume
+work because coordination stalled; this is a process failure, not an API blocker.
+Native agent cost counters unavailable; actual provider usage retained separately.
+
+History with stale no-live claims is preserved explicitly in checkpoint-history.md.
+Prior automation deadline remains2026-09-08 22:53 UTC; no implicit extension or
+uninterrupted uptime promise. New sessions can resume from this checkpoint.

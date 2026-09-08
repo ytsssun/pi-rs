@@ -1,0 +1,343 @@
+{
+  "reviewer": "retry_verifier",
+  "artifact": ".runs/live-luna-none-baseline-02",
+  "verdicts": [
+    {
+      "scenario": "bug",
+      "repetition": 1,
+      "passed": true,
+      "stages": [
+        {
+          "stage": 1,
+          "pid": 66196,
+          "passed": true,
+          "tool_call_ids": [
+            "call_8ZSKeOeAxThnzw1T3NwlxAG2"
+          ],
+          "external_acceptance": {
+            "scenario": "bug",
+            "stage": 1,
+            "integrity_errors": [],
+            "acceptance_exit": 0,
+            "stdout": "{\"checks\": 5}\n",
+            "stderr": "",
+            "expected_checks": 5,
+            "assertions_completed": true,
+            "passed": true
+          },
+          "canonical_prefix_preserved": true,
+          "frozen_user_turns": true
+        }
+      ],
+      "failure_category": null,
+      "human_interventions": 0
+    },
+    {
+      "scenario": "bug",
+      "repetition": 2,
+      "passed": true,
+      "stages": [
+        {
+          "stage": 1,
+          "pid": 66284,
+          "passed": true,
+          "tool_call_ids": [
+            "call_tA3StgP8fPx90Uc5rdRLWcMF"
+          ],
+          "external_acceptance": {
+            "scenario": "bug",
+            "stage": 1,
+            "integrity_errors": [],
+            "acceptance_exit": 0,
+            "stdout": "{\"checks\": 5}\n",
+            "stderr": "",
+            "expected_checks": 5,
+            "assertions_completed": true,
+            "passed": true
+          },
+          "canonical_prefix_preserved": true,
+          "frozen_user_turns": true
+        }
+      ],
+      "failure_category": null,
+      "human_interventions": 0
+    },
+    {
+      "scenario": "bug",
+      "repetition": 3,
+      "passed": true,
+      "stages": [
+        {
+          "stage": 1,
+          "pid": 66318,
+          "passed": true,
+          "tool_call_ids": [
+            "call_44G17SnWZDB9TdisTMqntKwF"
+          ],
+          "external_acceptance": {
+            "scenario": "bug",
+            "stage": 1,
+            "integrity_errors": [],
+            "acceptance_exit": 0,
+            "stdout": "{\"checks\": 5}\n",
+            "stderr": "",
+            "expected_checks": 5,
+            "assertions_completed": true,
+            "passed": true
+          },
+          "canonical_prefix_preserved": true,
+          "frozen_user_turns": true
+        }
+      ],
+      "failure_category": null,
+      "human_interventions": 0
+    },
+    {
+      "scenario": "behavior",
+      "repetition": 1,
+      "passed": true,
+      "stages": [
+        {
+          "stage": 1,
+          "pid": 66368,
+          "passed": true,
+          "tool_call_ids": [
+            "call_oaxrPACARWvdHPrKApnsAd4a",
+            "call_KW6FKiRkJFO3NreLzTxW3qon"
+          ],
+          "external_acceptance": {
+            "scenario": "behavior",
+            "stage": 1,
+            "integrity_errors": [],
+            "acceptance_exit": 0,
+            "stdout": "{\"checks\": 39}\n",
+            "stderr": "",
+            "expected_checks": 39,
+            "assertions_completed": true,
+            "passed": true
+          },
+          "canonical_prefix_preserved": true,
+          "frozen_user_turns": true
+        }
+      ],
+      "failure_category": null,
+      "human_interventions": 0
+    },
+    {
+      "scenario": "behavior",
+      "repetition": 2,
+      "passed": false,
+      "stages": [
+        {
+          "stage": 1,
+          "pid": 66607,
+          "passed": false,
+          "tool_call_ids": [
+            "call_HoldWzAndKM0TYa4iTIrobkJ",
+            "call_W6dnhcqTQAzwAUAY6o7k0rKu"
+          ],
+          "external_acceptance": {
+            "scenario": "behavior",
+            "stage": 1,
+            "integrity_errors": [],
+            "acceptance_exit": 0,
+            "stdout": "{\"checks\": 39}\n",
+            "stderr": "",
+            "expected_checks": 39,
+            "assertions_completed": true,
+            "passed": true
+          },
+          "canonical_prefix_preserved": true,
+          "frozen_user_turns": true
+        }
+      ],
+      "failure_category": "model behavior / environment discovery: no successful tests; Python3 available",
+      "human_interventions": 0
+    },
+    {
+      "scenario": "behavior",
+      "repetition": 3,
+      "passed": true,
+      "stages": [
+        {
+          "stage": 1,
+          "pid": 66944,
+          "passed": true,
+          "tool_call_ids": [
+            "call_OaPOZTflhZN59DxHjdbgsje8"
+          ],
+          "external_acceptance": {
+            "scenario": "behavior",
+            "stage": 1,
+            "integrity_errors": [],
+            "acceptance_exit": 0,
+            "stdout": "{\"checks\": 39}\n",
+            "stderr": "",
+            "expected_checks": 39,
+            "assertions_completed": true,
+            "passed": true
+          },
+          "canonical_prefix_preserved": true,
+          "frozen_user_turns": true
+        }
+      ],
+      "failure_category": null,
+      "human_interventions": 0
+    },
+    {
+      "scenario": "resume",
+      "repetition": 1,
+      "passed": true,
+      "stages": [
+        {
+          "stage": 1,
+          "pid": 67004,
+          "passed": true,
+          "tool_call_ids": [
+            "call_Iah7RgEum10sGy1fitpbndVO"
+          ],
+          "external_acceptance": {
+            "scenario": "resume",
+            "stage": 1,
+            "integrity_errors": [],
+            "acceptance_exit": 0,
+            "stdout": "{\"checks\": 39}\n",
+            "stderr": "",
+            "expected_checks": 39,
+            "assertions_completed": true,
+            "passed": true
+          },
+          "canonical_prefix_preserved": true,
+          "frozen_user_turns": true
+        },
+        {
+          "stage": 2,
+          "pid": 67572,
+          "passed": true,
+          "tool_call_ids": [
+            "call_EuvExHjLQyA06IVALWWnc4Us"
+          ],
+          "external_acceptance": {
+            "scenario": "resume",
+            "stage": 2,
+            "integrity_errors": [],
+            "acceptance_exit": 0,
+            "stdout": "{\"checks\": 48}\n",
+            "stderr": "",
+            "expected_checks": 48,
+            "assertions_completed": true,
+            "passed": true
+          },
+          "canonical_prefix_preserved": true,
+          "frozen_user_turns": true
+        }
+      ],
+      "failure_category": null,
+      "human_interventions": 0
+    },
+    {
+      "scenario": "resume",
+      "repetition": 2,
+      "passed": false,
+      "stages": [
+        {
+          "stage": 1,
+          "pid": 67633,
+          "passed": false,
+          "tool_call_ids": [
+            "call_8ba4t6wiUXDjKry4eeKWGpZj"
+          ],
+          "external_acceptance": {
+            "scenario": "resume",
+            "stage": 1,
+            "integrity_errors": [],
+            "acceptance_exit": 0,
+            "stdout": "{\"checks\": 39}\n",
+            "stderr": "",
+            "expected_checks": 39,
+            "assertions_completed": true,
+            "passed": true
+          },
+          "canonical_prefix_preserved": true,
+          "frozen_user_turns": true
+        },
+        {
+          "stage": 2,
+          "pid": 67689,
+          "passed": true,
+          "tool_call_ids": [
+            "call_pcvkwj0xoRlAxW0NHpjdE9hi"
+          ],
+          "external_acceptance": {
+            "scenario": "resume",
+            "stage": 2,
+            "integrity_errors": [],
+            "acceptance_exit": 0,
+            "stdout": "{\"checks\": 48}\n",
+            "stderr": "",
+            "expected_checks": 48,
+            "assertions_completed": true,
+            "passed": true
+          },
+          "canonical_prefix_preserved": true,
+          "frozen_user_turns": true
+        }
+      ],
+      "failure_category": "model behavior: stage1 omitted new discount tests",
+      "human_interventions": 0
+    },
+    {
+      "scenario": "resume",
+      "repetition": 3,
+      "passed": true,
+      "stages": [
+        {
+          "stage": 1,
+          "pid": 67717,
+          "passed": true,
+          "tool_call_ids": [
+            "call_mTxIpUtqxo3Avfjo44IXTsOn"
+          ],
+          "external_acceptance": {
+            "scenario": "resume",
+            "stage": 1,
+            "integrity_errors": [],
+            "acceptance_exit": 0,
+            "stdout": "{\"checks\": 39}\n",
+            "stderr": "",
+            "expected_checks": 39,
+            "assertions_completed": true,
+            "passed": true
+          },
+          "canonical_prefix_preserved": true,
+          "frozen_user_turns": true
+        },
+        {
+          "stage": 2,
+          "pid": 67756,
+          "passed": true,
+          "tool_call_ids": [
+            "call_bgBTHrlvCk3XB4JA82Z8Sk9c"
+          ],
+          "external_acceptance": {
+            "scenario": "resume",
+            "stage": 2,
+            "integrity_errors": [],
+            "acceptance_exit": 0,
+            "stdout": "{\"checks\": 48}\n",
+            "stderr": "",
+            "expected_checks": 48,
+            "assertions_completed": true,
+            "passed": true
+          },
+          "canonical_prefix_preserved": true,
+          "frozen_user_turns": true
+        }
+      ],
+      "failure_category": null,
+      "human_interventions": 0
+    }
+  ],
+  "independent_passed": 7,
+  "independent_failed": 2
+}

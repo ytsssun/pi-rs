@@ -1,7 +1,11 @@
 # Resource accounting
 
 Cycle starts 2026-09-06 (local). Concurrent agent cap: 4 including coordinator.
-Native subagents used: upstream research (1). Model token/cost counters are not exposed by these subagent calls; unknown, not zero. No project provider calls yet. Record provider-reported usage in persisted model responses when available.
+Native agent token/cost counters remain unavailable. Actual live OpenAI usage is recorded in experiments/live-openai-results.json; M5 retry accounting is exported from response records by experiments/summarize_live.py. Missing/incomplete response usage is unknown.
+
+## Historical cycle entries
+
+The entries below describe their own time, including the former access blocker; they do not mean that no live calls exist now.
 No performance claims yet. Startup, memory, concurrency and model/tool latency require separate measurements.
 
 M1: 3 worker agents (upstream research + continuation spike, runtime, independent verifier); maximum concurrent agents 4 including coordinator. No live project inference calls; local HTTP double responses only. Successful runtime provider usage is persisted in session. Failed/incomplete request usage is currently not captured. Coordinator/native worker token cost is unavailable through the collaboration API, not estimated. Rust toolchain and Cargo dependencies downloaded locally. No startup/RSS/throughput benchmark performed.
@@ -13,3 +17,9 @@ Final M2 clean candidate verification was interrupted once more by account quota
 M3: coordinator plus two reused workers; no new worker handles. Another verifier quota interruption occurred; partial original/adversarial artifacts preserved and resumed after external reset. No usage resets, no live inference calls, native token/cost counters unavailable. Direct dependency unicode-normalization added; unrelated lockfile rustls update reverted before integration.
 
 Live-model cycle from ef2b8e6: coordinator plus one independent acceptance/review worker (2 concurrent total). No actual inference requests; provider tokens/cost not applicable because access blocked. Native agent token counters unavailable. Local relay test used fake upstream responses, not a paid provider. No usage reset or desktop auth change.
+
+## M5 closeout
+
+Coordinator plus one newly active replacement verifier (2 active, cap4); previous pending_init review never produced work. Pilot02:5 actual HTTP responses,3242 reported total tokens. Existing artifacts reused, no pilot rerun needed. No native usage counters or capacity-reset actions. Final matrix usage is exported without summing cumulative session vectors.
+
+Final retry matrix: 64 responses with usage, 61719 input tokens and 5538 completion tokens (provider-reported, no invoice claim). 7/9 independent successes,2 failed tasks. Export: experiments/live-retry-results.json. No missing response usage in this matrix.

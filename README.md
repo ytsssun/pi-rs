@@ -1,6 +1,6 @@
 # pi-rs
 
-An experimental Rust coding-agent runtime with narrowly tested Pi compatibility. It can change files, execute tests, save a session, exit and continue a new user turn. Deterministic scenarios pass with fixtures/local HTTP doubles; **real model coding has not been verified**. This is not yet a drop-in Pi replacement.
+An experimental Rust coding-agent runtime with narrowly tested Pi compatibility. It can change files, execute tests, save a session, exit and continue a new user turn. Real OpenAI model coding and cross-process continuation have been independently verified on small fixed tasks. The first Luna baseline completed 8/9 tasks fully; one run omitted testing its new behavior despite correct code. See [live review](experiments/live-luna-review.md) and [current checkpoint](docs/checkpoint.md) for retry status and limitations. This is not yet a drop-in Pi replacement.
 
 ## Run the coding scenario
 

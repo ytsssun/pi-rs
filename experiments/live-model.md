@@ -4,27 +4,19 @@ Starting runtime commit: `ef2b8e6a11bb54f5600e30880f19c05d5ce229ad` on `main`.
 This cycle changes only validation infrastructure and records. No new TUI,
 provider, multiplayer or extension implementation is included.
 
-## Current result: blocked before first live request
+## Current result and scope
 
-Access inspection found no provider API variables, no Pi auth/models files, and
-no project dotenv file. Codex auth mode is `chatgpt`; its API key field is empty.
-Only credential presence/type was reported, never values. The existing runtime
-uses `/chat/completions` and `OPENAI_API_KEY`; ChatGPT login tokens are not assumed
-to authorize that API. Desktop login/configuration has not been changed.
-The user was asked for an authorized credential file path, endpoint and model ID,
-not a secret pasted into chat. No selected live model or endpoint has been frozen
-because that information is unavailable.
+Live access is available via ignored `.env`. Real Luna baseline-01 had 8/9
+independent successes, including three cross-process resumes; one model omitted
+new-function tests. Nano and Luna failures remain recorded in
+`live-openai-results.json` and their independent verdict files. Luna required the
+optional explicit reasoning-effort CLI change, so the earlier statement that no
+runtime change was needed is superseded. No credentials were published.
 
-- Live attempts: **0**; independently completed: **0**; model/task failures: **0**.
-- Human-steered model attempts: **0**. One user access-configuration response is
-  required before execution; that is a prerequisite, not a model success/failure.
-- Nine baseline repetitions and the context trial: **not run**.
-- Daily-use readiness: **not established**.
-- Native coordinator/worker token counters: unavailable, not zero.
-
-`python3 experiments/run_live.py --phase pilot --output .runs/live-access-check --model unspecified`
-exited 2 with missing-credential preflight and created no run directory. This is
-an environment block, not an inference request. No fallback to fixtures exists.
+M5 is now bounded closeout per `../docs/milestone5.md`: pilot02 independently
+passed; one authorized baseline02 is complete:7/9 independent successes,2 failed tasks. No repeated selection of only
+green runs. The unchanged 9/9 gate still controls the context trial. Final retry
+findings are in `live-retry-review.md` and the current project checkpoint.
 
 ## Frozen acceptance
 
@@ -118,3 +110,26 @@ Runner stops after two consecutive unsuccessful runs, any harness exception, or
 a process timeout for inspection; unrun repetitions remain unrun, never passes.
 CLI exit zero denotes automated checks only; independent completion requires the
 recorded verifier review as well.
+
+
+## Historical access check — superseded after user supplied .env
+
+Access inspection found no provider API variables, no Pi auth/models files, and
+no project dotenv file. Codex auth mode is `chatgpt`; its API key field is empty.
+Only credential presence/type was reported, never values. The existing runtime
+uses `/chat/completions` and `OPENAI_API_KEY`; ChatGPT login tokens are not assumed
+to authorize that API. Desktop login/configuration has not been changed.
+The user was asked for an authorized credential file path, endpoint and model ID,
+not a secret pasted into chat. No selected live model or endpoint has been frozen
+because that information is unavailable.
+
+- Live attempts: **0**; independently completed: **0**; model/task failures: **0**.
+- Human-steered model attempts: **0**. One user access-configuration response is
+  required before execution; that is a prerequisite, not a model success/failure.
+- Nine baseline repetitions and the context trial: **not run**.
+- Daily-use readiness: **not established**.
+- Native coordinator/worker token counters: unavailable, not zero.
+
+`python3 experiments/run_live.py --phase pilot --output .runs/live-access-check --model unspecified`
+exited 2 with missing-credential preflight and created no run directory. This is
+an environment block, not an inference request. No fallback to fixtures exists.
