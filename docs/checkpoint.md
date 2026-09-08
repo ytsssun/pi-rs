@@ -223,3 +223,5 @@ Verified E092: Rust provider module now has a tested SSE data payload parser (mu
 Verified E093: Rust `SseDecoder` now buffers split chunks and emits multiple complete SSE events, including `[DONE]`, while rejecting incomplete final events. Provider transport remains blocking; this is parser-only groundwork.
 
 Verified E094: Rust SseDecoder handles standard CRLF event separators in addition to LF, with unit coverage. This remains parser groundwork, not live streaming transport.
+
+Verified E096: independently reran bounded Rust `StreamQueue` targeted tests and full cargo suite. Capacity, terminal exactly-once, wait wakeup, close, and post-close rejection pass. Queue is not yet exposed through Node-API or connected to HTTP provider.
