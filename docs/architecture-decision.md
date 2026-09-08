@@ -32,8 +32,8 @@ A JS runtime remains part of deployment, so this is not a standalone Rust-only b
 | Responsibility | Target owner | Present evidence / remaining obligation |
 | --- | --- | --- |
 | Canonical session tree, append/branch/policy/recovery state | Rust | v3 read/write + native session persistence tested; migration/full API/recovery incomplete |
-| Agent state machine, next model/tool/turn, steering/cancel decisions | Rust | Isolated dispatch/reentry shown; integrated native agent state machine still missing |
-| Context policy and projection decisions | Rust | TS/Rust projection and original hook chains tested separately; integration with native state machine remains |
+| Agent state machine, next model/tool/turn, steering/cancel decisions | Rust | Integrated sequential native state machine tested; steering/cancel/parallel conformance incomplete |
+| Context policy and projection decisions | Rust | Integrated current-view projection/persisted reset/fork tested, plus TS control; full schema incomplete |
 | Loading/resolution, extension closures, event dispatch mechanics | Upstream JS host | Actual unchanged Kimi/Todo through loader/runner tested; full package/API inventory still required |
 | UI factories, components, themes, focus/terminal rendering | Upstream JS host | Identity and limited original mounting/replacement/disposal methods tested; real app/terminal/overlay lifecycle unverified |
 | Provider transports/auth adapters | JS initially, governed by Rust runtime requests | No integrated Rust scheduler to actual adapter proof yet; existing CLI provider evidence is a separate path |
@@ -77,7 +77,7 @@ padEnd(40). This was a harness error, not a runtime defect or relaxed assertion.
 The JSON-component negative exits1 at factory-instance identity, preserving evidence
 that naive serialization is insufficient for these values.
 
-## Next milestone, frozen acceptance
+## Completed integration milestone — preserved frozen acceptance
 
 Build one **Rust-owned native model/tool/session execution path**, reusing these
 modules. Stop adding unrelated isolated interface probes as a substitute.
@@ -98,9 +98,9 @@ modules. Stop adding unrelated isolated interface probes as a substitute.
    the integrated path. Keep failed runs and stable acceptance; fixtures establish
    deterministic architecture behavior only, not independent live-model coding.
 
-Complete the architecture goal only after auditing its actual requirements against
-this integrated evidence. The decision direction is now clear; the missing Rust
-scheduler integration remains substantive work, not a reason to repeat this decision.
+The originally frozen criteria above are retained for audit. They were executed
+and independently reviewed in docs/integrated-runtime-review.md. Integrated
+scheduling is now demonstrated; full product compatibility remains incomplete.
 
 ## Reproduce UI evidence
 
