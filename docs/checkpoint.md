@@ -159,3 +159,5 @@ Verified E062: duplicate request ID submission is rejected without consuming pen
 Verified E063: independently rebuilt and reran `experiments/native-batch-hook-abort.mjs`; a second tool_call hook block causes zero executions for both calls, source-order error results, and continued runtime progress.
 
 Tested E064: batch `write/edit/bash` calls now write native in-flight pending markers before execution, aligning mutation durability with sequential path. Existing integration and syntax checks pass; batch crash/reopen recovery remains unverified.
+
+Verified E065: two batch mutation markers survive simulated process exit 9; reopen blocks replay until both are explicitly resolved, then a new turn begins. This validates durable batch recovery markers but not crash during actual concurrent execution.
