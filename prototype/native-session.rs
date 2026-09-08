@@ -1,6 +1,6 @@
 //! Node-API integration experiment for the real Rust Pi session module.
 //! Registry belongs to napi_env; explicit close or environment teardown drops stores.
-use pi_rs::{pi_runtime::PiRuntime, pi_session_store::PiSessionStore, provider::openai_chat, stream_queue::{StreamEvent, StreamQueue}};
+use pi_rs::{pi_runtime::PiRuntime, pi_session_store::PiSessionStore, provider::openai_chat, stream_queue::{spawn_producer, StreamEvent, StreamQueue}};
 use serde_json::{json, Value};
 use std::{
     cell::RefCell,
@@ -61,6 +61,7 @@ struct Registry {
     next: u64,
     stores: HashMap<String, NativeSession>,
     queues: HashMap<String, std::sync::Arc<StreamQueue>>,
+    producers: HashMap<String, std::thread::JoinHandle<Result<(), pi_rs::stream_queue::ProducerError>>>,
 }
 impl Drop for Registry {
     fn drop(&mut self) {
@@ -104,6 +105,16 @@ impl Registry {
                     self.next = self.next.checked_add(1).ok_or("queue handle exhausted")?;
                     let handle = format!("{}:q{}", self.prefix, self.next);
                     self.queues.insert(handle.clone(), std::sync::Arc::new(StreamQueue::new(capacity)));
+                    Ok(json!(handle))
+                }
+                "stream_fixture_start" => {
+                    let capacity = r["capacity"].as_u64().unwrap_or(8) as usize;
+                    let q = std::sync::Arc::new(StreamQueue::new(capacity));
+                    self.next = self.next.checked_add(1).ok_or("stream handle exhausted")?;
+                    let handle = format!("{}:s{}", self.prefix, self.next);
+                    let events = r["events"].as_array().ok_or("events required")?.iter().map(|e| StreamEvent { value: e["value"].clone(), terminal: e["terminal"].as_bool().unwrap_or(false) }).collect::<Vec<_>>();
+                    self.producers.insert(handle.clone(), spawn_producer(std::sync::Arc::clone(&q), events));
+                    self.queues.insert(handle.clone(), q);
                     Ok(json!(handle))
                 }
                 "queue_push" => {
@@ -254,6 +265,7 @@ pub unsafe extern "C" fn napi_register_module_v1(env: Handle, exports: Handle) -
         next: 0,
         stores: HashMap::new(),
         queues: HashMap::new(),
+        producers: HashMap::new(),
     })))
     .cast();
     if napi_set_instance_data(env, state, Some(cleanup), null_mut()) != 0 {
