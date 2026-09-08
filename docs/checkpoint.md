@@ -1,6 +1,6 @@
 # Current checkpoint
 
-The Rust/Node-API runtime remains an integration prototype; the shipped Rust CLI
+The Rust/Node-API runtime now has a live unified entry with original Pi tools: E145/E146/E147/E149/E150/E153 passed under independent external checks. It remains an integration prototype; the shipped Rust CLI
 still uses the legacy execution path. Running CLI help does not prove extension
 integration or a clean build (E128 overstated both).
 
