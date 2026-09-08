@@ -27,7 +27,11 @@ export async function drive({manager,host,prompt,stream,trace=[],onToolUpdate=()
         const registered=host.runner.getAllRegisteredTools().find(t=>t.definition.name===call.name);
         if(!registered)throw Error(`Tool ${call.name} not found`);
         const tool=wrapRegisteredTool(registered,host.runner);
-        result=await executeWithUpdates(tool,call.id,validateToolArguments(tool,call),new AbortController().signal,async update=>{
+        const validated=validateToolArguments(tool,call);
+        const hookEvent={type:'tool_call',toolCallId:call.id,toolName:call.name,input:validated};
+        const hook=await host.runner.emitToolCall(hookEvent);
+        if(hook?.block) throw Error(hook.reason||'Tool execution was blocked');
+        result=await executeWithUpdates(tool,call.id,hookEvent.input,new AbortController().signal,async update=>{
           const accepted=step({event:'tool_update',requestId,update});
           if(accepted.type!=='accepted') throw Error('native runtime rejected tool update');
           try { await onToolUpdate({toolCallId:call.id,toolName:call.name,partialResult:update,requestId}); }
