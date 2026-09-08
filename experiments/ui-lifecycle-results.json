@@ -1,0 +1,32 @@
+{
+  "upstream": "9767ba275f3e9a5ee0f5c5342249b629ab1b2282",
+  "sourceSha256": "80c0fc6d193daf08648dac3d68075bdfd6285bf095b8f380f32da9cbe9e7aa40",
+  "trace": [
+    "factory:widget-old",
+    "factory:footer",
+    "factory:header",
+    "dispose:widget-old",
+    "factory:widget-new",
+    "dispose:widget-new",
+    "dispose:footer",
+    "dispose:header"
+  ],
+  "checks": {
+    "earlyHeaderFactorySkipped": true,
+    "factoryIdentityRetained": true,
+    "componentMutationVisible": true,
+    "replacementDisposesBeforeFactory": true,
+    "clearDisposesOnce": true,
+    "builtinsRestored": true,
+    "nativeSessionReadableDuringCallbacks": true,
+    "disposeFailurePreventsReplacement": true,
+    "staleContextRejected": true
+  },
+  "limits": [
+    "Original lifecycle method bodies; constructor/lifecycle setup uses fixture fields",
+    "UI requestRender sentinel, no real terminal/TUI startup/input/visual layout",
+    "Synthetic extension factory, not arbitrary ecosystem UI plugin suite",
+    "No custom overlay/focus/dispose-on-process-shutdown proof",
+    "No integrated Rust-owned scheduler/model loop"
+  ]
+}

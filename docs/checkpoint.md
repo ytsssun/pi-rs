@@ -1,43 +1,44 @@
 # Current checkpoint — core-only Rust architecture evaluation
 
-## Verified state
+## Decision and verified state
 
-Starting commit123dc3fc126be6abbd733fb2d4f5aebda7737719; main authorized.
-Pi9767ba275f3e9a5ee0f5c5342249b629ab1b2282 unchanged.
-Node-API addon links actual Rust PiSessionStore/Index; native path passes frozen7
-writer oracle cases and unchanged Todo three-process persisted continuation.
-Native/helper Todo results match. Lifecycle tests verify isolated/stale/cross-env
-handles, failed-open no allocation,64create/close cycles and Rust Drop on natural
-Worker exit/termination. Registration rejects prior instance data instead of leak-
-prone overwrite. Explicit close/env exit tested, not arbitrary GC/leak freedom.
+Starting commit0788e3bc96ff439a0dd757b6f3f949b54e6217b3; main authorized.
+Pinned Pi9767ba275f3e9a5ee0f5c5342249b629ab1b2282 unchanged.
+Architecture direction accepted: upstream JS ecosystem host + Rust runtime exposed
+through Node-API. Full compatibility not established. Reason/ownership/alternative
+comparison and frozen next acceptance: docs/architecture-decision.md, independently
+reviewed in docs/architecture-decision-review.md.
+
+Original UI widget/header/footer lifecycle methods now tested with actual extension
+runner, Text/Container/Theme and native session callbacks. Identity, replacement
+ordering, disposal, built-in restoration and stale context assertions pass. Naive
+JSON component negative fails expected identity check. Initial padding expectation
+error preserved; exact upstream40column output now asserted.
 
 Reproduce:
 ```
 python3 scripts/build-native-session.py
-TSX_TSCONFIG_PATH=vendor/pi-mono/tsconfig.json node --import ./vendor/pi-mono/node_modules/tsx/dist/loader.mjs experiments/pi-write-cases.mjs prototype/architecture/native-store-backend.mjs
-TSX_TSCONFIG_PATH=vendor/pi-mono/tsconfig.json node --import ./vendor/pi-mono/node_modules/tsx/dist/loader.mjs experiments/pi-store-todo.mjs --native
-node experiments/native-store-lifecycle.mjs
+TSX_TSCONFIG_PATH=vendor/pi-mono/tsconfig.json node --import ./vendor/pi-mono/node_modules/tsx/dist/loader.mjs experiments/ui-lifecycle.mjs
 ```
-Evidence: experiments/native-write-results.json, native-store-todo-results.json,
-native-store-lifecycle-results.json and docs/native-store-review.md.
-Design: docs/native-store-evaluation.md. No new dependencies/model calls/credentials.
-Node/platform caveat unchanged; original Rust core Cargo suite passed123dc3f,
-this cycle builds/links that unchanged core and tests native integration.
+Negative: append `--json-component-counterexample`. Evidence:
+experiments/ui-lifecycle-results.json; independent review above. This invokes
+original methods on fixture-initialized fields, not full InteractiveMode constructor,
+terminal startup, custom overlay/focus or shutdown lifecycle. No provider calls.
 
-## Limits and next milestone
+## Next milestone — integrated Rust state machine
 
-v3 subset, fixture clock/IDs/lifecycle, no CLI/model-driven loop integration or
-complete session migration/header/labels/recovery. Native JSON DTOs are fresh
-objects, no alias parity. Store lifetime explicit close/env exit only, raw FFI
-not production-hardened. Native abort has only prior bounded probe coverage;
-multiple sink rejection ordering and actual UI lifecycle remain unverified.
+Implement one Rust-owned native model/tool/session flow. Rust decides actions and
+continuation; JS loads/executes original tools/providers and UI. Reuse native session
+module and context policy, persist results, restore/follow up in fresh process,
+include failure/cancel, assert canonical history and current-view projection. Frozen
+criteria in architecture-decision.md. Independent audit requires integrated evidence;
+UI alone cannot complete architecture goal. Do not repeat isolated green probes.
 
-Next run actual upstream UI factory mounting/disposal with objects in JS, then
-consolidate ownership decision and compatibility obligations against the inventory.
-Node-API candidate now has integrated Rust session evidence. Context editing TS
-control works already; Rust justified by requested ownership, not unmeasured speed.
-Do not repeat native writer cases absent new changes. Integrate remaining seams
-rather than accumulate isolated proofs. Full ecosystem compatibility target stands.
+Existing evidence: native7writer cases/Todo3process persistence,19read cases,
+callback identity/reentry and5async cases. Remaining: integrated scheduler, complete
+session interface/migrations, alias contracts, async rejection order, provider
+integration, full UI and distribution/recovery. TS context control works, so Rust
+is an ownership choice, not a proven speed gain or unique context-editing necessity.
 
 ## Goal and coordination
 
@@ -47,10 +48,10 @@ TS fork remains the control for context editing. Only core/compatibility changes
 major licensing/distribution decisions or actual access blockers need user input.
 No global memory edits. Repository checkpoint/append-only board are authoritative.
 
-T022 architecture assessment ongoing; T028 native session integration subset tested;
-D008 native primary candidate strengthened, full compatibility still unproven.
+T022 architecture assessment ongoing; D009 direction accepted for implementation;
+T029 integrated Rust state machine proposed with frozen acceptance.
 This cycle used coordinator plus one independent reviewer (cap4); reviewer-owned
-independent native lifecycle/source review verified per-env cleanup and registration guard without user intervention. No live model calls or
+independent architecture review focused next work on integrated Rust state machine without user intervention. No live model calls or
 credentials; agent token counts unavailable. No background uptime promise.
 
 ## Historical evidence

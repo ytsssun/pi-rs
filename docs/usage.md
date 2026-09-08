@@ -84,3 +84,11 @@ lifecycle checks. Registration overwrite hazard addressed before integration.
 No user intervention/dependencies/model calls/keys. Usage unavailable; no timing,
 RSS, crash isolation or allocator-leak claims. Bounded lifecycle allocation is
 64sessions, not a new runtime maximum imposed on compatibility.
+
+### Architecture decision and UI method lifecycle (starting0788e3b)
+
+Coordinator+independent architecture/UI reviewer,2active cap4. Reviewer confirmed
+native direction and identified integrated scheduler as decisive remaining work.
+Both executed original UI lifecycle positive and negative; harness padding error
+preserved/corrected. No user intervention, new dependencies, keys or model calls.
+Agent token usage unavailable. No performance/whole-TUI compatibility claims.
