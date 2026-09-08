@@ -2,41 +2,41 @@
 
 ## Verified state
 
-Starting commit63c7e7950ba15d80c5c15573670609cae4fd2d1b; main authorized.
-Pinned Pi9767ba275f3e9a5ee0f5c5342249b629ab1b2282 unchanged.
-Rust Pi v3 index now selects branches, compaction-aware context entries and model/
-thinking settings. Independent full-snapshot fixture comparison against upstream
-passes; empty-ID mismatch found after initial green cases was fixed and retained.
-Rejection cases are separate from parity counts in experiments/pi-index-results.json.
-Unchanged Todo reads Rust-selected branch in two fresh processes (no TS manager),
-restores alpha and adds gamma with correct ID. Continuation is in memory only.
+Starting commit6e6a674af1c16749f6f8981e16e02614f37dd9e2; main authorized.
+Pi9767ba275f3e9a5ee0f5c5342249b629ab1b2282 remains fixed.
+Rust PiSessionStore now owns v3 append, selected branch and reopen. Seven independent
+upstream differential scenarios pass, including first-flush collision memory state
+(original Rust mismatch fixed). Unchanged Todo persists gamma across three fresh
+Node processes backed by Rust stores, restores correct IDs and branch-local policy.
+No TS SessionManager in that Todo flow. Existing Cargo tests pass.
 
 Reproduce:
 ```
 export PATH="$HOME/.cargo/bin:$PATH"
-cargo build --locked --example pi_session_index
-TSX_TSCONFIG_PATH=vendor/pi-mono/tsconfig.json node --import ./vendor/pi-mono/node_modules/tsx/dist/loader.mjs experiments/pi-index-cases.mjs
-TSX_TSCONFIG_PATH=vendor/pi-mono/tsconfig.json node --import ./vendor/pi-mono/node_modules/tsx/dist/loader.mjs experiments/pi-index-todo.mjs
+cargo build --locked --example pi_session_store
+TSX_TSCONFIG_PATH=vendor/pi-mono/tsconfig.json node --import ./vendor/pi-mono/node_modules/tsx/dist/loader.mjs experiments/pi-write-cases.mjs prototype/architecture/pi-store-backend.mjs
+TSX_TSCONFIG_PATH=vendor/pi-mono/tsconfig.json node --import ./vendor/pi-mono/node_modules/tsx/dist/loader.mjs experiments/pi-store-todo.mjs
 cargo test --locked
 ```
-Evidence: experiments/pi-index-results.json, experiments/pi-index-todo-results.json,
-docs/pi-index-review.md. Implementation: src/pi_session_index.rs; design and scope:
-docs/pi-index-evaluation.md. No credentials/model calls; upstream setup caveats in
-real-plugin-host.md still apply.
+Evidence: experiments/pi-write-results.json, experiments/pi-store-todo-results.json,
+docs/pi-write-review.md. Design: docs/pi-store-evaluation.md. Dependency/version
+caveats still in real-plugin-host.md. No credentials/live model calls.
 
-## Limits and immediate next milestone
+## Limits and next integration milestone
 
-Index is read-only, not CLI-integrated; original JS converts selected context
-entries to messages. Legacy migration, label/header/tree interface, arbitrary JSON
-edge semantics, append/branch/reopen, recovery and identity not complete. Missing
-IDs/cycles rejected explicitly; no parity claim for those rejections or file repair.
+Fixture adapter drives lifecycle and supplies IDs/clock; not a model-driven loop or
+CLI integration. v3 only; no complete migration/header/labels, concurrent writers,
+crash/partial-write recovery, missing-file create-on-open or full JSON edge parity.
+Append failure may change in-memory state before disk succeeds, matching upstream.
+No transactional rollback/safety claim. Policy persistence tested here; projection
+and native object identity were previously tested separately.
 
-Next implement Rust Pi append/branch/reopen with unknown records/canonical history
-preserved, differential to actual SessionManager. Drive unchanged Todo through
-persisted cross-process continuation and branch-local context policy. Include
-upstream delayed initial flush and durable branch selection. Then integrate native
-binding session authority; do not repeat fixed reads as a substitute. UI lifetime,
-async sink rejection ordering and cancellation remain architecture obligations.
+Next integrate this Rust session module into the Node-API host with per-instance
+ownership and cleanup, no borrow across JS callbacks. Reuse frozen writer/Todo
+acceptance against native adapter; helper transport remains comparison only. Then
+actual UI factory lifecycle and final architecture/inventory audit. D008 native
+candidate remains provisional until integrated evidence, full compatibility target
+unchanged. Do not repeat helper-only cases instead of integrating.
 
 ## Goal and coordination
 
@@ -46,10 +46,10 @@ TS fork remains the control for context editing. Only core/compatibility changes
 major licensing/distribution decisions or actual access blockers need user input.
 No global memory edits. Repository checkpoint/append-only board are authoritative.
 
-T022 architecture assessment ongoing; T027 Rust session index tested subset,
-write/restore next. D008 Node-API primary integration candidate unchanged.
+T022 architecture assessment ongoing; T027 read/write session subset tested;
+T028 native session integration proposed next. D008 candidate unchanged.
 This cycle used coordinator plus one independent reviewer (cap4); reviewer-owned
-independent fixtures exposed empty-ID selection semantics, fixed before integration without user intervention. No live model calls or
+independent writer fixture exposed failure-path memory ordering, fixed before integration without user intervention. No live model calls or
 credentials; agent token counts unavailable. No background uptime promise.
 
 ## Historical evidence

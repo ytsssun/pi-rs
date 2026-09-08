@@ -67,3 +67,11 @@ oracle consumed unchanged; added empty-ID counterexample changed implementation.
 Coordinator tested unchanged Todo with Rust branch reader. No user intervention,
 new dependencies, live model calls or credentials. Agent usage unavailable. No
 performance claims; existing cargo tests are local/fixture tests, not live-model E2E.
+
+### Rust Pi writer (starting6e6a674)
+
+Coordinator+independent writer oracle/reviewer,2active cap4. Worker acceptance
+reused unchanged; seventh failure case found upstream memory-before-persist
+semantics, changed implementation and independently passed. No user intervention,
+credentials/model calls or new dependencies. Agent token counts unavailable. Cargo
+suite uses fixtures/local tools; no benchmark/full reliability claims.
