@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // Experimental user entry: original Pi tools/extension host, Rust loop/store.
-import {readFileSync, existsSync} from 'node:fs';
+import {readFileSync, existsSync, writeFileSync} from 'node:fs';
 import {resolve} from 'node:path';
 const args=process.argv.slice(2), options={}, extensions=[];
 if(args.includes('--help')) {
@@ -10,7 +10,7 @@ if(args.includes('--help')) {
 for(let i=0;i<args.length;i++) {
   const key=args[i];
   if(key==='--resume') {if(options[key]) throw Error('duplicate --resume'); options[key]=true; continue;}
-  if(!['--session','--workspace','--input','--model','--fixture','--extension','--context-tool-chars'].includes(key)) throw Error(`unknown option ${key}`);
+  if(!['--session','--workspace','--input','--model','--fixture','--extension','--context-tool-chars','--trace-file'].includes(key)) throw Error(`unknown option ${key}`);
   const value=args[++i]; if(!value||value.startsWith('--')) throw Error(`missing value for ${key}`);
   if(key==='--extension') extensions.push(resolve(value));
   else {if(key in options) throw Error(`duplicate ${key}`); options[key]=value;}
@@ -34,5 +34,7 @@ try {
   let index=0;
   const stream=fixture?async()=>{const message=fixture[index++]; if(!message)throw Error('fixture exhausted');return {async *[Symbol.asyncIterator](){},async result(){return message;}};}:nativeProviderStream({model:options['--model'],streaming:true});
   const result=await drive({manager,host,prompt:options['--input'],stream});
-  console.log(JSON.stringify({result,session:path,fixture:Boolean(fixture),extensionErrors:host.errors}));
+  const report={result,session:path,fixture:Boolean(fixture),extensionErrors:host.errors};
+  if(options['--trace-file']) writeFileSync(resolve(options['--trace-file']),JSON.stringify(report,null,2)+'\n');
+  console.log(JSON.stringify(report));
 } finally {await manager.close();}
