@@ -81,3 +81,5 @@ an invented claim that the complete coding agent already replaces Pi.
 ## Execution continuity
 
 The project checkpoint and append-only board are the durable recovery mechanism. The Codex goal is active for this task, but a completed turn does not itself guarantee background execution: the app/user or an explicitly configured heartbeat must start another turn. Worker completion can notify the coordinator while this task is active; it cannot revive an exited process. On abnormal exit, resume from `git status`, the latest checkpoint, and `python3 scripts/board.py list`; never infer work from chat claims. No herdr executable or existing project automation was found in this environment.
+
+Latest evidence: `node experiments/compare-event-trace.mjs` passes lifecycle, tool identity and error semantics for the deterministic sequential case. The separate async hook probe currently requires built upstream package artifacts in `vendor/pi-mono/node_modules`; a clean checkout fails module resolution before executing the probe. This remains an environment/bootstrap gap, not a parity pass.
