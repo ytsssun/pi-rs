@@ -262,3 +262,8 @@ Verified E097: rebuilt native addon and independently exercised `queue_create`, 
 ### E104 — live stream tool-call probe (failed, retained)
 - A real provider stream request with one minimal `echo` tool returned one terminal `error` event; no tool-call event was observed.
 - Credentials and payload were not persisted. This is a live failure requiring attribution (provider request schema/model behavior vs native translation); it does not invalidate E103 transport success.
+
+### E105 — live tool-call SSE with OpenAI function schema (verified)
+- Re-ran live provider stream using canonical `{type:function,function:{...}}` tool schema.
+- Evidence: observed initial tool call metadata, incremental JSON argument chunks, `finish_reason: tool_calls`, and terminal `[DONE]`; process exited 0.
+- Prior E104 failure is superseded as a malformed tool-schema probe, not a provider transport failure.
