@@ -305,3 +305,7 @@ Streaming and synchronous HTTP requests now use the same Rust `chat_request` enc
 ### E112 — live resume session audit (verified)
 - Fresh seed/resume run after harness assertions: external file assertion passed (`NATIVE_LIVE_EDITED`), and resume session contained 5 persisted toolResult messages and 7 assistant messages.
 - No human steering was used. The initial output parsing mistake was a verifier-command error and is retained separately from product results.
+
+### E113 — repeated live streaming resume matrix (verified)
+- Three fresh seed/resume pairs passed the harness-owned external file assertion and persisted-message checks.
+- Each resume reported 5 toolResult and 7 assistant messages; no manual intervention was used. This is a three-run stability sample, not a reliability guarantee.
