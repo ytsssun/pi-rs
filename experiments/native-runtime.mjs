@@ -37,6 +37,7 @@ async function run(path,stage) {
       const updatePositions=result.trace.map((e,i)=>e.type==='tool_update'?i:-1).filter(i=>i>=0);
       const longResult=result.trace.findIndex(e=>e.type==='tool_result'&&e.tool==='long_output');
       assert.equal(updatePositions.length,2); assert.ok(updatePositions.every(i=>i<longResult));
+      assert.throws(()=>step({event:'tool_update',requestId:'5:4',update:{content:[]}}),/no active tool|stale|mismatched/);
     }
     assert.equal(responses.length,0);assert.deepEqual(host.errors,[]);
     const canonical=manager.snapshot().branch.filter(e=>e.type==='message').map(e=>e.message);
