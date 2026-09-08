@@ -7,6 +7,7 @@ integration or a clean build (E128 overstated both).
 Current work: unified execution path remains the priority.
 
 Latest verified unified-entry results: E145 live original read, E146 live original write, E147 fresh-process write/read resume, E148 unchanged protected extension load, and E149 fresh-process write/edit resume. E144 remains the pre-fix failure that exposed incorrect tool registration. The new entry is still experimental and has not replaced the legacy CLI. The latest change fixes
+E158 confirms the same policy projection/reset behavior through the existing Rust context path; unified-entry policy persistence is E157, while live model-view trimming remains unverified.
 live harness acceptance/reporting: per-scenario file checks, byte-exact text (no
 trim), and unknown-stage rejection. Reproduce offline counterexamples with
 `node --test experiments/native-live-acceptance.test.mjs`.
