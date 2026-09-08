@@ -284,3 +284,6 @@ Verified E097: rebuilt native addon and independently exercised `queue_create`, 
 
 ### Correction — stream completion fidelity
 E108's claim that converting a tool-call finish into `stop` was a correct fix is superseded. The bridge previously fabricated stop/EOF success and could accept incomplete streams. The adapter now preserves `toolUse` versus `stop`; the native bridge requires an explicit terminal marker and a supported provider finish reason. Late usage chunks are preserved. Evidence: `node experiments/native-stream-terminal.mjs` and `node experiments/openai-stream-canonical.mjs` pass. These are deterministic tests, not new live runs. Runtime integration and transport cancellation remain open.
+
+### Shared provider request encoding
+Streaming and synchronous HTTP requests now use the same Rust `chat_request` encoder. Pi tool definitions and canonical assistant/toolResult messages no longer bypass translation in streaming. Streaming requests request usage explicitly. Verified by `cargo test --locked --lib provider` (2 passed), including exact tool-call ID, arguments and toolResult encoding. This corrects E105's attribution: callers using the Pi-shaped tool schema were valid at the Pi boundary; the streaming implementation lacked conversion. Live runtime integration remains open.

@@ -34,9 +34,7 @@ pub fn client() -> Result<Client> {
         .build()?)
 }
 
-/// One bounded OpenAI Chat Completions request shared by CLI and native hosts.
-/// Credentials are read by the caller; this function never logs them.
-pub fn openai_chat(client: &Client, base: &str, key: &str, model: &str, messages: &[Value], tools: &Value, reasoning_effort: Option<&str>) -> Result<Value> {
+fn chat_request(model: &str, messages: &[Value], tools: &Value, reasoning_effort: Option<&str>) -> Value {
     let openai_tools: Vec<Value> = tools.as_array().map_or(&[][..], |v| &v[..]).iter().map(|tool| {
         if tool.get("function").is_some() { return tool.clone(); }
         json!({"type":"function","function":{"name":tool["name"],"description":tool["description"],"parameters":tool["parameters"]}})
@@ -50,6 +48,13 @@ pub fn openai_chat(client: &Client, base: &str, key: &str, model: &str, messages
     }).collect();
     let mut request = json!({"model": model, "messages": openai_messages, "tools": openai_tools});
     if let Some(effort) = reasoning_effort { request["reasoning_effort"] = json!(effort); }
+    request
+}
+
+/// One bounded OpenAI Chat Completions request shared by CLI and native hosts.
+/// Credentials are read by the caller; this function never logs them.
+pub fn openai_chat(client: &Client, base: &str, key: &str, model: &str, messages: &[Value], tools: &Value, reasoning_effort: Option<&str>) -> Result<Value> {
+    let request = chat_request(model, messages, tools, reasoning_effort);
     let response: Value = client.post(format!("{}/chat/completions", base.trim_end_matches('/')))
         .bearer_auth(key).json(&request).send()?.error_for_status()?.json()?;
     if !matches!(response["choices"][0]["finish_reason"].as_str(), Some("stop" | "tool_calls")) {
@@ -63,8 +68,9 @@ pub fn openai_chat(client: &Client, base: &str, key: &str, model: &str, messages
 /// OpenAI-compatible streaming request. Each decoded SSE payload is delivered
 /// in arrival order; `[DONE]` is delivered as `None` and ends the callback.
 pub fn openai_chat_stream<F: FnMut(Option<Value>) -> Result<()>>(client: &Client, base: &str, key: &str, model: &str, messages: &[Value], tools: &Value, reasoning_effort: Option<&str>, mut on_event: F) -> Result<()> {
-    let mut request = json!({"model": model, "messages": messages, "tools": tools, "stream": true});
-    if let Some(effort) = reasoning_effort { request["reasoning_effort"] = json!(effort); }
+    let mut request = chat_request(model, messages, tools, reasoning_effort);
+    request["stream"] = json!(true);
+    request["stream_options"] = json!({"include_usage": true});
     let mut response = client.post(format!("{}/chat/completions", base.trim_end_matches('/')))
         .bearer_auth(key).json(&request).send()?.error_for_status()?;
     let mut decoder = SseDecoder::default();
@@ -92,6 +98,17 @@ pub fn openai_chat_stream_to_queue(client: &Client, base: &str, key: &str, model
 #[cfg(test)]
 mod tests {
     use super::{parse_sse_data, SseDecoder};
+    #[test]
+    fn shared_request_encodes_pi_tool_continuation() {
+        use serde_json::json;
+        let request = super::chat_request("fixture", &[
+            json!({"role":"assistant","content":[{"type":"toolCall","id":"c","name":"echo","arguments":{"text":"hello"}}]}),
+            json!({"role":"toolResult","toolCallId":"c","content":[{"type":"text","text":"hello"}]})
+        ], &json!([{"name":"echo","description":"Echo","parameters":{"type":"object"}}]), None);
+        assert_eq!(request["tools"][0]["type"], "function");
+        assert_eq!(request["messages"][0]["tool_calls"][0]["function"]["arguments"], "{\"text\":\"hello\"}");
+        assert_eq!(request["messages"][1], json!({"role":"tool","tool_call_id":"c","content":"hello"}));
+    }
     #[test]
     fn parses_multiline_data_and_done() {
         assert_eq!(parse_sse_data("event: message\ndata: {\"x\":\ndata: 1}\n\n").unwrap().unwrap()["x"], 1);
