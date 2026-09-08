@@ -153,3 +153,5 @@ Tested E059: native batch host honors registered `executionMode: "sequential"` b
 Tested E060: batch preflight now invokes unchanged Pi `ExtensionRunner.emitToolCall` for every call before execution and turns hook blocks into error outcomes. Existing integrated fixture, syntax and diff checks pass. A dedicated hook-abort fixture and full upstream event differential remain open.
 
 Tested E061: batch admission now propagates any preflight hook block across the whole batch, so no call executes after a batch-level abort. Existing integration and syntax checks pass; dedicated hook-abort fixture remains to be added.
+
+Verified E062: duplicate request ID submission is rejected without consuming pending batch; a valid reverse-order retry then succeeds and persists source order. This closes a session-integrity bug found during batch verification.
