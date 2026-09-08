@@ -32,6 +32,12 @@ async function run(path,stage) {
       return {async *[Symbol.asyncIterator](){yield {type:'done'};},async result(){return response;}};
     };
     const result=await drive({manager,host,prompt:stage,stream});
+    if(stage==='seed') {
+      const traceTypes=result.trace.map(e=>e.type);
+      const updatePositions=result.trace.map((e,i)=>e.type==='tool_update'?i:-1).filter(i=>i>=0);
+      const longResult=result.trace.findIndex(e=>e.type==='tool_result'&&e.tool==='long_output');
+      assert.equal(updatePositions.length,2); assert.ok(updatePositions.every(i=>i<longResult));
+    }
     assert.equal(responses.length,0);assert.deepEqual(host.errors,[]);
     const canonical=manager.snapshot().branch.filter(e=>e.type==='message').map(e=>e.message);
     const tools=canonical.filter(m=>m.role==='toolResult');
