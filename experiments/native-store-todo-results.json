@@ -1,5 +1,5 @@
 {
-  "transport": "helper",
+  "transport": "native",
   "reports": [
     {
       "stage": "seed",

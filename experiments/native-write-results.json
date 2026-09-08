@@ -1,0 +1,2249 @@
+{
+  "passed": 7,
+  "upstream": [
+    {
+      "name": "delayed-first-flush",
+      "observations": {
+        "before": {
+          "entries": [
+            {
+              "type": "custom",
+              "customType": "state",
+              "data": {
+                "nested": {
+                  "id": "must-not-normalize"
+                }
+              },
+              "id": "entry-0",
+              "parentId": null,
+              "timestamp": "<generated>"
+            },
+            {
+              "type": "message",
+              "id": "entry-1",
+              "parentId": "entry-0",
+              "timestamp": "<generated>",
+              "message": {
+                "role": "user",
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "fixed user"
+                  }
+                ],
+                "timestamp": 1
+              }
+            }
+          ],
+          "branch": [
+            {
+              "type": "custom",
+              "customType": "state",
+              "data": {
+                "nested": {
+                  "id": "must-not-normalize"
+                }
+              },
+              "id": "entry-0",
+              "parentId": null,
+              "timestamp": "<generated>"
+            },
+            {
+              "type": "message",
+              "id": "entry-1",
+              "parentId": "entry-0",
+              "timestamp": "<generated>",
+              "message": {
+                "role": "user",
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "fixed user"
+                  }
+                ],
+                "timestamp": 1
+              }
+            }
+          ],
+          "disk": null
+        },
+        "after": {
+          "entries": [
+            {
+              "type": "custom",
+              "customType": "state",
+              "data": {
+                "nested": {
+                  "id": "must-not-normalize"
+                }
+              },
+              "id": "entry-0",
+              "parentId": null,
+              "timestamp": "<generated>"
+            },
+            {
+              "type": "message",
+              "id": "entry-1",
+              "parentId": "entry-0",
+              "timestamp": "<generated>",
+              "message": {
+                "role": "user",
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "fixed user"
+                  }
+                ],
+                "timestamp": 1
+              }
+            },
+            {
+              "type": "message",
+              "id": "entry-2",
+              "parentId": "entry-1",
+              "timestamp": "<generated>",
+              "message": {
+                "role": "assistant",
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "fixed assistant"
+                  }
+                ],
+                "api": "fixture",
+                "provider": "fixture",
+                "model": "fixture",
+                "usage": {
+                  "input": 0,
+                  "output": 0,
+                  "cacheRead": 0,
+                  "cacheWrite": 0,
+                  "totalTokens": 0,
+                  "cost": {
+                    "input": 0,
+                    "output": 0,
+                    "cacheRead": 0,
+                    "cacheWrite": 0,
+                    "total": 0
+                  }
+                },
+                "stopReason": "stop",
+                "timestamp": 2
+              }
+            }
+          ],
+          "branch": [
+            {
+              "type": "custom",
+              "customType": "state",
+              "data": {
+                "nested": {
+                  "id": "must-not-normalize"
+                }
+              },
+              "id": "entry-0",
+              "parentId": null,
+              "timestamp": "<generated>"
+            },
+            {
+              "type": "message",
+              "id": "entry-1",
+              "parentId": "entry-0",
+              "timestamp": "<generated>",
+              "message": {
+                "role": "user",
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "fixed user"
+                  }
+                ],
+                "timestamp": 1
+              }
+            },
+            {
+              "type": "message",
+              "id": "entry-2",
+              "parentId": "entry-1",
+              "timestamp": "<generated>",
+              "message": {
+                "role": "assistant",
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "fixed assistant"
+                  }
+                ],
+                "api": "fixture",
+                "provider": "fixture",
+                "model": "fixture",
+                "usage": {
+                  "input": 0,
+                  "output": 0,
+                  "cacheRead": 0,
+                  "cacheWrite": 0,
+                  "totalTokens": 0,
+                  "cost": {
+                    "input": 0,
+                    "output": 0,
+                    "cacheRead": 0,
+                    "cacheWrite": 0,
+                    "total": 0
+                  }
+                },
+                "stopReason": "stop",
+                "timestamp": 2
+              }
+            }
+          ],
+          "disk": [
+            {
+              "type": "session",
+              "version": 3,
+              "id": "session",
+              "timestamp": "<generated>",
+              "cwd": "/workspace/pi-write-case"
+            },
+            {
+              "type": "custom",
+              "customType": "state",
+              "data": {
+                "nested": {
+                  "id": "must-not-normalize"
+                }
+              },
+              "id": "entry-0",
+              "parentId": null,
+              "timestamp": "<generated>"
+            },
+            {
+              "type": "message",
+              "id": "entry-1",
+              "parentId": "entry-0",
+              "timestamp": "<generated>",
+              "message": {
+                "role": "user",
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "fixed user"
+                  }
+                ],
+                "timestamp": 1
+              }
+            },
+            {
+              "type": "message",
+              "id": "entry-2",
+              "parentId": "entry-1",
+              "timestamp": "<generated>",
+              "message": {
+                "role": "assistant",
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "fixed assistant"
+                  }
+                ],
+                "api": "fixture",
+                "provider": "fixture",
+                "model": "fixture",
+                "usage": {
+                  "input": 0,
+                  "output": 0,
+                  "cacheRead": 0,
+                  "cacheWrite": 0,
+                  "totalTokens": 0,
+                  "cost": {
+                    "input": 0,
+                    "output": 0,
+                    "cacheRead": 0,
+                    "cacheWrite": 0,
+                    "total": 0
+                  }
+                },
+                "stopReason": "stop",
+                "timestamp": 2
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "branch-append-reopen",
+      "observations": {
+        "branched": {
+          "entries": [
+            {
+              "type": "message",
+              "id": "entry-0",
+              "parentId": null,
+              "timestamp": "<generated>",
+              "message": {
+                "role": "user",
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "fixed user"
+                  }
+                ],
+                "timestamp": 1
+              }
+            },
+            {
+              "type": "message",
+              "id": "entry-1",
+              "parentId": "entry-0",
+              "timestamp": "<generated>",
+              "message": {
+                "role": "assistant",
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "fixed assistant"
+                  }
+                ],
+                "api": "fixture",
+                "provider": "fixture",
+                "model": "fixture",
+                "usage": {
+                  "input": 0,
+                  "output": 0,
+                  "cacheRead": 0,
+                  "cacheWrite": 0,
+                  "totalTokens": 0,
+                  "cost": {
+                    "input": 0,
+                    "output": 0,
+                    "cacheRead": 0,
+                    "cacheWrite": 0,
+                    "total": 0
+                  }
+                },
+                "stopReason": "stop",
+                "timestamp": 2
+              }
+            },
+            {
+              "type": "custom",
+              "customType": "state",
+              "data": {
+                "lane": "old"
+              },
+              "id": "entry-2",
+              "parentId": "entry-1",
+              "timestamp": "<generated>"
+            }
+          ],
+          "branch": [
+            {
+              "type": "message",
+              "id": "entry-0",
+              "parentId": null,
+              "timestamp": "<generated>",
+              "message": {
+                "role": "user",
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "fixed user"
+                  }
+                ],
+                "timestamp": 1
+              }
+            }
+          ],
+          "disk": [
+            {
+              "type": "session",
+              "version": 3,
+              "id": "session",
+              "timestamp": "<generated>",
+              "cwd": "/workspace/pi-write-case"
+            },
+            {
+              "type": "message",
+              "id": "entry-0",
+              "parentId": null,
+              "timestamp": "<generated>",
+              "message": {
+                "role": "user",
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "fixed user"
+                  }
+                ],
+                "timestamp": 1
+              }
+            },
+            {
+              "type": "message",
+              "id": "entry-1",
+              "parentId": "entry-0",
+              "timestamp": "<generated>",
+              "message": {
+                "role": "assistant",
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "fixed assistant"
+                  }
+                ],
+                "api": "fixture",
+                "provider": "fixture",
+                "model": "fixture",
+                "usage": {
+                  "input": 0,
+                  "output": 0,
+                  "cacheRead": 0,
+                  "cacheWrite": 0,
+                  "totalTokens": 0,
+                  "cost": {
+                    "input": 0,
+                    "output": 0,
+                    "cacheRead": 0,
+                    "cacheWrite": 0,
+                    "total": 0
+                  }
+                },
+                "stopReason": "stop",
+                "timestamp": 2
+              }
+            },
+            {
+              "type": "custom",
+              "customType": "state",
+              "data": {
+                "lane": "old"
+              },
+              "id": "entry-2",
+              "parentId": "entry-1",
+              "timestamp": "<generated>"
+            }
+          ]
+        },
+        "after": {
+          "entries": [
+            {
+              "type": "message",
+              "id": "entry-0",
+              "parentId": null,
+              "timestamp": "<generated>",
+              "message": {
+                "role": "user",
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "fixed user"
+                  }
+                ],
+                "timestamp": 1
+              }
+            },
+            {
+              "type": "message",
+              "id": "entry-1",
+              "parentId": "entry-0",
+              "timestamp": "<generated>",
+              "message": {
+                "role": "assistant",
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "fixed assistant"
+                  }
+                ],
+                "api": "fixture",
+                "provider": "fixture",
+                "model": "fixture",
+                "usage": {
+                  "input": 0,
+                  "output": 0,
+                  "cacheRead": 0,
+                  "cacheWrite": 0,
+                  "totalTokens": 0,
+                  "cost": {
+                    "input": 0,
+                    "output": 0,
+                    "cacheRead": 0,
+                    "cacheWrite": 0,
+                    "total": 0
+                  }
+                },
+                "stopReason": "stop",
+                "timestamp": 2
+              }
+            },
+            {
+              "type": "custom",
+              "customType": "state",
+              "data": {
+                "lane": "old"
+              },
+              "id": "entry-2",
+              "parentId": "entry-1",
+              "timestamp": "<generated>"
+            },
+            {
+              "type": "custom",
+              "customType": "state",
+              "data": {
+                "lane": "new"
+              },
+              "id": "entry-3",
+              "parentId": "entry-1",
+              "timestamp": "<generated>"
+            }
+          ],
+          "branch": [
+            {
+              "type": "message",
+              "id": "entry-0",
+              "parentId": null,
+              "timestamp": "<generated>",
+              "message": {
+                "role": "user",
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "fixed user"
+                  }
+                ],
+                "timestamp": 1
+              }
+            },
+            {
+              "type": "message",
+              "id": "entry-1",
+              "parentId": "entry-0",
+              "timestamp": "<generated>",
+              "message": {
+                "role": "assistant",
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "fixed assistant"
+                  }
+                ],
+                "api": "fixture",
+                "provider": "fixture",
+                "model": "fixture",
+                "usage": {
+                  "input": 0,
+                  "output": 0,
+                  "cacheRead": 0,
+                  "cacheWrite": 0,
+                  "totalTokens": 0,
+                  "cost": {
+                    "input": 0,
+                    "output": 0,
+                    "cacheRead": 0,
+                    "cacheWrite": 0,
+                    "total": 0
+                  }
+                },
+                "stopReason": "stop",
+                "timestamp": 2
+              }
+            },
+            {
+              "type": "custom",
+              "customType": "state",
+              "data": {
+                "lane": "new"
+              },
+              "id": "entry-3",
+              "parentId": "entry-1",
+              "timestamp": "<generated>"
+            }
+          ],
+          "disk": [
+            {
+              "type": "session",
+              "version": 3,
+              "id": "session",
+              "timestamp": "<generated>",
+              "cwd": "/workspace/pi-write-case"
+            },
+            {
+              "type": "message",
+              "id": "entry-0",
+              "parentId": null,
+              "timestamp": "<generated>",
+              "message": {
+                "role": "user",
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "fixed user"
+                  }
+                ],
+                "timestamp": 1
+              }
+            },
+            {
+              "type": "message",
+              "id": "entry-1",
+              "parentId": "entry-0",
+              "timestamp": "<generated>",
+              "message": {
+                "role": "assistant",
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "fixed assistant"
+                  }
+                ],
+                "api": "fixture",
+                "provider": "fixture",
+                "model": "fixture",
+                "usage": {
+                  "input": 0,
+                  "output": 0,
+                  "cacheRead": 0,
+                  "cacheWrite": 0,
+                  "totalTokens": 0,
+                  "cost": {
+                    "input": 0,
+                    "output": 0,
+                    "cacheRead": 0,
+                    "cacheWrite": 0,
+                    "total": 0
+                  }
+                },
+                "stopReason": "stop",
+                "timestamp": 2
+              }
+            },
+            {
+              "type": "custom",
+              "customType": "state",
+              "data": {
+                "lane": "old"
+              },
+              "id": "entry-2",
+              "parentId": "entry-1",
+              "timestamp": "<generated>"
+            },
+            {
+              "type": "custom",
+              "customType": "state",
+              "data": {
+                "lane": "new"
+              },
+              "id": "entry-3",
+              "parentId": "entry-1",
+              "timestamp": "<generated>"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "reset-new-root",
+      "observations": {
+        "entries": [
+          {
+            "type": "message",
+            "id": "entry-0",
+            "parentId": null,
+            "timestamp": "<generated>",
+            "message": {
+              "role": "user",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "fixed user"
+                }
+              ],
+              "timestamp": 1
+            }
+          },
+          {
+            "type": "custom",
+            "customType": "root",
+            "data": {
+              "count": 1
+            },
+            "id": "entry-1",
+            "parentId": null,
+            "timestamp": "<generated>"
+          }
+        ],
+        "branch": [
+          {
+            "type": "custom",
+            "customType": "root",
+            "data": {
+              "count": 1
+            },
+            "id": "entry-1",
+            "parentId": null,
+            "timestamp": "<generated>"
+          }
+        ],
+        "disk": [
+          {
+            "type": "session",
+            "version": 3,
+            "id": "session",
+            "timestamp": "<generated>",
+            "cwd": "/workspace/pi-write-case"
+          },
+          {
+            "type": "message",
+            "id": "entry-0",
+            "parentId": null,
+            "timestamp": "<generated>",
+            "message": {
+              "role": "user",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "fixed user"
+                }
+              ],
+              "timestamp": 1
+            }
+          },
+          {
+            "type": "custom",
+            "customType": "root",
+            "data": {
+              "count": 1
+            },
+            "id": "entry-1",
+            "parentId": null,
+            "timestamp": "<generated>"
+          }
+        ]
+      }
+    },
+    {
+      "name": "existing-without-assistant",
+      "observations": {
+        "entries": [
+          {
+            "type": "message",
+            "id": "entry-0",
+            "parentId": null,
+            "timestamp": "<generated>",
+            "message": {
+              "role": "user",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "fixed user"
+                }
+              ],
+              "timestamp": 1
+            }
+          },
+          {
+            "type": "custom",
+            "customType": "state",
+            "data": {
+              "ready": true
+            },
+            "id": "entry-1",
+            "parentId": "entry-0",
+            "timestamp": "<generated>"
+          }
+        ],
+        "branch": [
+          {
+            "type": "message",
+            "id": "entry-0",
+            "parentId": null,
+            "timestamp": "<generated>",
+            "message": {
+              "role": "user",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "fixed user"
+                }
+              ],
+              "timestamp": 1
+            }
+          },
+          {
+            "type": "custom",
+            "customType": "state",
+            "data": {
+              "ready": true
+            },
+            "id": "entry-1",
+            "parentId": "entry-0",
+            "timestamp": "<generated>"
+          }
+        ],
+        "disk": [
+          {
+            "type": "session",
+            "version": 3,
+            "id": "session",
+            "timestamp": "<generated>",
+            "cwd": "/workspace/pi-write-case"
+          },
+          {
+            "type": "message",
+            "id": "entry-0",
+            "parentId": null,
+            "timestamp": "<generated>",
+            "message": {
+              "role": "user",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "fixed user"
+                }
+              ],
+              "timestamp": 1
+            }
+          },
+          {
+            "type": "custom",
+            "customType": "state",
+            "data": {
+              "ready": true
+            },
+            "id": "entry-1",
+            "parentId": "entry-0",
+            "timestamp": "<generated>"
+          }
+        ]
+      }
+    },
+    {
+      "name": "unknown-entry-preserved",
+      "observations": {
+        "entries": [
+          {
+            "type": "message",
+            "id": "entry-0",
+            "parentId": null,
+            "timestamp": "<generated>",
+            "message": {
+              "role": "user",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "fixed user"
+                }
+              ],
+              "timestamp": 1
+            }
+          },
+          {
+            "type": "future_feature",
+            "id": "entry-1",
+            "parentId": "entry-0",
+            "timestamp": "<generated>",
+            "nested": {
+              "unicode": "😀",
+              "id": "payload-id",
+              "parentId": "payload-parent"
+            }
+          },
+          {
+            "type": "custom",
+            "customType": "state",
+            "data": {
+              "ok": true
+            },
+            "id": "entry-2",
+            "parentId": "entry-1",
+            "timestamp": "<generated>"
+          }
+        ],
+        "branch": [
+          {
+            "type": "message",
+            "id": "entry-0",
+            "parentId": null,
+            "timestamp": "<generated>",
+            "message": {
+              "role": "user",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "fixed user"
+                }
+              ],
+              "timestamp": 1
+            }
+          },
+          {
+            "type": "future_feature",
+            "id": "entry-1",
+            "parentId": "entry-0",
+            "timestamp": "<generated>",
+            "nested": {
+              "unicode": "😀",
+              "id": "payload-id",
+              "parentId": "payload-parent"
+            }
+          },
+          {
+            "type": "custom",
+            "customType": "state",
+            "data": {
+              "ok": true
+            },
+            "id": "entry-2",
+            "parentId": "entry-1",
+            "timestamp": "<generated>"
+          }
+        ],
+        "disk": [
+          {
+            "type": "session",
+            "version": 3,
+            "id": "session",
+            "timestamp": "<generated>",
+            "cwd": "/workspace/pi-write-case"
+          },
+          {
+            "type": "message",
+            "id": "entry-0",
+            "parentId": null,
+            "timestamp": "<generated>",
+            "message": {
+              "role": "user",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "fixed user"
+                }
+              ],
+              "timestamp": 1
+            }
+          },
+          {
+            "type": "future_feature",
+            "id": "entry-1",
+            "parentId": "entry-0",
+            "timestamp": "<generated>",
+            "nested": {
+              "unicode": "😀",
+              "id": "payload-id",
+              "parentId": "payload-parent"
+            }
+          },
+          {
+            "type": "custom",
+            "customType": "state",
+            "data": {
+              "ok": true
+            },
+            "id": "entry-2",
+            "parentId": "entry-1",
+            "timestamp": "<generated>"
+          }
+        ]
+      }
+    },
+    {
+      "name": "invalid-branch-preserves-state",
+      "observations": {
+        "entries": [
+          {
+            "type": "message",
+            "id": "entry-0",
+            "parentId": null,
+            "timestamp": "<generated>",
+            "message": {
+              "role": "user",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "fixed user"
+                }
+              ],
+              "timestamp": 1
+            }
+          }
+        ],
+        "branch": [
+          {
+            "type": "message",
+            "id": "entry-0",
+            "parentId": null,
+            "timestamp": "<generated>",
+            "message": {
+              "role": "user",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "fixed user"
+                }
+              ],
+              "timestamp": 1
+            }
+          }
+        ],
+        "disk": [
+          {
+            "type": "session",
+            "version": 3,
+            "id": "session",
+            "timestamp": "<generated>",
+            "cwd": "/workspace/pi-write-case"
+          },
+          {
+            "type": "message",
+            "id": "entry-0",
+            "parentId": null,
+            "timestamp": "<generated>",
+            "message": {
+              "role": "user",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "fixed user"
+                }
+              ],
+              "timestamp": 1
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "first-flush-collision-memory",
+      "observations": {
+        "entries": [
+          {
+            "type": "message",
+            "id": "entry-0",
+            "parentId": null,
+            "timestamp": "<generated>",
+            "message": {
+              "role": "user",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "fixed user"
+                }
+              ],
+              "timestamp": 1
+            }
+          },
+          {
+            "type": "message",
+            "id": "entry-1",
+            "parentId": "entry-0",
+            "timestamp": "<generated>",
+            "message": {
+              "role": "assistant",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "fixed assistant"
+                }
+              ],
+              "api": "fixture",
+              "provider": "fixture",
+              "model": "fixture",
+              "usage": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "totalTokens": 0,
+                "cost": {
+                  "input": 0,
+                  "output": 0,
+                  "cacheRead": 0,
+                  "cacheWrite": 0,
+                  "total": 0
+                }
+              },
+              "stopReason": "stop",
+              "timestamp": 2
+            }
+          }
+        ],
+        "branch": [
+          {
+            "type": "message",
+            "id": "entry-0",
+            "parentId": null,
+            "timestamp": "<generated>",
+            "message": {
+              "role": "user",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "fixed user"
+                }
+              ],
+              "timestamp": 1
+            }
+          },
+          {
+            "type": "message",
+            "id": "entry-1",
+            "parentId": "entry-0",
+            "timestamp": "<generated>",
+            "message": {
+              "role": "assistant",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "fixed assistant"
+                }
+              ],
+              "api": "fixture",
+              "provider": "fixture",
+              "model": "fixture",
+              "usage": {
+                "input": 0,
+                "output": 0,
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "totalTokens": 0,
+                "cost": {
+                  "input": 0,
+                  "output": 0,
+                  "cacheRead": 0,
+                  "cacheWrite": 0,
+                  "total": 0
+                }
+              },
+              "stopReason": "stop",
+              "timestamp": 2
+            }
+          }
+        ],
+        "diskPreserved": true
+      }
+    }
+  ],
+  "rust": [
+    {
+      "name": "delayed-first-flush",
+      "observations": {
+        "before": {
+          "entries": [
+            {
+              "customType": "state",
+              "data": {
+                "nested": {
+                  "id": "must-not-normalize"
+                }
+              },
+              "id": "entry-0",
+              "parentId": null,
+              "timestamp": "<generated>",
+              "type": "custom"
+            },
+            {
+              "id": "entry-1",
+              "message": {
+                "content": [
+                  {
+                    "text": "fixed user",
+                    "type": "text"
+                  }
+                ],
+                "role": "user",
+                "timestamp": 1
+              },
+              "parentId": "entry-0",
+              "timestamp": "<generated>",
+              "type": "message"
+            }
+          ],
+          "branch": [
+            {
+              "customType": "state",
+              "data": {
+                "nested": {
+                  "id": "must-not-normalize"
+                }
+              },
+              "id": "entry-0",
+              "parentId": null,
+              "timestamp": "<generated>",
+              "type": "custom"
+            },
+            {
+              "id": "entry-1",
+              "message": {
+                "content": [
+                  {
+                    "text": "fixed user",
+                    "type": "text"
+                  }
+                ],
+                "role": "user",
+                "timestamp": 1
+              },
+              "parentId": "entry-0",
+              "timestamp": "<generated>",
+              "type": "message"
+            }
+          ],
+          "disk": null
+        },
+        "after": {
+          "entries": [
+            {
+              "customType": "state",
+              "data": {
+                "nested": {
+                  "id": "must-not-normalize"
+                }
+              },
+              "id": "entry-0",
+              "parentId": null,
+              "timestamp": "<generated>",
+              "type": "custom"
+            },
+            {
+              "id": "entry-1",
+              "message": {
+                "content": [
+                  {
+                    "text": "fixed user",
+                    "type": "text"
+                  }
+                ],
+                "role": "user",
+                "timestamp": 1
+              },
+              "parentId": "entry-0",
+              "timestamp": "<generated>",
+              "type": "message"
+            },
+            {
+              "id": "entry-2",
+              "message": {
+                "api": "fixture",
+                "content": [
+                  {
+                    "text": "fixed assistant",
+                    "type": "text"
+                  }
+                ],
+                "model": "fixture",
+                "provider": "fixture",
+                "role": "assistant",
+                "stopReason": "stop",
+                "timestamp": 2,
+                "usage": {
+                  "cacheRead": 0,
+                  "cacheWrite": 0,
+                  "cost": {
+                    "cacheRead": 0,
+                    "cacheWrite": 0,
+                    "input": 0,
+                    "output": 0,
+                    "total": 0
+                  },
+                  "input": 0,
+                  "output": 0,
+                  "totalTokens": 0
+                }
+              },
+              "parentId": "entry-1",
+              "timestamp": "<generated>",
+              "type": "message"
+            }
+          ],
+          "branch": [
+            {
+              "customType": "state",
+              "data": {
+                "nested": {
+                  "id": "must-not-normalize"
+                }
+              },
+              "id": "entry-0",
+              "parentId": null,
+              "timestamp": "<generated>",
+              "type": "custom"
+            },
+            {
+              "id": "entry-1",
+              "message": {
+                "content": [
+                  {
+                    "text": "fixed user",
+                    "type": "text"
+                  }
+                ],
+                "role": "user",
+                "timestamp": 1
+              },
+              "parentId": "entry-0",
+              "timestamp": "<generated>",
+              "type": "message"
+            },
+            {
+              "id": "entry-2",
+              "message": {
+                "api": "fixture",
+                "content": [
+                  {
+                    "text": "fixed assistant",
+                    "type": "text"
+                  }
+                ],
+                "model": "fixture",
+                "provider": "fixture",
+                "role": "assistant",
+                "stopReason": "stop",
+                "timestamp": 2,
+                "usage": {
+                  "cacheRead": 0,
+                  "cacheWrite": 0,
+                  "cost": {
+                    "cacheRead": 0,
+                    "cacheWrite": 0,
+                    "input": 0,
+                    "output": 0,
+                    "total": 0
+                  },
+                  "input": 0,
+                  "output": 0,
+                  "totalTokens": 0
+                }
+              },
+              "parentId": "entry-1",
+              "timestamp": "<generated>",
+              "type": "message"
+            }
+          ],
+          "disk": [
+            {
+              "cwd": "/workspace/pi-write-case",
+              "id": "session",
+              "timestamp": "<generated>",
+              "type": "session",
+              "version": 3
+            },
+            {
+              "customType": "state",
+              "data": {
+                "nested": {
+                  "id": "must-not-normalize"
+                }
+              },
+              "id": "entry-0",
+              "parentId": null,
+              "timestamp": "<generated>",
+              "type": "custom"
+            },
+            {
+              "id": "entry-1",
+              "message": {
+                "content": [
+                  {
+                    "text": "fixed user",
+                    "type": "text"
+                  }
+                ],
+                "role": "user",
+                "timestamp": 1
+              },
+              "parentId": "entry-0",
+              "timestamp": "<generated>",
+              "type": "message"
+            },
+            {
+              "id": "entry-2",
+              "message": {
+                "api": "fixture",
+                "content": [
+                  {
+                    "text": "fixed assistant",
+                    "type": "text"
+                  }
+                ],
+                "model": "fixture",
+                "provider": "fixture",
+                "role": "assistant",
+                "stopReason": "stop",
+                "timestamp": 2,
+                "usage": {
+                  "cacheRead": 0,
+                  "cacheWrite": 0,
+                  "cost": {
+                    "cacheRead": 0,
+                    "cacheWrite": 0,
+                    "input": 0,
+                    "output": 0,
+                    "total": 0
+                  },
+                  "input": 0,
+                  "output": 0,
+                  "totalTokens": 0
+                }
+              },
+              "parentId": "entry-1",
+              "timestamp": "<generated>",
+              "type": "message"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "branch-append-reopen",
+      "observations": {
+        "branched": {
+          "entries": [
+            {
+              "id": "entry-0",
+              "message": {
+                "content": [
+                  {
+                    "text": "fixed user",
+                    "type": "text"
+                  }
+                ],
+                "role": "user",
+                "timestamp": 1
+              },
+              "parentId": null,
+              "timestamp": "<generated>",
+              "type": "message"
+            },
+            {
+              "id": "entry-1",
+              "message": {
+                "api": "fixture",
+                "content": [
+                  {
+                    "text": "fixed assistant",
+                    "type": "text"
+                  }
+                ],
+                "model": "fixture",
+                "provider": "fixture",
+                "role": "assistant",
+                "stopReason": "stop",
+                "timestamp": 2,
+                "usage": {
+                  "cacheRead": 0,
+                  "cacheWrite": 0,
+                  "cost": {
+                    "cacheRead": 0,
+                    "cacheWrite": 0,
+                    "input": 0,
+                    "output": 0,
+                    "total": 0
+                  },
+                  "input": 0,
+                  "output": 0,
+                  "totalTokens": 0
+                }
+              },
+              "parentId": "entry-0",
+              "timestamp": "<generated>",
+              "type": "message"
+            },
+            {
+              "customType": "state",
+              "data": {
+                "lane": "old"
+              },
+              "id": "entry-2",
+              "parentId": "entry-1",
+              "timestamp": "<generated>",
+              "type": "custom"
+            }
+          ],
+          "branch": [
+            {
+              "id": "entry-0",
+              "message": {
+                "content": [
+                  {
+                    "text": "fixed user",
+                    "type": "text"
+                  }
+                ],
+                "role": "user",
+                "timestamp": 1
+              },
+              "parentId": null,
+              "timestamp": "<generated>",
+              "type": "message"
+            }
+          ],
+          "disk": [
+            {
+              "type": "session",
+              "version": 3,
+              "id": "session",
+              "timestamp": "<generated>",
+              "cwd": "/workspace/pi-write-case"
+            },
+            {
+              "type": "message",
+              "id": "entry-0",
+              "parentId": null,
+              "timestamp": "<generated>",
+              "message": {
+                "role": "user",
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "fixed user"
+                  }
+                ],
+                "timestamp": 1
+              }
+            },
+            {
+              "id": "entry-1",
+              "message": {
+                "api": "fixture",
+                "content": [
+                  {
+                    "text": "fixed assistant",
+                    "type": "text"
+                  }
+                ],
+                "model": "fixture",
+                "provider": "fixture",
+                "role": "assistant",
+                "stopReason": "stop",
+                "timestamp": 2,
+                "usage": {
+                  "cacheRead": 0,
+                  "cacheWrite": 0,
+                  "cost": {
+                    "cacheRead": 0,
+                    "cacheWrite": 0,
+                    "input": 0,
+                    "output": 0,
+                    "total": 0
+                  },
+                  "input": 0,
+                  "output": 0,
+                  "totalTokens": 0
+                }
+              },
+              "parentId": "entry-0",
+              "timestamp": "<generated>",
+              "type": "message"
+            },
+            {
+              "customType": "state",
+              "data": {
+                "lane": "old"
+              },
+              "id": "entry-2",
+              "parentId": "entry-1",
+              "timestamp": "<generated>",
+              "type": "custom"
+            }
+          ]
+        },
+        "after": {
+          "entries": [
+            {
+              "id": "entry-0",
+              "message": {
+                "content": [
+                  {
+                    "text": "fixed user",
+                    "type": "text"
+                  }
+                ],
+                "role": "user",
+                "timestamp": 1
+              },
+              "parentId": null,
+              "timestamp": "<generated>",
+              "type": "message"
+            },
+            {
+              "id": "entry-1",
+              "message": {
+                "api": "fixture",
+                "content": [
+                  {
+                    "text": "fixed assistant",
+                    "type": "text"
+                  }
+                ],
+                "model": "fixture",
+                "provider": "fixture",
+                "role": "assistant",
+                "stopReason": "stop",
+                "timestamp": 2,
+                "usage": {
+                  "cacheRead": 0,
+                  "cacheWrite": 0,
+                  "cost": {
+                    "cacheRead": 0,
+                    "cacheWrite": 0,
+                    "input": 0,
+                    "output": 0,
+                    "total": 0
+                  },
+                  "input": 0,
+                  "output": 0,
+                  "totalTokens": 0
+                }
+              },
+              "parentId": "entry-0",
+              "timestamp": "<generated>",
+              "type": "message"
+            },
+            {
+              "customType": "state",
+              "data": {
+                "lane": "old"
+              },
+              "id": "entry-2",
+              "parentId": "entry-1",
+              "timestamp": "<generated>",
+              "type": "custom"
+            },
+            {
+              "customType": "state",
+              "data": {
+                "lane": "new"
+              },
+              "id": "entry-3",
+              "parentId": "entry-1",
+              "timestamp": "<generated>",
+              "type": "custom"
+            }
+          ],
+          "branch": [
+            {
+              "id": "entry-0",
+              "message": {
+                "content": [
+                  {
+                    "text": "fixed user",
+                    "type": "text"
+                  }
+                ],
+                "role": "user",
+                "timestamp": 1
+              },
+              "parentId": null,
+              "timestamp": "<generated>",
+              "type": "message"
+            },
+            {
+              "id": "entry-1",
+              "message": {
+                "api": "fixture",
+                "content": [
+                  {
+                    "text": "fixed assistant",
+                    "type": "text"
+                  }
+                ],
+                "model": "fixture",
+                "provider": "fixture",
+                "role": "assistant",
+                "stopReason": "stop",
+                "timestamp": 2,
+                "usage": {
+                  "cacheRead": 0,
+                  "cacheWrite": 0,
+                  "cost": {
+                    "cacheRead": 0,
+                    "cacheWrite": 0,
+                    "input": 0,
+                    "output": 0,
+                    "total": 0
+                  },
+                  "input": 0,
+                  "output": 0,
+                  "totalTokens": 0
+                }
+              },
+              "parentId": "entry-0",
+              "timestamp": "<generated>",
+              "type": "message"
+            },
+            {
+              "customType": "state",
+              "data": {
+                "lane": "new"
+              },
+              "id": "entry-3",
+              "parentId": "entry-1",
+              "timestamp": "<generated>",
+              "type": "custom"
+            }
+          ],
+          "disk": [
+            {
+              "type": "session",
+              "version": 3,
+              "id": "session",
+              "timestamp": "<generated>",
+              "cwd": "/workspace/pi-write-case"
+            },
+            {
+              "type": "message",
+              "id": "entry-0",
+              "parentId": null,
+              "timestamp": "<generated>",
+              "message": {
+                "role": "user",
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "fixed user"
+                  }
+                ],
+                "timestamp": 1
+              }
+            },
+            {
+              "id": "entry-1",
+              "message": {
+                "api": "fixture",
+                "content": [
+                  {
+                    "text": "fixed assistant",
+                    "type": "text"
+                  }
+                ],
+                "model": "fixture",
+                "provider": "fixture",
+                "role": "assistant",
+                "stopReason": "stop",
+                "timestamp": 2,
+                "usage": {
+                  "cacheRead": 0,
+                  "cacheWrite": 0,
+                  "cost": {
+                    "cacheRead": 0,
+                    "cacheWrite": 0,
+                    "input": 0,
+                    "output": 0,
+                    "total": 0
+                  },
+                  "input": 0,
+                  "output": 0,
+                  "totalTokens": 0
+                }
+              },
+              "parentId": "entry-0",
+              "timestamp": "<generated>",
+              "type": "message"
+            },
+            {
+              "customType": "state",
+              "data": {
+                "lane": "old"
+              },
+              "id": "entry-2",
+              "parentId": "entry-1",
+              "timestamp": "<generated>",
+              "type": "custom"
+            },
+            {
+              "customType": "state",
+              "data": {
+                "lane": "new"
+              },
+              "id": "entry-3",
+              "parentId": "entry-1",
+              "timestamp": "<generated>",
+              "type": "custom"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "reset-new-root",
+      "observations": {
+        "entries": [
+          {
+            "id": "entry-0",
+            "message": {
+              "content": [
+                {
+                  "text": "fixed user",
+                  "type": "text"
+                }
+              ],
+              "role": "user",
+              "timestamp": 1
+            },
+            "parentId": null,
+            "timestamp": "<generated>",
+            "type": "message"
+          },
+          {
+            "customType": "root",
+            "data": {
+              "count": 1
+            },
+            "id": "entry-1",
+            "parentId": null,
+            "timestamp": "<generated>",
+            "type": "custom"
+          }
+        ],
+        "branch": [
+          {
+            "customType": "root",
+            "data": {
+              "count": 1
+            },
+            "id": "entry-1",
+            "parentId": null,
+            "timestamp": "<generated>",
+            "type": "custom"
+          }
+        ],
+        "disk": [
+          {
+            "type": "session",
+            "version": 3,
+            "id": "session",
+            "timestamp": "<generated>",
+            "cwd": "/workspace/pi-write-case"
+          },
+          {
+            "type": "message",
+            "id": "entry-0",
+            "parentId": null,
+            "timestamp": "<generated>",
+            "message": {
+              "role": "user",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "fixed user"
+                }
+              ],
+              "timestamp": 1
+            }
+          },
+          {
+            "customType": "root",
+            "data": {
+              "count": 1
+            },
+            "id": "entry-1",
+            "parentId": null,
+            "timestamp": "<generated>",
+            "type": "custom"
+          }
+        ]
+      }
+    },
+    {
+      "name": "existing-without-assistant",
+      "observations": {
+        "entries": [
+          {
+            "id": "entry-0",
+            "message": {
+              "content": [
+                {
+                  "text": "fixed user",
+                  "type": "text"
+                }
+              ],
+              "role": "user",
+              "timestamp": 1
+            },
+            "parentId": null,
+            "timestamp": "<generated>",
+            "type": "message"
+          },
+          {
+            "customType": "state",
+            "data": {
+              "ready": true
+            },
+            "id": "entry-1",
+            "parentId": "entry-0",
+            "timestamp": "<generated>",
+            "type": "custom"
+          }
+        ],
+        "branch": [
+          {
+            "id": "entry-0",
+            "message": {
+              "content": [
+                {
+                  "text": "fixed user",
+                  "type": "text"
+                }
+              ],
+              "role": "user",
+              "timestamp": 1
+            },
+            "parentId": null,
+            "timestamp": "<generated>",
+            "type": "message"
+          },
+          {
+            "customType": "state",
+            "data": {
+              "ready": true
+            },
+            "id": "entry-1",
+            "parentId": "entry-0",
+            "timestamp": "<generated>",
+            "type": "custom"
+          }
+        ],
+        "disk": [
+          {
+            "type": "session",
+            "version": 3,
+            "id": "session",
+            "timestamp": "<generated>",
+            "cwd": "/workspace/pi-write-case"
+          },
+          {
+            "type": "message",
+            "id": "entry-0",
+            "parentId": null,
+            "timestamp": "<generated>",
+            "message": {
+              "role": "user",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "fixed user"
+                }
+              ],
+              "timestamp": 1
+            }
+          },
+          {
+            "customType": "state",
+            "data": {
+              "ready": true
+            },
+            "id": "entry-1",
+            "parentId": "entry-0",
+            "timestamp": "<generated>",
+            "type": "custom"
+          }
+        ]
+      }
+    },
+    {
+      "name": "unknown-entry-preserved",
+      "observations": {
+        "entries": [
+          {
+            "id": "entry-0",
+            "message": {
+              "content": [
+                {
+                  "text": "fixed user",
+                  "type": "text"
+                }
+              ],
+              "role": "user",
+              "timestamp": 1
+            },
+            "parentId": null,
+            "timestamp": "<generated>",
+            "type": "message"
+          },
+          {
+            "id": "entry-1",
+            "nested": {
+              "id": "payload-id",
+              "parentId": "payload-parent",
+              "unicode": "😀"
+            },
+            "parentId": "entry-0",
+            "timestamp": "<generated>",
+            "type": "future_feature"
+          },
+          {
+            "customType": "state",
+            "data": {
+              "ok": true
+            },
+            "id": "entry-2",
+            "parentId": "entry-1",
+            "timestamp": "<generated>",
+            "type": "custom"
+          }
+        ],
+        "branch": [
+          {
+            "id": "entry-0",
+            "message": {
+              "content": [
+                {
+                  "text": "fixed user",
+                  "type": "text"
+                }
+              ],
+              "role": "user",
+              "timestamp": 1
+            },
+            "parentId": null,
+            "timestamp": "<generated>",
+            "type": "message"
+          },
+          {
+            "id": "entry-1",
+            "nested": {
+              "id": "payload-id",
+              "parentId": "payload-parent",
+              "unicode": "😀"
+            },
+            "parentId": "entry-0",
+            "timestamp": "<generated>",
+            "type": "future_feature"
+          },
+          {
+            "customType": "state",
+            "data": {
+              "ok": true
+            },
+            "id": "entry-2",
+            "parentId": "entry-1",
+            "timestamp": "<generated>",
+            "type": "custom"
+          }
+        ],
+        "disk": [
+          {
+            "type": "session",
+            "version": 3,
+            "id": "session",
+            "timestamp": "<generated>",
+            "cwd": "/workspace/pi-write-case"
+          },
+          {
+            "type": "message",
+            "id": "entry-0",
+            "parentId": null,
+            "timestamp": "<generated>",
+            "message": {
+              "role": "user",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "fixed user"
+                }
+              ],
+              "timestamp": 1
+            }
+          },
+          {
+            "type": "future_feature",
+            "id": "entry-1",
+            "parentId": "entry-0",
+            "timestamp": "<generated>",
+            "nested": {
+              "unicode": "😀",
+              "id": "payload-id",
+              "parentId": "payload-parent"
+            }
+          },
+          {
+            "customType": "state",
+            "data": {
+              "ok": true
+            },
+            "id": "entry-2",
+            "parentId": "entry-1",
+            "timestamp": "<generated>",
+            "type": "custom"
+          }
+        ]
+      }
+    },
+    {
+      "name": "invalid-branch-preserves-state",
+      "observations": {
+        "entries": [
+          {
+            "id": "entry-0",
+            "message": {
+              "content": [
+                {
+                  "text": "fixed user",
+                  "type": "text"
+                }
+              ],
+              "role": "user",
+              "timestamp": 1
+            },
+            "parentId": null,
+            "timestamp": "<generated>",
+            "type": "message"
+          }
+        ],
+        "branch": [
+          {
+            "id": "entry-0",
+            "message": {
+              "content": [
+                {
+                  "text": "fixed user",
+                  "type": "text"
+                }
+              ],
+              "role": "user",
+              "timestamp": 1
+            },
+            "parentId": null,
+            "timestamp": "<generated>",
+            "type": "message"
+          }
+        ],
+        "disk": [
+          {
+            "type": "session",
+            "version": 3,
+            "id": "session",
+            "timestamp": "<generated>",
+            "cwd": "/workspace/pi-write-case"
+          },
+          {
+            "type": "message",
+            "id": "entry-0",
+            "parentId": null,
+            "timestamp": "<generated>",
+            "message": {
+              "role": "user",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "fixed user"
+                }
+              ],
+              "timestamp": 1
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "first-flush-collision-memory",
+      "observations": {
+        "entries": [
+          {
+            "id": "entry-0",
+            "message": {
+              "content": [
+                {
+                  "text": "fixed user",
+                  "type": "text"
+                }
+              ],
+              "role": "user",
+              "timestamp": 1
+            },
+            "parentId": null,
+            "timestamp": "<generated>",
+            "type": "message"
+          },
+          {
+            "id": "entry-1",
+            "message": {
+              "api": "fixture",
+              "content": [
+                {
+                  "text": "fixed assistant",
+                  "type": "text"
+                }
+              ],
+              "model": "fixture",
+              "provider": "fixture",
+              "role": "assistant",
+              "stopReason": "stop",
+              "timestamp": 2,
+              "usage": {
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "cost": {
+                  "cacheRead": 0,
+                  "cacheWrite": 0,
+                  "input": 0,
+                  "output": 0,
+                  "total": 0
+                },
+                "input": 0,
+                "output": 0,
+                "totalTokens": 0
+              }
+            },
+            "parentId": "entry-0",
+            "timestamp": "<generated>",
+            "type": "message"
+          }
+        ],
+        "branch": [
+          {
+            "id": "entry-0",
+            "message": {
+              "content": [
+                {
+                  "text": "fixed user",
+                  "type": "text"
+                }
+              ],
+              "role": "user",
+              "timestamp": 1
+            },
+            "parentId": null,
+            "timestamp": "<generated>",
+            "type": "message"
+          },
+          {
+            "id": "entry-1",
+            "message": {
+              "api": "fixture",
+              "content": [
+                {
+                  "text": "fixed assistant",
+                  "type": "text"
+                }
+              ],
+              "model": "fixture",
+              "provider": "fixture",
+              "role": "assistant",
+              "stopReason": "stop",
+              "timestamp": 2,
+              "usage": {
+                "cacheRead": 0,
+                "cacheWrite": 0,
+                "cost": {
+                  "cacheRead": 0,
+                  "cacheWrite": 0,
+                  "input": 0,
+                  "output": 0,
+                  "total": 0
+                },
+                "input": 0,
+                "output": 0,
+                "totalTokens": 0
+              }
+            },
+            "parentId": "entry-0",
+            "timestamp": "<generated>",
+            "type": "message"
+          }
+        ],
+        "diskPreserved": true
+      }
+    }
+  ]
+}

@@ -75,3 +75,12 @@ reused unchanged; seventh failure case found upstream memory-before-persist
 semantics, changed implementation and independently passed. No user intervention,
 credentials/model calls or new dependencies. Agent token counts unavailable. Cargo
 suite uses fixtures/local tools; no benchmark/full reliability claims.
+
+### Native session integration (starting123dc3f)
+
+Coordinator+independent native reviewer,2active cap4. Reused frozen writer7 and
+Todo acceptance unchanged except selecting transport; reviewer added reusable
+lifecycle checks. Registration overwrite hazard addressed before integration.
+No user intervention/dependencies/model calls/keys. Usage unavailable; no timing,
+RSS, crash isolation or allocator-leak claims. Bounded lifecycle allocation is
+64sessions, not a new runtime maximum imposed on compatibility.

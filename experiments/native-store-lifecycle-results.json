@@ -1,0 +1,19 @@
+{
+  "invalidInputsRejected": true,
+  "failedOpenDoesNotAllocate": true,
+  "isolatedStores": true,
+  "staleHandleRejected": true,
+  "crossWorkerHandlesRejected": true,
+  "workerNaturalExitWithOpenStore": 0,
+  "workerTerminationExit": 1,
+  "cleanupDelta": {
+    "finalizedEnvironments": 2,
+    "abandonedStoresDropped": 2
+  },
+  "boundedCreateClose64": true,
+  "finalCount": 0,
+  "limits": [
+    "Registry Drop counters verify cleanup entry and retained stores; not an allocator leak check or GC lifetime proof",
+    "No arbitrary registry maximum required or tested"
+  ]
+}

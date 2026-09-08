@@ -2,41 +2,42 @@
 
 ## Verified state
 
-Starting commit6e6a674af1c16749f6f8981e16e02614f37dd9e2; main authorized.
-Pi9767ba275f3e9a5ee0f5c5342249b629ab1b2282 remains fixed.
-Rust PiSessionStore now owns v3 append, selected branch and reopen. Seven independent
-upstream differential scenarios pass, including first-flush collision memory state
-(original Rust mismatch fixed). Unchanged Todo persists gamma across three fresh
-Node processes backed by Rust stores, restores correct IDs and branch-local policy.
-No TS SessionManager in that Todo flow. Existing Cargo tests pass.
+Starting commit123dc3fc126be6abbd733fb2d4f5aebda7737719; main authorized.
+Pi9767ba275f3e9a5ee0f5c5342249b629ab1b2282 unchanged.
+Node-API addon links actual Rust PiSessionStore/Index; native path passes frozen7
+writer oracle cases and unchanged Todo three-process persisted continuation.
+Native/helper Todo results match. Lifecycle tests verify isolated/stale/cross-env
+handles, failed-open no allocation,64create/close cycles and Rust Drop on natural
+Worker exit/termination. Registration rejects prior instance data instead of leak-
+prone overwrite. Explicit close/env exit tested, not arbitrary GC/leak freedom.
 
 Reproduce:
 ```
-export PATH="$HOME/.cargo/bin:$PATH"
-cargo build --locked --example pi_session_store
-TSX_TSCONFIG_PATH=vendor/pi-mono/tsconfig.json node --import ./vendor/pi-mono/node_modules/tsx/dist/loader.mjs experiments/pi-write-cases.mjs prototype/architecture/pi-store-backend.mjs
-TSX_TSCONFIG_PATH=vendor/pi-mono/tsconfig.json node --import ./vendor/pi-mono/node_modules/tsx/dist/loader.mjs experiments/pi-store-todo.mjs
-cargo test --locked
+python3 scripts/build-native-session.py
+TSX_TSCONFIG_PATH=vendor/pi-mono/tsconfig.json node --import ./vendor/pi-mono/node_modules/tsx/dist/loader.mjs experiments/pi-write-cases.mjs prototype/architecture/native-store-backend.mjs
+TSX_TSCONFIG_PATH=vendor/pi-mono/tsconfig.json node --import ./vendor/pi-mono/node_modules/tsx/dist/loader.mjs experiments/pi-store-todo.mjs --native
+node experiments/native-store-lifecycle.mjs
 ```
-Evidence: experiments/pi-write-results.json, experiments/pi-store-todo-results.json,
-docs/pi-write-review.md. Design: docs/pi-store-evaluation.md. Dependency/version
-caveats still in real-plugin-host.md. No credentials/live model calls.
+Evidence: experiments/native-write-results.json, native-store-todo-results.json,
+native-store-lifecycle-results.json and docs/native-store-review.md.
+Design: docs/native-store-evaluation.md. No new dependencies/model calls/credentials.
+Node/platform caveat unchanged; original Rust core Cargo suite passed123dc3f,
+this cycle builds/links that unchanged core and tests native integration.
 
-## Limits and next integration milestone
+## Limits and next milestone
 
-Fixture adapter drives lifecycle and supplies IDs/clock; not a model-driven loop or
-CLI integration. v3 only; no complete migration/header/labels, concurrent writers,
-crash/partial-write recovery, missing-file create-on-open or full JSON edge parity.
-Append failure may change in-memory state before disk succeeds, matching upstream.
-No transactional rollback/safety claim. Policy persistence tested here; projection
-and native object identity were previously tested separately.
+v3 subset, fixture clock/IDs/lifecycle, no CLI/model-driven loop integration or
+complete session migration/header/labels/recovery. Native JSON DTOs are fresh
+objects, no alias parity. Store lifetime explicit close/env exit only, raw FFI
+not production-hardened. Native abort has only prior bounded probe coverage;
+multiple sink rejection ordering and actual UI lifecycle remain unverified.
 
-Next integrate this Rust session module into the Node-API host with per-instance
-ownership and cleanup, no borrow across JS callbacks. Reuse frozen writer/Todo
-acceptance against native adapter; helper transport remains comparison only. Then
-actual UI factory lifecycle and final architecture/inventory audit. D008 native
-candidate remains provisional until integrated evidence, full compatibility target
-unchanged. Do not repeat helper-only cases instead of integrating.
+Next run actual upstream UI factory mounting/disposal with objects in JS, then
+consolidate ownership decision and compatibility obligations against the inventory.
+Node-API candidate now has integrated Rust session evidence. Context editing TS
+control works already; Rust justified by requested ownership, not unmeasured speed.
+Do not repeat native writer cases absent new changes. Integrate remaining seams
+rather than accumulate isolated proofs. Full ecosystem compatibility target stands.
 
 ## Goal and coordination
 
@@ -46,10 +47,10 @@ TS fork remains the control for context editing. Only core/compatibility changes
 major licensing/distribution decisions or actual access blockers need user input.
 No global memory edits. Repository checkpoint/append-only board are authoritative.
 
-T022 architecture assessment ongoing; T027 read/write session subset tested;
-T028 native session integration proposed next. D008 candidate unchanged.
+T022 architecture assessment ongoing; T028 native session integration subset tested;
+D008 native primary candidate strengthened, full compatibility still unproven.
 This cycle used coordinator plus one independent reviewer (cap4); reviewer-owned
-independent writer fixture exposed failure-path memory ordering, fixed before integration without user intervention. No live model calls or
+independent native lifecycle/source review verified per-env cleanup and registration guard without user intervention. No live model calls or
 credentials; agent token counts unavailable. No background uptime promise.
 
 ## Historical evidence

@@ -4,7 +4,8 @@ import {mkdtempSync,readFileSync,rmSync} from 'node:fs';
 import {tmpdir} from 'node:os';
 import {join,resolve} from 'node:path';
 import {spawnSync} from 'node:child_process';
-import {createBackend} from '../prototype/architecture/pi-store-backend.mjs';
+const native=process.argv.includes('--native');
+const {createBackend}=await import(native?'../prototype/architecture/native-store-backend.mjs':'../prototype/architecture/pi-store-backend.mjs');
 import {createHost,tsBackend} from '../prototype/real-plugin-host.mjs';
 import {wrapRegisteredTool} from '../vendor/pi-mono/packages/coding-agent/src/core/extensions/wrapper.ts';
 const plugin=resolve('vendor/pi-mono/packages/coding-agent/examples/extensions/todo.ts');
@@ -54,12 +55,12 @@ else {
   try {
     const reports=[];let prefix;
     for(const stage of ['seed','continue','verify']) {
-      const child=spawnSync(process.execPath,[...process.execArgv,resolve('experiments/pi-store-todo.mjs'),'child',file,stage],{encoding:'utf8',env:{PATH:'/usr/bin:/bin',TSX_TSCONFIG_PATH:resolve('vendor/pi-mono/tsconfig.json')},timeout:20000});
+      const child=spawnSync(process.execPath,[...process.execArgv,resolve('experiments/pi-store-todo.mjs'),'child',file,stage,...(native?['--native']:[])],{encoding:'utf8',env:{PATH:'/usr/bin:/bin',TSX_TSCONFIG_PATH:resolve('vendor/pi-mono/tsconfig.json')},timeout:20000});
       assert.equal(child.status,0,child.stderr);reports.push(JSON.parse(child.stdout));
       const content=readFileSync(file,'utf8');if(prefix)assert.ok(content.startsWith(prefix));prefix=content;
     }
     assert.equal(new Set(reports.map(r=>r.pid)).size,3);for(const report of reports)delete report.pid;
-    console.log(JSON.stringify({reports,threeFreshProcesses:true,canonicalPrefixRetained:true,
+    console.log(JSON.stringify({transport:native?'native':'helper',reports,threeFreshProcesses:true,canonicalPrefixRetained:true,
       limits:['Fixture model messages, actual unchanged Todo; no live provider/AgentSession loop','Rust IDs/clock injected by test adapter','v3 only, no concurrent writer/crash/legacy migration proof','Context policy branch persistence only, projection covered separately']},null,2));
   } finally {rmSync(directory,{recursive:true,force:true});}
 }
