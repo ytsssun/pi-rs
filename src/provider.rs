@@ -2,6 +2,14 @@ use anyhow::{Context, Result, bail};
 use reqwest::blocking::Client;
 use serde_json::{json, Value};
 
+/// Parse one OpenAI-compatible SSE data payload. `[DONE]` is represented as None.
+pub fn parse_sse_data(data: &str) -> Result<Option<Value>> {
+    let payload = data.lines().filter_map(|line| line.strip_prefix("data:")).map(str::trim_start).collect::<Vec<_>>().join("\n");
+    if payload == "[DONE]" { return Ok(None); }
+    if payload.is_empty() { bail!("empty SSE data payload"); }
+    Ok(Some(serde_json::from_str(&payload).context("invalid SSE JSON payload")?))
+}
+
 pub fn client() -> Result<Client> {
     Ok(Client::builder()
         .timeout(std::time::Duration::from_secs(120))
@@ -33,4 +41,15 @@ pub fn openai_chat(client: &Client, base: &str, key: &str, model: &str, messages
     let mut message = response["choices"][0].get("message").cloned().context("missing assistant message")?;
     if let Some(usage) = response.get("usage") { message.as_object_mut().context("assistant must be object")?.insert("_provider_usage".into(), usage.clone()); }
     Ok(message)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::parse_sse_data;
+    #[test]
+    fn parses_multiline_data_and_done() {
+        assert_eq!(parse_sse_data("event: message\ndata: {\"x\":\ndata: 1}\n\n").unwrap().unwrap()["x"], 1);
+        assert!(parse_sse_data("data: [DONE]\n\n").unwrap().is_none());
+        assert!(parse_sse_data("data: nope\n").is_err());
+    }
 }

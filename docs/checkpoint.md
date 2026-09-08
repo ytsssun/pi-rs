@@ -217,3 +217,5 @@ Verified E089: corrected immediate result-hook fixture passes after native rebui
 Verified E090: tool_result hook `usage` now propagates through native driver and Rust batch_result into canonical session messages. Abort fixture asserts usage on both source-ordered outcomes; native rebuild and cargo tests pass.
 
 Verified E091: independent regression matrix passed after recent hook and result-path changes: native rebuild; batch ID/order, termination, input mutation/invalid outcome, per-tool block/result hooks; stream assembler; and `/Users/stevensun/.cargo/bin/cargo test --locked`. This matrix contains no live model call.
+
+Verified E092: Rust provider module now has a tested SSE data payload parser (multiline data, `[DONE]`, empty/invalid payload errors). This is parser groundwork only; the active transport remains blocking and native live streaming is not implemented.
