@@ -112,6 +112,15 @@ impl Registry {
                     q.push(StreamEvent { value: r["event"].clone(), terminal: r["terminal"].as_bool().unwrap_or(false) }).map_err(|e| format!("push: {:?}", e))?;
                     Ok(Value::Null)
                 }
+                "queue_push_batch" => {
+                    let handle = r["handle"].as_str().ok_or("handle required")?;
+                    let q = self.queues.get(handle).ok_or("unknown queue")?;
+                    for item in r["events"].as_array().ok_or("events required")? {
+                        q.push(StreamEvent { value: item["value"].clone(), terminal: item["terminal"].as_bool().unwrap_or(false) })
+                            .map_err(|e| format!("push: {:?}", e))?;
+                    }
+                    Ok(Value::Null)
+                }
                 "queue_poll" => {
                     let handle = r["handle"].as_str().ok_or("handle required")?;
                     let q = self.queues.get(handle).ok_or("unknown queue")?;
