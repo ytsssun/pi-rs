@@ -258,3 +258,7 @@ Verified E097: rebuilt native addon and independently exercised `queue_create`, 
 - Loaded existing environment credentials without printing them; invoked `provider_stream_start` with the configured low-cost model and a minimal request.
 - Evidence: native addon rebuilt; Node observed 4 queued events, terminal=true, elapsed 1677 ms, process exited 0.
 - Event payloads were intentionally not persisted; this proves transport/queue lifecycle only, not coding-task quality or Pi compatibility.
+
+### E104 — live stream tool-call probe (failed, retained)
+- A real provider stream request with one minimal `echo` tool returned one terminal `error` event; no tool-call event was observed.
+- Credentials and payload were not persisted. This is a live failure requiring attribution (provider request schema/model behavior vs native translation); it does not invalidate E103 transport success.
