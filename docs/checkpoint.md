@@ -129,3 +129,7 @@ Verified E046: corrected third clean native live bash seed/resume run passed. To
 Verified E048: native pending marker is flushed even before an assistant entry, allowing reopen recovery. `experiments/native-inflight-recovery.mjs` proves reopen blocks unresolved replay and explicit `resolve_in_flight` succeeds. This is deterministic marker recovery; abrupt process termination during a real provider/tool call remains untested.
 
 Verified E050: native driver now owns the async tool-update barrier. `experiments/native-update-barrier.mjs` covers successful non-awaited update, rejected sink, and undefined rejection; no tool result/model continuation occurs before sink settlement and late updates are ignored. This is deterministic fixture evidence, not live-model parity. Upstream audit found parallel scheduling requires full-batch preflight, source-order persistence, and whole-batch sequential override; `maxConcurrency` would be a deliberate extension, so parallel implementation remains pending.
+
+## Current execution note (2026-09-08)
+
+The next batch implementation is not yet started. Independent clean verification attempted `cargo test --locked` but the current host has no `cargo` executable, so no fresh Rust compile result is claimed. JavaScript fixture verification remains available; restore a Rust toolchain before treating native source changes as build-verified.
