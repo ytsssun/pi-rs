@@ -12,4 +12,5 @@ export function* openaiEvents(chunk, state = new Map()) {
   if (choice.finish_reason === 'tool_calls') {
     for (const [i, id] of state) yield { type: 'toolcall_end', contentIndex: i, id };
   }
+  if (choice.finish_reason === 'stop') yield { type: 'done', reason: 'stop' };
 }
