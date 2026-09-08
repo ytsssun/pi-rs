@@ -301,3 +301,7 @@ Streaming and synchronous HTTP requests now use the same Rust `chat_request` enc
 
 ### E111 — harness external assertion rerun (verified)
 - Fresh live seed/resume run with streaming provider passed harness-owned external assertion: expected and actual `NATIVE_LIVE_EDITED`; no model output was trusted for acceptance.
+
+### E112 — live resume session audit (verified)
+- Fresh seed/resume run after harness assertions: external file assertion passed (`NATIVE_LIVE_EDITED`), and resume session contained 5 persisted toolResult messages and 7 assistant messages.
+- No human steering was used. The initial output parsing mistake was a verifier-command error and is retained separately from product results.
