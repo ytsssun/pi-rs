@@ -7,8 +7,8 @@ import {createHost,tsBackend} from '../prototype/real-plugin-host.mjs';
 import {drive} from '../prototype/architecture/native-runtime-driver.mjs';
 const dir=mkdtempSync(join(tmpdir(),'pi-input-'));
 try {
- for(const invalid of [false,true]) {
-  const manager=await createBackend({path:join(dir,`${invalid}.json`)});
+ for(const parallel of [false,true]) for(const invalid of [false,true]) {
+  const manager=await createBackend({path:join(dir,`${parallel}-${invalid}.json`)});
   const seen=[],hooks=[];
   try {
    const host=await createHost(tsBackend(['probe']),{sessionManager:manager,extensionPaths:[],factories:[pi=>{
@@ -17,7 +17,7 @@ try {
    }]});
    let n=0;
    const stream=async()=>({async *[Symbol.asyncIterator](){},async result(){return ++n===1?{role:'assistant',content:['a','b'].map(id=>({type:'toolCall',id,name:'probe',arguments:{value:invalid&&id==='a'?{}:'before'}})),stopReason:'toolUse'}:{role:'assistant',content:[],stopReason:'stop'};}});
-   await drive({manager,host,prompt:'test',parallel:true,stream});
+   await drive({manager,host,prompt:'test',parallel,stream});
    assert.deepEqual(seen,invalid?[42]:[42,42]);
    assert.deepEqual(hooks,invalid?['b']:['a','b']);
    assert.deepEqual(host.errors,[]);
