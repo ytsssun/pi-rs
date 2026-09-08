@@ -4,9 +4,9 @@ import {request} from './native-store-backend.mjs';
 import {sessionEntryToContextMessages} from '../../vendor/pi-mono/packages/coding-agent/src/core/session-manager.ts';
 import {wrapRegisteredTool} from '../../vendor/pi-mono/packages/coding-agent/src/core/extensions/wrapper.ts';
 import {validateToolArguments} from '../../vendor/pi-mono/packages/ai/src/utils/validation.ts';
-export async function drive({manager,host,prompt,stream,trace=[],onToolUpdate=()=>{},propagateUpdateErrors=false}) {
+export async function drive({manager,host,prompt,stream,trace=[],onToolUpdate=()=>{},propagateUpdateErrors=false,parallel=false}) {
   const step=payload=>request({op:'runtime',handle:manager.handle,...payload});
-  let action=step({event:'begin',prompt});
+  let action=step({event:'begin',prompt,parallel});
   trace.push({type:'turn_start'});
   for(let count=0;count<32;count++) {
     if(action.type==='done') { trace.push({type:'turn_end'}); return {action,trace}; }
@@ -37,6 +37,23 @@ export async function drive({manager,host,prompt,stream,trace=[],onToolUpdate=()
       } catch(error) { if(propagateUpdateErrors && updateFailed) throw updateFailure; isError=true;result={content:[{type:'text',text:error instanceof Error?error.message:String(error)}],details:{}};}
       action=step({event:'tool_result',requestId,result,isError});
       trace.push({type:'tool_result',requestId,tool:call.name,isError});
+    } else if(action.type==='tool_batch') {
+      trace.push({type:'tool_batch_start',batchId:action.batchId,calls:action.calls.length});
+      const results=await Promise.all(action.calls.map(async entry=>{
+        const call=entry.call??entry; let result,isError=false;
+        try {
+          const registered=host.runner.getAllRegisteredTools().find(t=>t.definition.name===call.name);
+          if(!registered) throw Error(`Tool ${call.name} not found`);
+          const tool=wrapRegisteredTool(registered,host.runner);
+          result=await executeWithUpdates(tool,call.id,validateToolArguments(tool,call),new AbortController().signal,async update=>{
+            trace.push({type:'tool_update',tool:call.name});
+            await onToolUpdate({toolCallId:call.id,toolName:call.name,partialResult:update,requestId:entry.requestId});
+          });
+        } catch(error) { isError=true; result={content:[{type:'text',text:error instanceof Error?error.message:String(error)}],details:{}}; }
+        trace.push({type:'tool_result',requestId:entry.requestId,tool:call.name,isError});
+        return {requestId:entry.requestId,content:result.content,details:result.details,isError};
+      }));
+      action=step({event:'batch_result',batchId:action.batchId,results,messageTimestamp:Date.now()});
     } else throw Error('unknown Rust action '+action.type);
   }
   throw Error('bounded fixture action limit exceeded');

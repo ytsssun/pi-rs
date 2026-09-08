@@ -139,3 +139,5 @@ Verified E052: the Rust toolchain is installed at `/Users/stevensun/.cargo/bin` 
 Verified E053: `experiments/upstream-parallel-contract.mjs` executable check confirms the pinned upstream source contains whole-batch sequential override, source-order preflight, Promise.all execution barrier, and source-order result persistence. This strengthens the Rust batch acceptance contract; pi-rs batch implementation remains outstanding.
 
 Tested E054: Rust runtime now has an opt-in `parallel:true` batch action with per-call request IDs; `batch_result` validates count/IDs and persists source-order tool results. Default sequential behavior is unchanged. Cargo tests pass. The native JS driver still needs batch execution/preflight semantics, so this is not a live or full upstream compatibility result.
+
+Tested E055: native driver now passes `parallel` to Rust `begin`, executes `tool_batch` calls concurrently, and submits source-correlated `batch_result` outcomes. Existing sequential fixture and `/Users/stevensun/.cargo/bin/cargo test --locked` pass. This is an opt-in prototype; full upstream preflight/abort semantics and live batch verification remain open.
