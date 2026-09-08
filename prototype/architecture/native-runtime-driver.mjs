@@ -10,11 +10,14 @@ export async function drive({manager,host,prompt,stream,trace=[]}) {
     trace.push({type:action.type,requestId:action.requestId,tool:action.call?.name});
     if(action.type==='done')return {action,trace};
     if(action.type==='model') {
+      trace.push({type:'model_start',requestId:action.requestId});
       const messages=await host.runner.emitContext(action.contextEntries.flatMap(sessionEntryToContextMessages));
       const output=await stream({provider:'fixture'}, {systemPrompt:'native architecture experiment',messages,tools:host.requestTools()});
       for await(const _event of output){} // Stream transport consumption, no turn decisions.
       action=step({event:'model_result',requestId:action.requestId,message:await output.result()});
+      trace.push({type:'model_result',requestId:action.requestId});
     } else if(action.type==='tool') {
+      trace.push({type:'tool_start',requestId:action.requestId,tool:action.call?.name});
       const call=action.call;let result,isError=false;
       try {
         if(call.skipError)throw Error(call.skipError); // Rust rejected truncated call.
@@ -24,6 +27,7 @@ export async function drive({manager,host,prompt,stream,trace=[]}) {
         result=await tool.execute(call.id,validateToolArguments(tool,call),new AbortController().signal);
       } catch(error) {isError=true;result={content:[{type:'text',text:error instanceof Error?error.message:String(error)}],details:{}};}
       action=step({event:'tool_result',requestId:action.requestId,result,isError});
+      trace.push({type:'tool_result',requestId:action.requestId,tool:call.name,isError});
     } else throw Error('unknown Rust action '+action.type);
   }
   throw Error('bounded fixture action limit exceeded');
