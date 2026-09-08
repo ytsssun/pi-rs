@@ -11,6 +11,10 @@ export function* openaiEvents(chunk, state = new Map()) {
   }
   if (choice.finish_reason === 'tool_calls') {
     for (const [i, id] of state) yield { type: 'toolcall_end', contentIndex: i, id };
+    yield { type: 'done', reason: 'toolUse' };
   }
   if (choice.finish_reason === 'stop') yield { type: 'done', reason: 'stop' };
+  if (choice.finish_reason && !['stop', 'tool_calls'].includes(choice.finish_reason)) {
+    throw Error(`unsupported or incomplete finish reason: ${choice.finish_reason}`);
+  }
 }

@@ -1,0 +1,16 @@
+import assert from 'node:assert/strict';
+import { assembleNativeQueue } from '../prototype/architecture/native-stream-bridge.mjs';
+const chunk = (delta, finish_reason = null) => ({value:{choices:[{delta,finish_reason}]},terminal:false});
+const done = {value:null,terminal:true};
+const run = events => assembleNativeQueue(() => events.shift() ?? null, 'fixture');
+assert.equal(run([chunk({content:'ok'}),chunk({},'stop'),done]).stopReason,'stop');
+const call = chunk({tool_calls:[{index:0,id:'a',function:{name:'echo',arguments:'{}'}}]});
+const result = run([call,chunk({},'tool_calls'),{value:{choices:[],usage:{total_tokens:9}},terminal:false},done]);
+assert.equal(result.stopReason,'toolUse');
+assert.equal(result.usage.total_tokens,9);
+assert.deepEqual(result.content[0].arguments,{});
+assert.throws(()=>run([chunk({content:'partial'}),done]),/without terminal/);
+assert.throws(()=>run([chunk({},'stop')]),/without terminal marker/);
+assert.throws(()=>run([chunk({},'length'),done]),/incomplete finish/);
+assert.throws(()=>run([{value:{type:'error',message:'transport failed'},terminal:true}]),/transport failed/);
+console.log('PASS: stop/toolUse, late usage, missing finish/DONE, truncation, provider error');

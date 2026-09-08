@@ -5,17 +5,22 @@ import { StreamAssembler } from './stream-assembler.mjs';
 export function assembleOpenAIChunks(chunks) {
   const assembler = new StreamAssembler();
   const state = new Map();
-  for (const chunk of chunks) for (const event of openaiEvents(chunk, state)) assembler.push(event);
-  if (!assembler.terminal) assembler.push({ type: 'done', reason: 'eof' });
-  return assembler.finish();
+  let usage;
+  for (const chunk of chunks) {
+    if (chunk?.usage) usage = chunk.usage;
+    for (const event of openaiEvents(chunk, state)) assembler.push(event);
+  }
+  const result = assembler.finish();
+  if (usage) result.usage = usage;
+  return result;
 }
 
 export function assembleNativeQueue(request, handle) {
   const chunks = [];
   for (;;) {
     const event = request({ op: 'queue_poll', handle, wait: true });
-    if (event == null) break;
-    if (event.terminal) { if (event.value?.type === 'error') throw Error(event.value.message ?? 'provider stream error'); chunks.push({ choices: [{ delta: {}, finish_reason: 'stop' }] }); break; }
+    if (event == null) throw Error('native stream ended without terminal marker');
+    if (event.terminal) { if (event.value?.type === 'error') throw Error(event.value.message ?? 'provider stream error'); break; }
     chunks.push(event.value);
   }
   return assembleOpenAIChunks(chunks);

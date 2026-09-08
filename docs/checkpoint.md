@@ -281,3 +281,6 @@ Verified E097: rebuilt native addon and independently exercised `queue_create`, 
 ### E108 — live tool bridge terminal mapping (verified)
 - Live provider tool call passed through native queue and bridge with canonical `echo` call and `text` argument.
 - Evidence: `name=echo`, `args=[text]`, `stop=stop`, process exit 0; terminal no longer misclassified as EOF.
+
+### Correction — stream completion fidelity
+E108's claim that converting a tool-call finish into `stop` was a correct fix is superseded. The bridge previously fabricated stop/EOF success and could accept incomplete streams. The adapter now preserves `toolUse` versus `stop`; the native bridge requires an explicit terminal marker and a supported provider finish reason. Late usage chunks are preserved. Evidence: `node experiments/native-stream-terminal.mjs` and `node experiments/openai-stream-canonical.mjs` pass. These are deterministic tests, not new live runs. Runtime integration and transport cancellation remain open.
