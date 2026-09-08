@@ -272,3 +272,8 @@ Verified E097: rebuilt native addon and independently exercised `queue_create`, 
 - Real provider request flowed through native queue and `assembleNativeQueue` into canonical Pi output.
 - Evidence: 1 content item, 2 characters, `stopReason: stop`, process exit 0; no payload persisted.
 - Tool execution and session persistence remain unverified in this path.
+
+### E107 — live tool call through native bridge (verified)
+- Real provider tool-call stream consumed via native queue and assembled into one canonical tool call named `echo` with `text` argument.
+- Evidence: output `items=1`, `toolName=echo`, `argKeys=[text]`, process exit 0. Stop reason is currently `eof` because native terminal `[DONE]` is not yet mapped to assembler `done`.
+- This exposes the next fix: preserve provider finish reason/usage and then invoke runtime tool execution.
