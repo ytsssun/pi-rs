@@ -73,7 +73,7 @@ export async function drive({manager,host,prompt,stream,trace=[],onToolUpdate=()
         const hooked=await host.runner.emitToolResult({type:'tool_result',toolCallId:call.id,toolName:call.name,input:args,content:result.content??[],details:result.details,isError,usage:result.usage});
         if(hooked){ result.content=hooked.content??result.content; result.details=hooked.details??result.details; isError=hooked.isError??isError; }
         trace.push({type:'tool_result',requestId:entry.requestId,tool:call.name,isError});
-        return {requestId:entry.requestId,content:result.content,details:result.details,isError};
+        return {requestId:entry.requestId,content:result.content,details:result.details,isError,usage:result.usage,terminate:result.terminate===true};
       };
       const sequential=prepared.some(({tool})=>tool?.definition?.executionMode==='sequential');
       const results=[];
