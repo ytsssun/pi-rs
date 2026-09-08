@@ -107,3 +107,5 @@ Verified live provider smoke: with existing `.env` authorization, `gpt-5.6-luna`
 Verified E037: `experiments/native-provider-live.mjs` sends a real gpt-5.6-luna request through Node-API `provider_chat` and receives the expected marker. The model omitted punctuation, so the probe accepts the semantically equivalent marker. This is provider transport only; native Rust model/tool/session continuation and live coding/resume remain unverified.
 
 E038 failed: native live harness reached the real provider but OpenAI returned HTTP 400 before a model response. The native host passes Pi tool definitions directly; Chat Completions requires conversion to `function` tool objects. No live native coding/resume success is claimed.
+
+Verified E039: fresh native Node-API harness with real `gpt-5.6-luna` completed model → unchanged JS `read` tool → model → turn end. This is the first live model execution through the native runtime. It is one read-only scenario in one process; cross-process native resume, mutations, and repeated trials remain unverified.
