@@ -313,3 +313,7 @@ Streaming and synchronous HTTP requests now use the same Rust `chat_request` enc
 ### E114 — live provider transport error containment (verified)
 - With an intentionally unreachable local base URL, native provider stream returned a terminal error event; no normal completion was emitted.
 - This verifies transport failure containment only; session rollback semantics remain covered by deterministic runtime tests.
+
+### E115 — unchanged Pi extension sidecar (tested)
+- Ran `node prototype/test-extension-sidecar.mjs` against the pinned upstream `protected-paths.ts` without modification.
+- Protected-path blocks, allowed paths, malformed hook inputs, and malformed JSON behavior matched the fixture expectations. This validates the Node extension host in isolation; it is not yet proof that the extension is wired into the Rust-driven live runtime.
