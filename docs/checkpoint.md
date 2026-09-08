@@ -233,3 +233,8 @@ Verified E097: rebuilt native addon and independently exercised `queue_create`, 
 - Queue close cancels production without error; overflow is surfaced through join result.
 - Evidence: `/Users/stevensun/.cargo/bin/cargo test --locked stream_queue` (4 passed).
 - Commit: `e39ca9b` (pushed `origin/main`).
+
+### E099 — native queue seam regression (verified)
+- Rebuilt the native addon and reran `node experiments/native-queue-seam.mjs` after adding blocking poll support.
+- Evidence: output `{"verified":true,"orderedPoll":true,"terminal":true,"close":true}`.
+- The fixture remains deterministic; it does not exercise live HTTP streaming.
