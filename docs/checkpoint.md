@@ -1,6 +1,6 @@
 # Checkpoint M3 — targeted edit integration
 
-Current work branch: `work/coding-loop`, forked from `main` at `00766dc`. Do not merge main or force-push. User authorizes suitable verified project commits/pushes. See git log for implementation and verification commits. M1 checkpoint retained in checkpoint-m1.md as historical evidence; its read-only limitations and priority order are superseded here.
+Current work branch: `main`. User explicitly authorized merging the single work thread to main on 2026-09-07; main was fast-forwarded from `00766dc` to `d0407ee` and pushed to origin. This supersedes the earlier no-main-merge instruction. Continue suitable verified project commits/pushes on main while this single-thread arrangement applies. Never force-push. See git log for implementation and verification commits. M1 checkpoint retained in checkpoint-m1.md as historical evidence; its read-only limitations and priority order are superseded here.
 
 ## Start here
 
