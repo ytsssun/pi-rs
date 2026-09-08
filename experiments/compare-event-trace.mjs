@@ -9,4 +9,8 @@ const report=JSON.parse(run.stdout);
 const actual=report.reports[0].trace.filter(e=>['turn_start','model_start','model_result','tool_start','tool_result','turn_end'].includes(e.type));
 // The native driver currently exposes action boundaries; normalize names only.
 assert.deepEqual(actual.map(e=>e.type),expected.map(e=>e.type),`event order mismatch\n${run.stdout}`);
+const expectedTools=expected.filter(e=>e.type==='tool_start'||e.type==='tool_result');
+const actualTools=actual.filter(e=>e.type==='tool_start'||e.type==='tool_result');
+assert.deepEqual(actualTools.map(e=>e.tool),expectedTools.map(e=>e.tool),'tool names mismatch');
+assert.deepEqual(actualTools.filter(e=>e.type==='tool_result').map(e=>e.isError??false),expectedTools.filter(e=>e.type==='tool_result').map(e=>e.isError??false),'tool error semantics mismatch');
 console.log(JSON.stringify({verified:true,expected:expected.map(e=>e.type),actual:actual.map(e=>e.type)}));
