@@ -91,3 +91,24 @@ Node 22.18+ is used for TypeScript stripping. Fixed Pi reference: `9767ba275f3e9
 [Checkpoint](docs/checkpoint.md) · [Frozen M2 acceptance](docs/milestone2.md) · [Independent baseline](experiments/round2-baseline.md) · [Coordination retrospective](docs/retrospective-m2.md) · [Board](docs/board.jsonl)
 
 Query durable tasks with `python3 scripts/board.py list`. Root and adapted-source licensing are recorded in LICENSE, NOTICE and compatibility/NOTICE. Full transitive distribution audit remains open before public release.
+
+## Experimental unified entry
+
+`bin/pi-native.mjs` connects the Rust Node-API loop/store to original Pi coding
+ tool definitions and the existing extension host. It remains experimental and
+ does not replace the legacy `cargo run` CLI yet. Build the addon and upstream
+ dependencies first using `python3 scripts/build-native-session.py` and the
+ documented upstream bootstrap.
+
+```sh
+node --import ./vendor/pi-mono/node_modules/tsx/dist/loader.mjs bin/pi-native.mjs \
+  --session /absolute/new-session.jsonl --workspace /absolute/disposable-repo \
+  --input 'Read the repository' --model MODEL_ID
+```
+
+Use `--resume` with the same session/workspace and a new input for another turn.
+`--extension FILE` loads an unchanged extension; only the host's currently
+implemented APIs are supported. Original coding tools include bash with host
+permissions. This entry exposes mutation tools without a sandbox; use disposable
+workspaces. `--fixture FILE` substitutes a per-invocation array of Pi assistant
+messages for the model, for deterministic integration checks.
