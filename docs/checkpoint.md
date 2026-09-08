@@ -238,3 +238,8 @@ Verified E097: rebuilt native addon and independently exercised `queue_create`, 
 - Rebuilt the native addon and reran `node experiments/native-queue-seam.mjs` after adding blocking poll support.
 - Evidence: output `{"verified":true,"orderedPoll":true,"terminal":true,"close":true}`.
 - The fixture remains deterministic; it does not exercise live HTTP streaming.
+
+### E100 — native batch producer seam (verified)
+- Rebuilt addon to `target/native-session.node` and exercised `queue_push_batch` from Node.
+- Evidence: ordered delta then terminal event observed through `queue_poll`; no error.
+- This is a deterministic native fixture; live HTTP provider producer remains open.
