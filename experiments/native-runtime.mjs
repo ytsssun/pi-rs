@@ -31,9 +31,13 @@ async function run(path,stage) {
       requests.push(structuredClone(context.messages));const response=responses.shift();assert.ok(response,'no extra model request');
       return {async *[Symbol.asyncIterator](){yield {type:'done'};},async result(){return response;}};
     };
-    const result=await drive({manager,host,prompt:stage,stream});
+    const result=await drive({manager,host,prompt:stage,stream,onToolUpdate:async event=>{if(event.toolName==='explode')throw Error('deliberate sink rejection');}});
     if(stage==='seed') {
-      const traceTypes=result.trace.map(e=>e.type);
+      for(const end of result.trace.filter(e=>['model_result','tool_result'].includes(e.type))) {
+        const start=result.trace.find(e=>e.type===end.type.replace('_result','_start')&&e.requestId===end.requestId);
+        assert.ok(start,'completion must correlate to its own start');
+        assert.equal(start.tool,end.tool);
+      }
       const updatePositions=result.trace.map((e,i)=>e.type==='tool_update'?i:-1).filter(i=>i>=0);
       const longResult=result.trace.findIndex(e=>e.type==='tool_result'&&e.tool==='long_output');
       assert.equal(updatePositions.length,2); assert.ok(updatePositions.every(i=>i<longResult));
@@ -44,6 +48,7 @@ async function run(path,stage) {
     const tools=canonical.filter(m=>m.role==='toolResult');
     const long=tools.find(m=>m.toolName==='long_output');assert.equal(long.content[0].text,longText);
     assert.equal(tools.find(m=>m.toolName==='explode').isError,true);
+    assert.equal(tools.find(m=>m.toolName==='explode').content[0].text,'deliberate sink rejection');
     assert.equal(tools.filter(m=>m.toolName==='long_output').length,1);
     if(stage!=='reset') {
       for(const view of requests)for(const m of view)if(m.role==='toolResult')assert.ok(m.content[0].text.startsWith('plugin:')&&m.content[0].text.includes('[context view truncated; canonical result retained]'));
