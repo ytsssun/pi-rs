@@ -346,3 +346,5 @@ The parameter-mutation experiment now registers a tool_result interceptor and ch
 The pinned upstream async tool contract and native sink rejection probe both pass. Partial updates are ordered and awaited before executor settlement; late updates are ignored; thrown tools, cooperative abort, and sink rejection are preserved. This remains a prepared-tool/bridge probe, not proof that the full Rust agent loop is wired to every async extension path.
 
 E123 verifies the barrier in the integrated native runtime driver: continuation waits for async update sinks, late updates are ignored, and sink rejection (including undefined rejection) prevents the next model call. Full provider and crash-recovery coverage remain open.
+
+E124 revalidated durable unresolved-tool recovery across process boundaries: abrupt child exit leaves a marker, reopening blocks replay, and explicit resolution enables a new turn. Actual crash during live provider execution remains open.
