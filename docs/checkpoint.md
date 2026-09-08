@@ -1,62 +1,77 @@
-# Current checkpoint — core-only Rust architecture evaluation
+# Checkpoint — architecture assessment completed; implementation remains
 
-## Decision and verified state
+## Current verified status
 
-Starting commit0788e3bc96ff439a0dd757b6f3f949b54e6217b3; main authorized.
-Pinned Pi9767ba275f3e9a5ee0f5c5342249b629ab1b2282 unchanged.
-Architecture direction accepted: upstream JS ecosystem host + Rust runtime exposed
-through Node-API. Full compatibility not established. Reason/ownership/alternative
-comparison and frozen next acceptance: docs/architecture-decision.md, independently
-reviewed in docs/architecture-decision-review.md.
+Architecture direction: Rust core through Node-API, pinned upstream JS ecosystem
+host unchanged. Architecture assessment now has integrated evidence; this is NOT
+complete Rust rewrite, all-plugin compatibility, production readiness or measured
+performance improvement. Pi9767ba275f3e9a5ee0f5c5342249b629ab1b2282 remains reference.
+Starting commit for this closeout: e1e6ab934f56481464c9e2cacb90e3ad159c7e4a.
 
-Original UI widget/header/footer lifecycle methods now tested with actual extension
-runner, Text/Container/Theme and native session callbacks. Identity, replacement
-ordering, disposal, built-in restoration and stale context assertions pass. Naive
-JSON component negative fails expected identity check. Initial padding expectation
-error preserved; exact upstream40column output now asserted.
+Native PiRuntime now decides sequential model/tool continuation and writes through
+PiSessionStore. Actual JS loader/runner/wrappers and context hooks are used. Four
+fresh processes prove persisted followup/reset/fork with branch-local projection,
+prior hook edits retained and canonical file prefix untouched. Five independent
+upstream/native message and model-view comparisons pass. Pending-branch cross-write
+was found and fixed; regressions retain failure evidence. Writer7, native lifecycle
+and cargo test --locked also passed.
 
-Reproduce:
+Reproduce current integrated evidence:
 ```
 python3 scripts/build-native-session.py
-TSX_TSCONFIG_PATH=vendor/pi-mono/tsconfig.json node --import ./vendor/pi-mono/node_modules/tsx/dist/loader.mjs experiments/ui-lifecycle.mjs
+TSX_TSCONFIG_PATH=vendor/pi-mono/tsconfig.json node --import ./vendor/pi-mono/node_modules/tsx/dist/loader.mjs experiments/native-runtime.mjs
+TSX_TSCONFIG_PATH=vendor/pi-mono/tsconfig.json node --import ./vendor/pi-mono/node_modules/tsx/dist/loader.mjs experiments/integrated-control.mjs
 ```
-Negative: append `--json-component-counterexample`. Evidence:
-experiments/ui-lifecycle-results.json; independent review above. This invokes
-original methods on fixture-initialized fields, not full InteractiveMode constructor,
-terminal startup, custom overlay/focus or shutdown lifecycle. No provider calls.
 
-## Next milestone — integrated Rust state machine
+Decision: docs/architecture-decision.md. Integrated scope/method/results:
+docs/integrated-runtime-evaluation.md; independent frozen and overall goal audit:
+docs/integrated-runtime-review.md. Reports in experiments/native-runtime-results.json
+and experiments/integrated-control-results.json. No credentials/live model calls.
+Node/platform caveats in docs/real-plugin-host.md apply. Core Rust/session code is
+real, but model responses and clock are fixtures. No public native-runtime CLI yet.
 
-Implement one Rust-owned native model/tool/session flow. Rust decides actions and
-continuation; JS loads/executes original tools/providers and UI. Reuse native session
-module and context policy, persist results, restore/follow up in fresh process,
-include failure/cancel, assert canonical history and current-view projection. Frozen
-criteria in architecture-decision.md. Independent audit requires integrated evidence;
-UI alone cannot complete architecture goal. Do not repeat isolated green probes.
+## Next implementation milestone (no architecture signoff required)
 
-Existing evidence: native7writer cases/Todo3process persistence,19read cases,
-callback identity/reentry and5async cases. Remaining: integrated scheduler, complete
-session interface/migrations, alias contracts, async rejection order, provider
-integration, full UI and distribution/recovery. TS context control works, so Rust
-is an ownership choice, not a proven speed gain or unique context-editing necessity.
+Bring native runtime event/tool-hook ordering toward pinned Pi conformance, reusing
+original JS extension host. Start with actual before_tool/tool_result and agent/turn/
+message/tool lifecycle events, including an async partial-update barrier and tool
+failure. Derive external cases from original AgentSession/agent-loop, including
+steering/cancel interactions before adding those transitions. Preserve sequential
+baseline and current-view context semantics. Keep active operations correlated to
+their session; no pending branch cross-write or completed-tool replay.
 
-## Goal and coordination
+Acceptance for that milestone must be frozen in a new project record before edits;
+it is product conformance work, not a claim more architecture research is required.
+Then integrate live provider/public CLI path and expand full plugin/API coverage.
+Do not publish/release or claim full compatibility from current fixtures.
 
-Rewrite only Pi core runtime in Rust, existing ecosystem plugins unchanged and
-fully compatible; do not lower this objective or pursue deferred completion gates.
-TS fork remains the control for context editing. Only core/compatibility changes,
-major licensing/distribution decisions or actual access blockers need user input.
-No global memory edits. Repository checkpoint/append-only board are authoritative.
+## Remaining limits
 
-T022 architecture assessment ongoing; D009 direction accepted for implementation;
-T029 integrated Rust state machine proposed with frozen acceptance.
-This cycle used coordinator plus one independent reviewer (cap4); reviewer-owned
-independent architecture review focused next work on integrated Rust state machine without user intervention. No live model calls or
-credentials; agent token counts unavailable. No background uptime promise.
+Full session migrations/header/labels/aliases, arbitrary JSON edges, parallelism,
+stream/events/cancel/steering/batch termination, crash/partial-write resolution,
+actual provider transport through new native loop and cross-platform production
+FFI packaging remain incomplete. Unfinished persisted calls reject explicitly, not
+fully recover. Projection supports one text tool block. Pending branch/external
+message changes currently reject; rich Pi steering is future work. Existing CLI
+still uses its previous native-session path; native addon is an integration prototype.
 
-## Historical evidence
+## Preserved project objective and operations
 
-See docs/checkpoint-history.md for prior checkpoints, docs/architecture-evaluation.md
-for chronological architecture findings, docs/plugin-seams.md for full inventory,
-and docs/board.jsonl for append-only tasks/findings. Historical live matrices8/9
-then7/9 do not establish Pi compatibility; no new model calls in this cycle.
+Only Pi core runtime is rewritten in Rust; entire existing ecosystem must ultimately
+work without plugin changes. JS remains necessary for plugins/UI/provider adapters.
+TS control already performs tested context editing; Rust serves requested runtime
+ownership, not a proven speed advantage. Do not change these goals, narrow full
+compatibility, or adopt significant licensing/distribution changes without user.
+No global memory edits; project files/append-only board are authoritative.
+
+Main pushes authorized, no force push/release/publication. This cycle coordinator+
+independent reviewer used2workers within cap4; findings changed implementation and
+coverage without user intervention. No background48hour promise or model spend.
+
+## History
+
+Earlier checkpoints: docs/checkpoint-history.md. Evidence index and alternatives:
+docs/architecture-evaluation.md, docs/plugin-seams.md, docs/architecture-decision.md.
+Board T029 integrated fixture milestone tested; architecture assessment T022 closed
+with explicit full-product limits. Subsequent work follows the project goal, not
+an invented claim that the complete coding agent already replaces Pi.

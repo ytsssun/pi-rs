@@ -1,0 +1,1044 @@
+{
+  "reports": [
+    {
+      "stage": "seed",
+      "trace": [
+        {
+          "type": "model",
+          "requestId": "2:1"
+        },
+        {
+          "type": "tool",
+          "requestId": "3:2",
+          "tool": "todo"
+        },
+        {
+          "type": "tool",
+          "requestId": "4:3",
+          "tool": "long_output"
+        },
+        {
+          "type": "tool",
+          "requestId": "5:4",
+          "tool": "explode"
+        },
+        {
+          "type": "model",
+          "requestId": "6:5"
+        },
+        {
+          "type": "done"
+        }
+      ],
+      "executed": [
+        "long_output",
+        "explode"
+      ],
+      "requests": [
+        [
+          {
+            "content": "seed",
+            "role": "user",
+            "timestamp": 0
+          }
+        ],
+        [
+          {
+            "content": "seed",
+            "role": "user",
+            "timestamp": 0
+          },
+          {
+            "api": "fixture",
+            "content": [
+              {
+                "arguments": {
+                  "action": "add",
+                  "text": "alpha"
+                },
+                "id": "a",
+                "name": "todo",
+                "type": "toolCall"
+              },
+              {
+                "arguments": {},
+                "id": "long",
+                "name": "long_output",
+                "type": "toolCall"
+              },
+              {
+                "arguments": {},
+                "id": "fail",
+                "name": "explode",
+                "type": "toolCall"
+              }
+            ],
+            "model": "fixture",
+            "provider": "fixture",
+            "role": "assistant",
+            "stopReason": "toolUse",
+            "timestamp": 1
+          },
+          {
+            "content": [
+              {
+                "text": "plugin:A\n[context view truncated; canonical result retained]",
+                "type": "text"
+              }
+            ],
+            "details": {
+              "action": "add",
+              "nextId": 2,
+              "todos": [
+                {
+                  "done": false,
+                  "id": 1,
+                  "text": "alpha"
+                }
+              ]
+            },
+            "isError": false,
+            "role": "toolResult",
+            "timestamp": 0,
+            "toolCallId": "a",
+            "toolName": "todo"
+          },
+          {
+            "content": [
+              {
+                "text": "plugin:r\n[context view truncated; canonical result retained]",
+                "type": "text"
+              }
+            ],
+            "details": {
+              "lines": 100
+            },
+            "isError": false,
+            "role": "toolResult",
+            "timestamp": 0,
+            "toolCallId": "long",
+            "toolName": "long_output"
+          },
+          {
+            "content": [
+              {
+                "text": "plugin:d\n[context view truncated; canonical result retained]",
+                "type": "text"
+              }
+            ],
+            "details": {},
+            "isError": true,
+            "role": "toolResult",
+            "timestamp": 0,
+            "toolCallId": "fail",
+            "toolName": "explode"
+          }
+        ]
+      ],
+      "canonicalToolCount": 3,
+      "canonicalLongOutputRetained": true
+    },
+    {
+      "stage": "continue",
+      "trace": [
+        {
+          "type": "model",
+          "requestId": "8:1"
+        },
+        {
+          "type": "tool",
+          "requestId": "9:2",
+          "tool": "todo"
+        },
+        {
+          "type": "tool",
+          "requestId": "10:3",
+          "tool": "todo"
+        },
+        {
+          "type": "model",
+          "requestId": "11:4"
+        },
+        {
+          "type": "done"
+        }
+      ],
+      "executed": [],
+      "requests": [
+        [
+          {
+            "content": "seed",
+            "role": "user",
+            "timestamp": 0
+          },
+          {
+            "api": "fixture",
+            "content": [
+              {
+                "arguments": {
+                  "action": "add",
+                  "text": "alpha"
+                },
+                "id": "a",
+                "name": "todo",
+                "type": "toolCall"
+              },
+              {
+                "arguments": {},
+                "id": "long",
+                "name": "long_output",
+                "type": "toolCall"
+              },
+              {
+                "arguments": {},
+                "id": "fail",
+                "name": "explode",
+                "type": "toolCall"
+              }
+            ],
+            "model": "fixture",
+            "provider": "fixture",
+            "role": "assistant",
+            "stopReason": "toolUse",
+            "timestamp": 1
+          },
+          {
+            "content": [
+              {
+                "text": "plugin:A\n[context view truncated; canonical result retained]",
+                "type": "text"
+              }
+            ],
+            "details": {
+              "action": "add",
+              "nextId": 2,
+              "todos": [
+                {
+                  "done": false,
+                  "id": 1,
+                  "text": "alpha"
+                }
+              ]
+            },
+            "isError": false,
+            "role": "toolResult",
+            "timestamp": 0,
+            "toolCallId": "a",
+            "toolName": "todo"
+          },
+          {
+            "content": [
+              {
+                "text": "plugin:r\n[context view truncated; canonical result retained]",
+                "type": "text"
+              }
+            ],
+            "details": {
+              "lines": 100
+            },
+            "isError": false,
+            "role": "toolResult",
+            "timestamp": 0,
+            "toolCallId": "long",
+            "toolName": "long_output"
+          },
+          {
+            "content": [
+              {
+                "text": "plugin:d\n[context view truncated; canonical result retained]",
+                "type": "text"
+              }
+            ],
+            "details": {},
+            "isError": true,
+            "role": "toolResult",
+            "timestamp": 0,
+            "toolCallId": "fail",
+            "toolName": "explode"
+          },
+          {
+            "api": "fixture",
+            "content": [
+              {
+                "text": "seed complete",
+                "type": "text"
+              }
+            ],
+            "model": "fixture",
+            "provider": "fixture",
+            "role": "assistant",
+            "stopReason": "stop",
+            "timestamp": 1
+          },
+          {
+            "content": "continue",
+            "role": "user",
+            "timestamp": 0
+          }
+        ],
+        [
+          {
+            "content": "seed",
+            "role": "user",
+            "timestamp": 0
+          },
+          {
+            "api": "fixture",
+            "content": [
+              {
+                "arguments": {
+                  "action": "add",
+                  "text": "alpha"
+                },
+                "id": "a",
+                "name": "todo",
+                "type": "toolCall"
+              },
+              {
+                "arguments": {},
+                "id": "long",
+                "name": "long_output",
+                "type": "toolCall"
+              },
+              {
+                "arguments": {},
+                "id": "fail",
+                "name": "explode",
+                "type": "toolCall"
+              }
+            ],
+            "model": "fixture",
+            "provider": "fixture",
+            "role": "assistant",
+            "stopReason": "toolUse",
+            "timestamp": 1
+          },
+          {
+            "content": [
+              {
+                "text": "plugin:A\n[context view truncated; canonical result retained]",
+                "type": "text"
+              }
+            ],
+            "details": {
+              "action": "add",
+              "nextId": 2,
+              "todos": [
+                {
+                  "done": false,
+                  "id": 1,
+                  "text": "alpha"
+                }
+              ]
+            },
+            "isError": false,
+            "role": "toolResult",
+            "timestamp": 0,
+            "toolCallId": "a",
+            "toolName": "todo"
+          },
+          {
+            "content": [
+              {
+                "text": "plugin:r\n[context view truncated; canonical result retained]",
+                "type": "text"
+              }
+            ],
+            "details": {
+              "lines": 100
+            },
+            "isError": false,
+            "role": "toolResult",
+            "timestamp": 0,
+            "toolCallId": "long",
+            "toolName": "long_output"
+          },
+          {
+            "content": [
+              {
+                "text": "plugin:d\n[context view truncated; canonical result retained]",
+                "type": "text"
+              }
+            ],
+            "details": {},
+            "isError": true,
+            "role": "toolResult",
+            "timestamp": 0,
+            "toolCallId": "fail",
+            "toolName": "explode"
+          },
+          {
+            "api": "fixture",
+            "content": [
+              {
+                "text": "seed complete",
+                "type": "text"
+              }
+            ],
+            "model": "fixture",
+            "provider": "fixture",
+            "role": "assistant",
+            "stopReason": "stop",
+            "timestamp": 1
+          },
+          {
+            "content": "continue",
+            "role": "user",
+            "timestamp": 0
+          },
+          {
+            "api": "fixture",
+            "content": [
+              {
+                "arguments": {
+                  "action": "list"
+                },
+                "id": "list",
+                "name": "todo",
+                "type": "toolCall"
+              },
+              {
+                "arguments": {
+                  "action": "add",
+                  "text": "gamma"
+                },
+                "id": "gamma",
+                "name": "todo",
+                "type": "toolCall"
+              }
+            ],
+            "model": "fixture",
+            "provider": "fixture",
+            "role": "assistant",
+            "stopReason": "toolUse",
+            "timestamp": 1
+          },
+          {
+            "content": [
+              {
+                "text": "plugin:[\n[context view truncated; canonical result retained]",
+                "type": "text"
+              }
+            ],
+            "details": {
+              "action": "list",
+              "nextId": 2,
+              "todos": [
+                {
+                  "done": false,
+                  "id": 1,
+                  "text": "alpha"
+                }
+              ]
+            },
+            "isError": false,
+            "role": "toolResult",
+            "timestamp": 0,
+            "toolCallId": "list",
+            "toolName": "todo"
+          },
+          {
+            "content": [
+              {
+                "text": "plugin:A\n[context view truncated; canonical result retained]",
+                "type": "text"
+              }
+            ],
+            "details": {
+              "action": "add",
+              "nextId": 3,
+              "todos": [
+                {
+                  "done": false,
+                  "id": 1,
+                  "text": "alpha"
+                },
+                {
+                  "done": false,
+                  "id": 2,
+                  "text": "gamma"
+                }
+              ]
+            },
+            "isError": false,
+            "role": "toolResult",
+            "timestamp": 0,
+            "toolCallId": "gamma",
+            "toolName": "todo"
+          }
+        ]
+      ],
+      "canonicalToolCount": 5,
+      "canonicalLongOutputRetained": true
+    },
+    {
+      "stage": "reset",
+      "trace": [
+        {
+          "type": "model",
+          "requestId": "14:1"
+        },
+        {
+          "type": "done"
+        }
+      ],
+      "executed": [],
+      "requests": [
+        [
+          {
+            "content": "seed",
+            "role": "user",
+            "timestamp": 0
+          },
+          {
+            "api": "fixture",
+            "content": [
+              {
+                "arguments": {
+                  "action": "add",
+                  "text": "alpha"
+                },
+                "id": "a",
+                "name": "todo",
+                "type": "toolCall"
+              },
+              {
+                "arguments": {},
+                "id": "long",
+                "name": "long_output",
+                "type": "toolCall"
+              },
+              {
+                "arguments": {},
+                "id": "fail",
+                "name": "explode",
+                "type": "toolCall"
+              }
+            ],
+            "model": "fixture",
+            "provider": "fixture",
+            "role": "assistant",
+            "stopReason": "toolUse",
+            "timestamp": 1
+          },
+          {
+            "content": [
+              {
+                "text": "plugin:Added todo #1: alpha",
+                "type": "text"
+              }
+            ],
+            "details": {
+              "action": "add",
+              "nextId": 2,
+              "todos": [
+                {
+                  "done": false,
+                  "id": 1,
+                  "text": "alpha"
+                }
+              ]
+            },
+            "isError": false,
+            "role": "toolResult",
+            "timestamp": 0,
+            "toolCallId": "a",
+            "toolName": "todo"
+          },
+          {
+            "content": [
+              {
+                "text": "plugin:row0: canonical long output\nrow1: canonical long output\nrow2: canonical long output\nrow3: canonical long output\nrow4: canonical long output\nrow5: canonical long output\nrow6: canonical long output\nrow7: canonical long output\nrow8: canonical long output\nrow9: canonical long output\nrow10: canonical long output\nrow11: canonical long output\nrow12: canonical long output\nrow13: canonical long output\nrow14: canonical long output\nrow15: canonical long output\nrow16: canonical long output\nrow17: canonical long output\nrow18: canonical long output\nrow19: canonical long output\nrow20: canonical long output\nrow21: canonical long output\nrow22: canonical long output\nrow23: canonical long output\nrow24: canonical long output\nrow25: canonical long output\nrow26: canonical long output\nrow27: canonical long output\nrow28: canonical long output\nrow29: canonical long output\nrow30: canonical long output\nrow31: canonical long output\nrow32: canonical long output\nrow33: canonical long output\nrow34: canonical long output\nrow35: canonical long output\nrow36: canonical long output\nrow37: canonical long output\nrow38: canonical long output\nrow39: canonical long output\nrow40: canonical long output\nrow41: canonical long output\nrow42: canonical long output\nrow43: canonical long output\nrow44: canonical long output\nrow45: canonical long output\nrow46: canonical long output\nrow47: canonical long output\nrow48: canonical long output\nrow49: canonical long output\nrow50: canonical long output\nrow51: canonical long output\nrow52: canonical long output\nrow53: canonical long output\nrow54: canonical long output\nrow55: canonical long output\nrow56: canonical long output\nrow57: canonical long output\nrow58: canonical long output\nrow59: canonical long output\nrow60: canonical long output\nrow61: canonical long output\nrow62: canonical long output\nrow63: canonical long output\nrow64: canonical long output\nrow65: canonical long output\nrow66: canonical long output\nrow67: canonical long output\nrow68: canonical long output\nrow69: canonical long output\nrow70: canonical long output\nrow71: canonical long output\nrow72: canonical long output\nrow73: canonical long output\nrow74: canonical long output\nrow75: canonical long output\nrow76: canonical long output\nrow77: canonical long output\nrow78: canonical long output\nrow79: canonical long output\nrow80: canonical long output\nrow81: canonical long output\nrow82: canonical long output\nrow83: canonical long output\nrow84: canonical long output\nrow85: canonical long output\nrow86: canonical long output\nrow87: canonical long output\nrow88: canonical long output\nrow89: canonical long output\nrow90: canonical long output\nrow91: canonical long output\nrow92: canonical long output\nrow93: canonical long output\nrow94: canonical long output\nrow95: canonical long output\nrow96: canonical long output\nrow97: canonical long output\nrow98: canonical long output\nrow99: canonical long output",
+                "type": "text"
+              }
+            ],
+            "details": {
+              "lines": 100
+            },
+            "isError": false,
+            "role": "toolResult",
+            "timestamp": 0,
+            "toolCallId": "long",
+            "toolName": "long_output"
+          },
+          {
+            "content": [
+              {
+                "text": "plugin:deliberate tool failure",
+                "type": "text"
+              }
+            ],
+            "details": {},
+            "isError": true,
+            "role": "toolResult",
+            "timestamp": 0,
+            "toolCallId": "fail",
+            "toolName": "explode"
+          },
+          {
+            "api": "fixture",
+            "content": [
+              {
+                "text": "seed complete",
+                "type": "text"
+              }
+            ],
+            "model": "fixture",
+            "provider": "fixture",
+            "role": "assistant",
+            "stopReason": "stop",
+            "timestamp": 1
+          },
+          {
+            "content": "continue",
+            "role": "user",
+            "timestamp": 0
+          },
+          {
+            "api": "fixture",
+            "content": [
+              {
+                "arguments": {
+                  "action": "list"
+                },
+                "id": "list",
+                "name": "todo",
+                "type": "toolCall"
+              },
+              {
+                "arguments": {
+                  "action": "add",
+                  "text": "gamma"
+                },
+                "id": "gamma",
+                "name": "todo",
+                "type": "toolCall"
+              }
+            ],
+            "model": "fixture",
+            "provider": "fixture",
+            "role": "assistant",
+            "stopReason": "toolUse",
+            "timestamp": 1
+          },
+          {
+            "content": [
+              {
+                "text": "plugin:[ ] #1: alpha",
+                "type": "text"
+              }
+            ],
+            "details": {
+              "action": "list",
+              "nextId": 2,
+              "todos": [
+                {
+                  "done": false,
+                  "id": 1,
+                  "text": "alpha"
+                }
+              ]
+            },
+            "isError": false,
+            "role": "toolResult",
+            "timestamp": 0,
+            "toolCallId": "list",
+            "toolName": "todo"
+          },
+          {
+            "content": [
+              {
+                "text": "plugin:Added todo #2: gamma",
+                "type": "text"
+              }
+            ],
+            "details": {
+              "action": "add",
+              "nextId": 3,
+              "todos": [
+                {
+                  "done": false,
+                  "id": 1,
+                  "text": "alpha"
+                },
+                {
+                  "done": false,
+                  "id": 2,
+                  "text": "gamma"
+                }
+              ]
+            },
+            "isError": false,
+            "role": "toolResult",
+            "timestamp": 0,
+            "toolCallId": "gamma",
+            "toolName": "todo"
+          },
+          {
+            "api": "fixture",
+            "content": [
+              {
+                "text": "followup complete",
+                "type": "text"
+              }
+            ],
+            "model": "fixture",
+            "provider": "fixture",
+            "role": "assistant",
+            "stopReason": "stop",
+            "timestamp": 1
+          },
+          {
+            "content": "reset",
+            "role": "user",
+            "timestamp": 0
+          }
+        ]
+      ],
+      "canonicalToolCount": 5,
+      "canonicalLongOutputRetained": true
+    },
+    {
+      "stage": "fork",
+      "trace": [
+        {
+          "type": "model",
+          "requestId": "17:1"
+        },
+        {
+          "type": "tool",
+          "requestId": "18:2",
+          "tool": "todo"
+        },
+        {
+          "type": "tool",
+          "requestId": "19:3",
+          "tool": "todo"
+        },
+        {
+          "type": "model",
+          "requestId": "20:4"
+        },
+        {
+          "type": "done"
+        }
+      ],
+      "executed": [],
+      "requests": [
+        [
+          {
+            "content": "seed",
+            "role": "user",
+            "timestamp": 0
+          },
+          {
+            "api": "fixture",
+            "content": [
+              {
+                "arguments": {
+                  "action": "add",
+                  "text": "alpha"
+                },
+                "id": "a",
+                "name": "todo",
+                "type": "toolCall"
+              },
+              {
+                "arguments": {},
+                "id": "long",
+                "name": "long_output",
+                "type": "toolCall"
+              },
+              {
+                "arguments": {},
+                "id": "fail",
+                "name": "explode",
+                "type": "toolCall"
+              }
+            ],
+            "model": "fixture",
+            "provider": "fixture",
+            "role": "assistant",
+            "stopReason": "toolUse",
+            "timestamp": 1
+          },
+          {
+            "content": [
+              {
+                "text": "plugin:A\n[context view truncated; canonical result retained]",
+                "type": "text"
+              }
+            ],
+            "details": {
+              "action": "add",
+              "nextId": 2,
+              "todos": [
+                {
+                  "done": false,
+                  "id": 1,
+                  "text": "alpha"
+                }
+              ]
+            },
+            "isError": false,
+            "role": "toolResult",
+            "timestamp": 0,
+            "toolCallId": "a",
+            "toolName": "todo"
+          },
+          {
+            "content": [
+              {
+                "text": "plugin:r\n[context view truncated; canonical result retained]",
+                "type": "text"
+              }
+            ],
+            "details": {
+              "lines": 100
+            },
+            "isError": false,
+            "role": "toolResult",
+            "timestamp": 0,
+            "toolCallId": "long",
+            "toolName": "long_output"
+          },
+          {
+            "content": [
+              {
+                "text": "plugin:d\n[context view truncated; canonical result retained]",
+                "type": "text"
+              }
+            ],
+            "details": {},
+            "isError": true,
+            "role": "toolResult",
+            "timestamp": 0,
+            "toolCallId": "fail",
+            "toolName": "explode"
+          },
+          {
+            "api": "fixture",
+            "content": [
+              {
+                "text": "seed complete",
+                "type": "text"
+              }
+            ],
+            "model": "fixture",
+            "provider": "fixture",
+            "role": "assistant",
+            "stopReason": "stop",
+            "timestamp": 1
+          },
+          {
+            "content": "fork",
+            "role": "user",
+            "timestamp": 0
+          }
+        ],
+        [
+          {
+            "content": "seed",
+            "role": "user",
+            "timestamp": 0
+          },
+          {
+            "api": "fixture",
+            "content": [
+              {
+                "arguments": {
+                  "action": "add",
+                  "text": "alpha"
+                },
+                "id": "a",
+                "name": "todo",
+                "type": "toolCall"
+              },
+              {
+                "arguments": {},
+                "id": "long",
+                "name": "long_output",
+                "type": "toolCall"
+              },
+              {
+                "arguments": {},
+                "id": "fail",
+                "name": "explode",
+                "type": "toolCall"
+              }
+            ],
+            "model": "fixture",
+            "provider": "fixture",
+            "role": "assistant",
+            "stopReason": "toolUse",
+            "timestamp": 1
+          },
+          {
+            "content": [
+              {
+                "text": "plugin:A\n[context view truncated; canonical result retained]",
+                "type": "text"
+              }
+            ],
+            "details": {
+              "action": "add",
+              "nextId": 2,
+              "todos": [
+                {
+                  "done": false,
+                  "id": 1,
+                  "text": "alpha"
+                }
+              ]
+            },
+            "isError": false,
+            "role": "toolResult",
+            "timestamp": 0,
+            "toolCallId": "a",
+            "toolName": "todo"
+          },
+          {
+            "content": [
+              {
+                "text": "plugin:r\n[context view truncated; canonical result retained]",
+                "type": "text"
+              }
+            ],
+            "details": {
+              "lines": 100
+            },
+            "isError": false,
+            "role": "toolResult",
+            "timestamp": 0,
+            "toolCallId": "long",
+            "toolName": "long_output"
+          },
+          {
+            "content": [
+              {
+                "text": "plugin:d\n[context view truncated; canonical result retained]",
+                "type": "text"
+              }
+            ],
+            "details": {},
+            "isError": true,
+            "role": "toolResult",
+            "timestamp": 0,
+            "toolCallId": "fail",
+            "toolName": "explode"
+          },
+          {
+            "api": "fixture",
+            "content": [
+              {
+                "text": "seed complete",
+                "type": "text"
+              }
+            ],
+            "model": "fixture",
+            "provider": "fixture",
+            "role": "assistant",
+            "stopReason": "stop",
+            "timestamp": 1
+          },
+          {
+            "content": "fork",
+            "role": "user",
+            "timestamp": 0
+          },
+          {
+            "api": "fixture",
+            "content": [
+              {
+                "arguments": {
+                  "action": "list"
+                },
+                "id": "list",
+                "name": "todo",
+                "type": "toolCall"
+              },
+              {
+                "arguments": {
+                  "action": "add",
+                  "text": "delta"
+                },
+                "id": "gamma",
+                "name": "todo",
+                "type": "toolCall"
+              }
+            ],
+            "model": "fixture",
+            "provider": "fixture",
+            "role": "assistant",
+            "stopReason": "toolUse",
+            "timestamp": 1
+          },
+          {
+            "content": [
+              {
+                "text": "plugin:[\n[context view truncated; canonical result retained]",
+                "type": "text"
+              }
+            ],
+            "details": {
+              "action": "list",
+              "nextId": 2,
+              "todos": [
+                {
+                  "done": false,
+                  "id": 1,
+                  "text": "alpha"
+                }
+              ]
+            },
+            "isError": false,
+            "role": "toolResult",
+            "timestamp": 0,
+            "toolCallId": "list",
+            "toolName": "todo"
+          },
+          {
+            "content": [
+              {
+                "text": "plugin:A\n[context view truncated; canonical result retained]",
+                "type": "text"
+              }
+            ],
+            "details": {
+              "action": "add",
+              "nextId": 3,
+              "todos": [
+                {
+                  "done": false,
+                  "id": 1,
+                  "text": "alpha"
+                },
+                {
+                  "done": false,
+                  "id": 2,
+                  "text": "delta"
+                }
+              ]
+            },
+            "isError": false,
+            "role": "toolResult",
+            "timestamp": 0,
+            "toolCallId": "gamma",
+            "toolName": "todo"
+          }
+        ]
+      ],
+      "canonicalToolCount": 5,
+      "canonicalLongOutputRetained": true
+    }
+  ],
+  "distinctProcesses": true,
+  "canonicalPrefixRetained": true,
+  "limits": [
+    "Deterministic StreamFn-shaped fixture, no live provider or model autonomy",
+    "Explicit sequential subset; no parallel scheduling/steering/cancel/stream event compatibility",
+    "Unfinished persisted calls reject on reopen, no complete recovery workflow",
+    "Prototype projection one text block; full message schema/session aliases unproven",
+    "No public CLI integration or full plugin compatibility"
+  ]
+}

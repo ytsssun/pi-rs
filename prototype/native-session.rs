@@ -1,6 +1,6 @@
 //! Node-API integration experiment for the real Rust Pi session module.
 //! Registry belongs to napi_env; explicit close or environment teardown drops stores.
-use pi_rs::pi_session_store::PiSessionStore;
+use pi_rs::{pi_runtime::PiRuntime, pi_session_store::PiSessionStore};
 use serde_json::{json, Value};
 use std::{
     cell::RefCell,
@@ -52,10 +52,14 @@ extern "C" {
 static NEXT_ENV: AtomicU64 = AtomicU64::new(1);
 static ENV_DROPS: AtomicU64 = AtomicU64::new(0);
 static ABANDONED_DROPS: AtomicU64 = AtomicU64::new(0);
+struct NativeSession {
+    store: PiSessionStore,
+    runtime: PiRuntime,
+}
 struct Registry {
     prefix: u64,
     next: u64,
-    stores: HashMap<String, PiSessionStore>,
+    stores: HashMap<String, NativeSession>,
 }
 impl Drop for Registry {
     fn drop(&mut self) {
@@ -77,7 +81,13 @@ impl Registry {
                     .map_err(|e| e.to_string())?;
                     self.next = self.next.checked_add(1).ok_or("session handle exhausted")?;
                     let handle = format!("{}:{}", self.prefix, self.next);
-                    self.stores.insert(handle.clone(), store);
+                    self.stores.insert(
+                        handle.clone(),
+                        NativeSession {
+                            store,
+                            runtime: PiRuntime::default(),
+                        },
+                    );
                     Ok(json!(handle))
                 }
                 "count" => Ok(json!(self.stores.len())),
@@ -97,10 +107,23 @@ impl Registry {
                         .stores
                         .get_mut(handle)
                         .ok_or("unknown or closed session")?;
+                    if store.runtime.is_waiting()
+                        && (op == "branch" || (op == "append" && r["entry"]["type"] == "message"))
+                    {
+                        return Err("runtime pending; branch or external message mutation requires explicit coordination".into());
+                    }
                     match op {
-                        "snapshot" => store.snapshot().map_err(|e| e.to_string()),
-                        "append" => store.append(r["entry"].clone()).map_err(|e| e.to_string()),
+                        "runtime" => store
+                            .runtime
+                            .step(&mut store.store, &r)
+                            .map_err(|e| e.to_string()),
+                        "snapshot" => store.store.snapshot().map_err(|e| e.to_string()),
+                        "append" => store
+                            .store
+                            .append(r["entry"].clone())
+                            .map_err(|e| e.to_string()),
                         "branch" => store
+                            .store
                             .branch(r["leaf"].clone())
                             .map(|_| Value::Null)
                             .map_err(|e| e.to_string()),

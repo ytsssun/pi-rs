@@ -1,0 +1,44 @@
+{
+  "reports": [
+    {
+      "mode": "reject",
+      "calls": 1,
+      "modelRequests": 2,
+      "canonicalParity": true,
+      "providerViewParity": true
+    },
+    {
+      "mode": "no-content",
+      "calls": 1,
+      "modelRequests": 2,
+      "canonicalParity": true,
+      "providerViewParity": true
+    },
+    {
+      "mode": "aborted",
+      "calls": 0,
+      "modelRequests": 1,
+      "canonicalParity": true,
+      "providerViewParity": true
+    },
+    {
+      "mode": "error",
+      "calls": 0,
+      "modelRequests": 1,
+      "canonicalParity": true,
+      "providerViewParity": true
+    },
+    {
+      "mode": "length",
+      "calls": 0,
+      "modelRequests": 2,
+      "canonicalParity": true,
+      "providerViewParity": true
+    }
+  ],
+  "staleCompletionRejected": true,
+  "pendingBranchRejected": true,
+  "externalMessageAppendRejected": true,
+  "stoppedModelReopen": true,
+  "scope": "deterministic sequential canonical messages/provider views; no streaming event, live model or full compatibility claim"
+}

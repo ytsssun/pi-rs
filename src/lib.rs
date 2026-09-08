@@ -1,3 +1,4 @@
+pub mod pi_runtime;
 pub mod pi_session_store;
 pub mod pi_session_index;
 pub mod edit;

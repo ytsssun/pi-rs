@@ -110,3 +110,17 @@ TSX_TSCONFIG_PATH=vendor/pi-mono/tsconfig.json node --import ./vendor/pi-mono/no
 ```
 Append `--json-component-counterexample` for expected exit1. Result/source hash:
 experiments/ui-lifecycle-results.json. Setup/runtime caveats in real-plugin-host.md.
+
+## Integrated evidence after the decision
+
+The frozen sequential milestone now runs through native PiRuntime+PiSessionStore,
+actual JS extension tooling/context hooks and four-process restore/reset/fork.
+Five source-derived upstream/native canonical-message and provider-view comparisons
+pass. A real pending-action branch-write bug was independently found and fixed;
+regressions and unimplemented steering semantics are explicit. See
+`docs/integrated-runtime-evaluation.md` and `docs/integrated-runtime-review.md`.
+
+The state-machine integration is no longer a missing proof of concept. Product gaps
+(stream/cancellation/parallel/steering, full APIs/migrations/aliases, live providers,
+packaging/recovery) remain. Keep architecture confidence separate from an all-plugin
+release guarantee. No unmeasured benefit is inferred from passing these experiments.

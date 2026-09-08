@@ -92,3 +92,11 @@ native direction and identified integrated scheduler as decisive remaining work.
 Both executed original UI lifecycle positive and negative; harness padding error
 preserved/corrected. No user intervention, new dependencies, keys or model calls.
 Agent token usage unavailable. No performance/whole-TUI compatibility claims.
+
+### Integrated Rust runtime (startinge1e6ab9)
+
+Coordinator+independent upstream/control verifier,2active cap4. Reviewer found
+stopReason/content obligations and real pending-branch cross-write, then verified
+fixes; branch-policy gap in first3process fixture prompted fourth fork stage.
+No user intervention, extra dependencies, keys or live model calls. Agent usage
+unavailable. Frozen fixture milestone met; performance/model autonomy unmeasured.
