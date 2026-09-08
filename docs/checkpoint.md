@@ -189,3 +189,5 @@ E076 is superseded: strengthening the abort fixture to assert full tool_result e
 Verified E077: blocked batch entries now retain validated arguments and tool metadata. The full tool_result event-shape abort fixture passes with both outcomes observed in source order and zero execution; prior E076 failure was caused by missing metadata on propagated blocked entries.
 
 Verified E078: native batch abort fixture now has Pi `tool_result` hook rewrite blocked content; rebuilt run confirms both rewritten values persist in canonical Rust session messages in source order, while tools execute zero times.
+
+F079 proposed: native provider adapter currently uses synchronous Rust `provider_chat` and emits only a terminal stream event. True token/tool streaming remains an explicit compatibility gap; no latency or end-to-end performance claim is made.
