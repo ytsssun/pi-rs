@@ -1,6 +1,6 @@
 use anyhow::{bail, Context, Result};
 use pi_rs::{appended_path, run_with_options, Session};
-use serde_json::{json, Value};
+use serde_json::Value;
 use std::{env, fs, path::Path, time::Duration};
 fn main() -> Result<()> {
     let args: Vec<String> = env::args().skip(1).collect();
