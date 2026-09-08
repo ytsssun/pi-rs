@@ -155,3 +155,5 @@ Tested E060: batch preflight now invokes unchanged Pi `ExtensionRunner.emitToolC
 Tested E061: batch admission now propagates any preflight hook block across the whole batch, so no call executes after a batch-level abort. Existing integration and syntax checks pass; dedicated hook-abort fixture remains to be added.
 
 Verified E062: duplicate request ID submission is rejected without consuming pending batch; a valid reverse-order retry then succeeds and persists source order. This closes a session-integrity bug found during batch verification.
+
+Verified E063: independently rebuilt and reran `experiments/native-batch-hook-abort.mjs`; a second tool_call hook block causes zero executions for both calls, source-order error results, and continued runtime progress.
