@@ -267,3 +267,8 @@ Verified E097: rebuilt native addon and independently exercised `queue_create`, 
 - Re-ran live provider stream using canonical `{type:function,function:{...}}` tool schema.
 - Evidence: observed initial tool call metadata, incremental JSON argument chunks, `finish_reason: tool_calls`, and terminal `[DONE]`; process exited 0.
 - Prior E104 failure is superseded as a malformed tool-schema probe, not a provider transport failure.
+
+### E106 — live provider through native bridge (verified)
+- Real provider request flowed through native queue and `assembleNativeQueue` into canonical Pi output.
+- Evidence: 1 content item, 2 characters, `stopReason: stop`, process exit 0; no payload persisted.
+- Tool execution and session persistence remain unverified in this path.
