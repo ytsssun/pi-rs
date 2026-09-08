@@ -64,7 +64,7 @@ export async function drive({manager,host,prompt,stream,trace=[],onToolUpdate=()
         trace.push({type:'tool_result',requestId:entry.requestId,tool:call.name,isError});
         return {requestId:entry.requestId,content:result.content,details:result.details,isError};
       };
-      const sequential=prepared.some(({tool})=>tool?.definition.executionMode==='sequential');
+      const sequential=prepared.some(({tool})=>tool?.definition?.executionMode==='sequential');
       const results=[];
       if(sequential) for(const item of prepared) results.push(await runOne(item));
       else results.push(...await Promise.all(prepared.map(runOne)));
