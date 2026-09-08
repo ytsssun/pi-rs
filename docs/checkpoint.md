@@ -298,3 +298,6 @@ Streaming and synchronous HTTP requests now use the same Rust `chat_request` enc
 - Existing live harness now opts into `nativeProviderStream({streaming:true})`.
 - Seed and a separate resume process both completed with real model-selected `write`, `edit`, and `bash` tools; external file check passed exactly (`NATIVE_LIVE_EDITED`), exit 0, no steering.
 - Trace showed 4 model turns in seed and 3 in resume. This verifies the requested live streaming + process recovery scenario for the fixture workspace; broader Pi compatibility remains open.
+
+### E111 — harness external assertion rerun (verified)
+- Fresh live seed/resume run with streaming provider passed harness-owned external assertion: expected and actual `NATIVE_LIVE_EDITED`; no model output was trusted for acceptance.
