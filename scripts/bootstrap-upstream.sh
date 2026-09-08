@@ -10,3 +10,8 @@ fi
 actual=$(git -C vendor/pi-mono rev-parse HEAD)
 [ "$actual" = "$ref" ] || { echo 'Existing upstream differs; refusing to overwrite' >&2; exit 1; }
 git -C vendor/pi-mono diff --exit-code
+if [ "${1:-}" = "--build" ]; then
+  command -v npm >/dev/null 2>&1 || { echo 'npm is required for --build' >&2; exit 1; }
+  npm --prefix vendor/pi-mono ci --ignore-scripts
+  npm --prefix vendor/pi-mono run build:offline
+fi
