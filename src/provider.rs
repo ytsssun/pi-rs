@@ -1,6 +1,8 @@
 use anyhow::{Context, Result, bail};
 use reqwest::blocking::Client;
 use serde_json::{json, Value};
+use std::sync::Arc;
+use crate::stream_queue::{StreamEvent, StreamQueue};
 
 /// Parse one OpenAI-compatible SSE data payload. `[DONE]` is represented as None.
 pub fn parse_sse_data(data: &str) -> Result<Option<Value>> {
@@ -75,6 +77,16 @@ pub fn openai_chat_stream<F: FnMut(Option<Value>) -> Result<()>>(client: &Client
         }
     }
     decoder.finish()
+}
+
+/// Run a streaming request and publish decoded payloads to a bounded queue.
+/// The terminal `[DONE]` marker is represented by a terminal event.
+pub fn openai_chat_stream_to_queue(client: &Client, base: &str, key: &str, model: &str, messages: &[Value], tools: &Value, reasoning_effort: Option<&str>, queue: Arc<StreamQueue>) -> Result<()> {
+    openai_chat_stream(client, base, key, model, messages, tools, reasoning_effort, |event| {
+        let terminal = event.is_none();
+        queue.push(StreamEvent { value: event.unwrap_or(Value::Null), terminal })
+            .map_err(|e| anyhow::anyhow!("stream queue push failed: {:?}", e))
+    })
 }
 
 #[cfg(test)]
