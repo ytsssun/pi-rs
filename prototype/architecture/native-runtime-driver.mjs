@@ -13,7 +13,9 @@ export async function drive({manager,host,prompt,stream,trace=[],onToolUpdate=()
     const requestId=action.requestId;
     if(action.type==='model') {
       trace.push({type:'model_start',requestId});
-      const messages=await host.runner.emitContext(action.contextEntries.flatMap(sessionEntryToContextMessages));
+      const canonicalMessages=action.contextEntries.flatMap(sessionEntryToContextMessages);
+      const projected=step({event:'project',messages:canonicalMessages});
+      const messages=await host.runner.emitContext(projected);
       const output=await stream({provider:'fixture'}, {systemPrompt:'native architecture experiment',messages,tools:host.requestTools()});
       for await(const _event of output){} // Stream transport consumption, no turn decisions.
       action=step({event:'model_result',requestId,message:await output.result()});
