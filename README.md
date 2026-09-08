@@ -6,7 +6,7 @@ An experimental Rust coding-agent runtime with narrowly tested Pi compatibility.
 
 The project rewrites **Pi's core runtime**, while keeping the existing TypeScript/Node.js host as the compatibility boundary for the Pi ecosystem. Rust owns the session tree, context projection, runtime state machine and recovery; the host continues to load extensions, hold plugin objects and closures, dispatch UI events, and adapt providers. Node-API is the current seam because it preserves JavaScript identity and lets existing plugins run without a rewrite. It is an implementation boundary, not a claim that every Pi subsystem must remain in TypeScript.
 
-The next milestone is **native event and tool-hook conformance**: reproduce the pinned Pi agent/turn/message/tool event ordering, async update barriers, and tool-failure behavior in the Rust runtime while invoking the unchanged JS extension host. The acceptance cases and known gaps are tracked in [the checkpoint](docs/checkpoint.md); passing fixtures will not be treated as full Pi compatibility.
+The next milestone is **provider continuation and extension conformance**: verify live streaming tool results across resumed processes while invoking the unchanged JS extension host. The acceptance cases and known gaps are tracked in [the checkpoint](docs/checkpoint.md); passing fixtures will not be treated as full Pi compatibility.
 
 ## Run the coding scenario
 
@@ -86,7 +86,7 @@ node --experimental-vm-modules experiments/read-differential.mjs
 python3 experiments/read-resume.py
 ```
 
-Node 22.18+ is used for TypeScript stripping. Fixed Pi reference: `9767ba275f3e9a5ee0f5c5342249b629ab1b2282`, MIT. Truncation probe compares 36 full results. Instrumented original write execution compares four filesystem/result cases; see [scope and shims](experiments/write-differential.md). The Node extension spike loads one unchanged extension and is not connected to Rust. No exact bash output, full agent-loop, Pi session import/export, TUI, complete extension/provider or multiplayer claim. No speed/memory advantage has been measured.
+Node 22.18+ is used for TypeScript stripping. Fixed Pi reference: `9767ba275f3e9a5ee0f5c5342249b629ab1b2282`, MIT. Truncation probe compares 36 full results. Instrumented original write execution compares four filesystem/result cases; see [scope and shims](experiments/write-differential.md). The Node extension spike loads one unchanged extension and is not connected to Rust. Exact bash parity, complete Pi session import/export, TUI, complete extension/provider or multiplayer compatibility remain unverified. No speed/memory advantage has been measured.
 
 [Checkpoint](docs/checkpoint.md) · [Frozen M2 acceptance](docs/milestone2.md) · [Independent baseline](experiments/round2-baseline.md) · [Coordination retrospective](docs/retrospective-m2.md) · [Board](docs/board.jsonl)
 
