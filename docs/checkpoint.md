@@ -293,3 +293,8 @@ Streaming and synchronous HTTP requests now use the same Rust `chat_request` enc
 - Independent live run: `node --env-file=.env --import ./vendor/pi-mono/node_modules/tsx/dist/loader.mjs experiments/native-stream-runtime-live.mjs` after native rebuild.
 - Evidence: model `gpt-5.4-mini`, 2 model turns, 1 real `echo` tool execution with exact `STREAM_RUNTIME_OK`, persisted toolResult, final assistant `stop`, exit 0, `humanInterventions:0`; usage recorded for both assistant turns.
 - This verifies one live tool loop and persistence in-process. Cross-process resume from this streaming path, broader tool safety, and full plugin compatibility remain open.
+
+### E110 — live streaming cross-process resume (verified)
+- Existing live harness now opts into `nativeProviderStream({streaming:true})`.
+- Seed and a separate resume process both completed with real model-selected `write`, `edit`, and `bash` tools; external file check passed exactly (`NATIVE_LIVE_EDITED`), exit 0, no steering.
+- Trace showed 4 model turns in seed and 3 in resume. This verifies the requested live streaming + process recovery scenario for the fixture workspace; broader Pi compatibility remains open.
