@@ -1,4 +1,4 @@
-# Checkpoint — architecture assessment completed; implementation remains
+# Checkpoint — M7 event/tool parity proposed; implementation remains
 
 ## Current verified status
 
@@ -31,6 +31,8 @@ Node/platform caveats in docs/real-plugin-host.md apply. Core Rust/session code 
 real, but model responses and clock are fixtures. No public native-runtime CLI yet.
 
 ## Next implementation milestone (no architecture signoff required)
+
+Frozen acceptance: [M7 event and tool-hook parity](event-parity-milestone.md).
 
 Bring native runtime event/tool-hook ordering toward pinned Pi conformance, reusing
 original JS extension host. Start with actual before_tool/tool_result and agent/turn/
