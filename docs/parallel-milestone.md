@@ -1,13 +1,11 @@
 # Next milestone — parallel tool scheduling
 
-**Status: proposed.** Native Rust currently drains tool calls sequentially. Pinned Pi dispatches calls in parallel unless any call is marked sequential, while preserving source call order in persisted results and allowing completion events to arrive out of order.
+**Status: blocked on protocol redesign, implementation next.** The current Rust action protocol returns one `tool` action and accepts one `tool_result`; a JS-only `Promise.all` would bypass Rust ordering, in-flight markers, and persistence. Parallel scheduling therefore requires a batch action with per-call request IDs and a batch completion event.
 
-Acceptance:
+Required protocol shape:
 
-1. Two independent unchanged-host tools overlap in execution, with a bounded concurrency limit.
-2. A sequential-marked tool forces the batch into sequential mode.
-3. Completion events may be out of order, but canonical persisted tool results follow assistant call order.
-4. One failure does not silently cancel unrelated calls; all outcomes are persisted and the next model turn receives the complete batch.
-5. Cancellation stops admission and reports aborted outcomes without replay after resume.
+```json
+{"type":"tool_batch","batchId":"...","calls":[{"requestId":"...","call":{}}],"maxConcurrency":N}
+```
 
-No performance claim is made; measure overlap and wall time separately from model/provider latency.
+The host may complete calls in any order. Rust persists results in source call order and emits the next model action only after every admitted call has an outcome. Sequential-marked calls force the existing single-action path. Cancellation and failure aggregation remain explicit acceptance cases.
