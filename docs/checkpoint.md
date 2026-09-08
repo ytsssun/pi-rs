@@ -326,3 +326,8 @@ Streaming and synchronous HTTP requests now use the same Rust `chat_request` enc
 - Loaded pinned unchanged `protected-paths.ts` through `real-plugin-host` and emitted a write `tool_call` for `.env`.
 - Evidence: runner returned `block:true` with reason `Path ".env" is protected`.
 - This proves the extension hook contract at the JS runner seam; full Rust driver integration still requires running the same hook inside a live driver turn.
+
+### E118 — sequential hook bypass fixed (verified)
+- A live protected-path probe initially modified `.env`, proving sequential runtime bypassed `emitToolCall`.
+- Added the missing hook call; deterministic batch hook regression passed, and a fresh protected live probe exited 0 without creating `.env` (session retained one blocked toolResult and two assistant messages).
+- The prior failure is retained as the bug-finding evidence; this does not claim all extensions are compatible.
