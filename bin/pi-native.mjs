@@ -32,7 +32,7 @@ try {
   const host=await createHost(tsBackend(tools.map(t=>t.name)),{cwd,sessionManager:manager,extensionPaths:extensions,factories:[pi=>{for(const tool of tools) pi.registerTool(tool);} ]});
   if(options['--context-tool-chars']!==undefined) { const raw=options['--context-tool-chars']; manager.setContextPolicy(raw==='none'?null:Number(raw)); }
   let index=0;
-  const stream=fixture?async()=>{const message=fixture[index++]; if(!message)throw Error('fixture exhausted');return {async *[Symbol.asyncIterator](){},async result(){return message;}};}:nativeProviderStream({model:options['--model'],streaming:true});
+  const stream=fixture?async()=>{const message=fixture[index++]; if(!message)throw Error(`fixture exhausted after ${index} assistant responses; provide the next assistant message for the tool result`);return {async *[Symbol.asyncIterator](){},async result(){return message;}};}:nativeProviderStream({model:options['--model'],streaming:true});
   const result=await drive({manager,host,prompt:options['--input'],stream});
   const report={result,session:path,fixture:Boolean(fixture),extensionErrors:host.errors};
   if(options['--trace-file']) writeFileSync(resolve(options['--trace-file']),JSON.stringify(report,null,2)+'\n');

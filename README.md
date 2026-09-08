@@ -111,7 +111,7 @@ Use `--resume` with the same session/workspace and a new input for another turn.
 implemented APIs are supported. Original coding tools include bash with host
 permissions. This entry exposes mutation tools without a sandbox; use disposable
 workspaces. `--fixture FILE` substitutes a per-invocation array of Pi assistant
-messages for the model, for deterministic integration checks.
+messages for the model, for deterministic integration checks. The array must include every assistant response requested by the loop, including responses after tool results; exhaustion is a deliberate error.
 
 ### Live unified-entry recovery probe
 
