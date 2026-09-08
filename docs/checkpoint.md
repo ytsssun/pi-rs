@@ -334,3 +334,6 @@ Streaming and synchronous HTTP requests now use the same Rust `chat_request` enc
 
 ### E119 — corrected seed external assertion (verified)
 - Fresh streaming seed run after the harness expectation fix passed its own external assertion: `NATIVE_LIVE_EDITED`; session contained 3 toolResult and 4 assistant messages.
+
+### Sequential result interception correction
+The parameter-mutation experiment now registers a tool_result interceptor and checks exact persisted replacement content in sequential/parallel and valid/invalid-input combinations. Before the fix, sequential execution failed with no result hook calls (`[]` versus `[a,b]`). The driver now invokes the unchanged ExtensionRunner result interceptor before sending the result to Rust. Both `node experiments/native-batch-input-mutation.mjs` and `node experiments/native-batch-hook-abort.mjs` pass. Deterministic evidence only; remaining event lifecycle and termination parity are not implied.
