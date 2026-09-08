@@ -9,3 +9,14 @@ export function assembleOpenAIChunks(chunks) {
   if (!assembler.terminal) assembler.push({ type: 'done', reason: 'eof' });
   return assembler.finish();
 }
+
+export function assembleNativeQueue(request, handle) {
+  const chunks = [];
+  for (;;) {
+    const event = request({ op: 'queue_poll', handle, wait: true });
+    if (event == null) break;
+    if (event.terminal) { if (event.value?.type === 'error') throw Error(event.value.message ?? 'provider stream error'); break; }
+    chunks.push(event.value);
+  }
+  return assembleOpenAIChunks(chunks);
+}
