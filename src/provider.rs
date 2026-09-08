@@ -58,6 +58,25 @@ pub fn openai_chat(client: &Client, base: &str, key: &str, model: &str, messages
     Ok(message)
 }
 
+/// OpenAI-compatible streaming request. Each decoded SSE payload is delivered
+/// in arrival order; `[DONE]` is delivered as `None` and ends the callback.
+pub fn openai_chat_stream<F: FnMut(Option<Value>) -> Result<()>>(client: &Client, base: &str, key: &str, model: &str, messages: &[Value], tools: &Value, reasoning_effort: Option<&str>, mut on_event: F) -> Result<()> {
+    let mut request = json!({"model": model, "messages": messages, "tools": tools, "stream": true});
+    if let Some(effort) = reasoning_effort { request["reasoning_effort"] = json!(effort); }
+    let mut response = client.post(format!("{}/chat/completions", base.trim_end_matches('/')))
+        .bearer_auth(key).json(&request).send()?.error_for_status()?;
+    let mut decoder = SseDecoder::default();
+    let mut buf = [0u8; 8192];
+    loop {
+        let n = std::io::Read::read(&mut response, &mut buf)?;
+        if n == 0 { break; }
+        for event in decoder.push(std::str::from_utf8(&buf[..n]).context("stream was not UTF-8")?)? {
+            let done = event.is_none(); on_event(event)?; if done { return Ok(()); }
+        }
+    }
+    decoder.finish()
+}
+
 #[cfg(test)]
 mod tests {
     use super::{parse_sse_data, SseDecoder};
