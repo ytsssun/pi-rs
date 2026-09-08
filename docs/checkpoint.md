@@ -103,3 +103,5 @@ Async hook probe now runs after `sh scripts/bootstrap-upstream.sh --build`; it r
 Verified E033: lifecycle differential and five-case upstream async contract both pass on current main after bootstrap. This does not prove native sink completion/rejection parity end to end or live provider operation.
 
 Verified live provider smoke: with existing `.env` authorization, `gpt-5.6-luna` and reasoning `none` completed a read-only request, then a separate process resumed the session and completed a follow-up request. This validates legacy CLI provider/session flow only; it does not validate native Node-API provider integration or autonomous coding.
+
+Verified E037: `experiments/native-provider-live.mjs` sends a real gpt-5.6-luna request through Node-API `provider_chat` and receives the expected marker. The model omitted punctuation, so the probe accepts the semantically equivalent marker. This is provider transport only; native Rust model/tool/session continuation and live coding/resume remain unverified.
