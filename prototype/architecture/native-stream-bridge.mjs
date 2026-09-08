@@ -20,3 +20,7 @@ export function assembleNativeQueue(request, handle) {
   }
   return assembleOpenAIChunks(chunks);
 }
+
+export function runtimeCalls(canonical) {
+  return (canonical.content ?? []).filter(x => x.type === 'toolCall').map(x => ({ id: x.id, name: x.name, arguments: x.arguments }));
+}
