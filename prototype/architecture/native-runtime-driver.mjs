@@ -41,16 +41,19 @@ export async function drive({manager,host,prompt,stream,trace=[],onToolUpdate=()
       trace.push({type:'tool_batch_start',batchId:action.batchId,calls:action.calls.length});
       // Preflight the complete batch before admitting any execution. This is
       // required by pinned Pi's parallel agent loop and prevents partial writes.
-      const prepared=action.calls.map(entry=>{
+      const prepared=await Promise.all(action.calls.map(async entry=>{
         const call=entry.call??entry;
         const registered=host.runner.getAllRegisteredTools().find(t=>t.definition.name===call.name);
         if(!registered) throw Error(`Tool ${call.name} not found`);
         const tool=wrapRegisteredTool(registered,host.runner);
+        const hook=await host.runner.emitToolCall({toolCallId:call.id,toolName:call.name,args:call.arguments});
+        if(hook?.block) return {entry,call,blocked:hook.block};
         return {entry,call,tool,args:validateToolArguments(tool,call)};
-      });
-      const runOne=async ({entry,call,tool,args})=>{
+      }));
+      const runOne=async ({entry,call,tool,args,blocked})=>{
         let result,isError=false;
         try {
+          if(blocked) throw Error(blocked);
           result=await executeWithUpdates(tool,call.id,args,new AbortController().signal,async update=>{
             trace.push({type:'tool_update',tool:call.name});
             await onToolUpdate({toolCallId:call.id,toolName:call.name,partialResult:update,requestId:entry.requestId});
@@ -59,7 +62,7 @@ export async function drive({manager,host,prompt,stream,trace=[],onToolUpdate=()
         trace.push({type:'tool_result',requestId:entry.requestId,tool:call.name,isError});
         return {requestId:entry.requestId,content:result.content,details:result.details,isError};
       };
-      const sequential=prepared.some(({tool})=>tool.definition.executionMode==='sequential');
+      const sequential=prepared.some(({tool})=>tool?.definition.executionMode==='sequential');
       const results=[];
       if(sequential) for(const item of prepared) results.push(await runOne(item));
       else results.push(...await Promise.all(prepared.map(runOne)));
