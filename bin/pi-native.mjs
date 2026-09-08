@@ -10,7 +10,7 @@ if(args.includes('--help')) {
 for(let i=0;i<args.length;i++) {
   const key=args[i];
   if(key==='--resume') {if(options[key]) throw Error('duplicate --resume'); options[key]=true; continue;}
-  if(!['--session','--workspace','--input','--model','--fixture','--extension'].includes(key)) throw Error(`unknown option ${key}`);
+  if(!['--session','--workspace','--input','--model','--fixture','--extension','--context-tool-chars'].includes(key)) throw Error(`unknown option ${key}`);
   const value=args[++i]; if(!value||value.startsWith('--')) throw Error(`missing value for ${key}`);
   if(key==='--extension') extensions.push(resolve(value));
   else {if(key in options) throw Error(`duplicate ${key}`); options[key]=value;}
@@ -30,6 +30,7 @@ const tools=createCodingTools(cwd);
 const manager=await createBackend({path,cwd,mode:options['--resume']?'open':'create'});
 try {
   const host=await createHost(tsBackend(tools.map(t=>t.name)),{cwd,sessionManager:manager,extensionPaths:extensions,factories:[pi=>{for(const tool of tools) pi.registerTool(tool);} ]});
+  if(options['--context-tool-chars']!==undefined) { const raw=options['--context-tool-chars']; manager.setContextPolicy(raw==='none'?null:Number(raw)); }
   let index=0;
   const stream=fixture?async()=>{const message=fixture[index++]; if(!message)throw Error('fixture exhausted');return {async *[Symbol.asyncIterator](){},async result(){return message;}};}:nativeProviderStream({model:options['--model'],streaming:true});
   const result=await drive({manager,host,prompt:options['--input'],stream});

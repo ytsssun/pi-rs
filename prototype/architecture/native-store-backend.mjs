@@ -14,6 +14,7 @@ export async function createBackend({path,cwd=process.cwd(),mode='create'}) {
   return {handle,snapshot,appendRaw:append,
     // Synchronous compatibility methods required by unchanged Pi tool context.
     getSessionId:()=>snapshot().header?.id,
+    setContextPolicy:limit=>call({op:'runtime',event:'policy',limit:limit===undefined?null:limit}),
     getCwd:()=>cwd,
     appendMessage:message=>append({type:'message',message}),appendCustomEntry:(customType,data)=>append({type:'custom',customType,data}),
     branch:id=>call({op:'branch',leaf:id}),resetLeaf:()=>call({op:'branch',leaf:null}),
