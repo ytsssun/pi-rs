@@ -52,7 +52,7 @@ export async function drive({manager,host,prompt,stream,trace=[],onToolUpdate=()
         const hookEvent={type:'tool_call',toolCallId:call.id,toolName:call.name,input:validated};
         const hook=await host.runner.emitToolCall(hookEvent);
         const args=hookEvent.input;
-        prepared.push(hook?.block ? {entry,call,immediate:{content:[{type:'text',text:hook.reason||'Tool execution was blocked'}],terminate:hook.terminate===true}} : {entry,call,tool,args});
+        prepared.push(hook?.block ? {entry,call,args,immediate:{content:[{type:'text',text:hook.reason||'Tool execution was blocked'}],terminate:hook.terminate===true}} : {entry,call,tool,args});
         } catch(error) {
           prepared.push({entry,call,args:call.arguments??{},immediate:{content:[{type:'text',text:error instanceof Error?error.message:String(error)}]}});
         }
