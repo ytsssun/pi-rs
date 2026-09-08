@@ -5,6 +5,7 @@ pub mod edit;
 pub mod read;
 pub mod tools;
 pub mod provider;
+pub mod stream_queue;
 use anyhow::{bail, Context, Result};
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
