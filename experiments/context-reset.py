@@ -31,6 +31,10 @@ try:
         assert second.returncode==0,second.stderr
         after=json.loads(session.read_text())
         assert after['context_tool_chars'] is None
+        assert len(after['context_policy_changes']) == 2
+        assert after['context_policy_changes'][0]['tool_chars'] == 2
+        assert after['context_policy_changes'][1]['previous_tool_chars'] == 2
+        assert after['context_policy_changes'][1]['tool_chars'] is None
         assert after['messages'][:len(before['messages'])]==before['messages']
         assert requests[2]['messages'][2]['content']=='abcdef'
         third=cli('--resume','--input','still full')
@@ -40,7 +44,6 @@ try:
         uncertain=json.loads(session.read_text())
         uncertain['messages'] += [{'role':'user','content':'pending effect'}, {'role':'assistant','tool_calls':[{'id':'write-pending','type':'function','function':{'name':'write','arguments':'{"path":"data","content":"changed"}'}}]}]
         uncertain['in_flight']='write-pending'
-        uncertain['context_tool_chars']=2
         session.write_text(json.dumps(uncertain))
         snapshot=session.read_bytes()
         denied=cli('--resume','--context-tool-chars','none')

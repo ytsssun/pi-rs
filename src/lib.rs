@@ -10,6 +10,16 @@ use std::{
     path::{Path, PathBuf},
 };
 
+/// A native context-view policy change, anchored to canonical history length.
+/// This is a logical append-only audit within the snapshot, not a tamper-proof log.
+#[derive(Debug, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct ContextPolicyChange {
+    pub after_messages: usize,
+    pub previous_tool_chars: Option<usize>,
+    pub tool_chars: Option<usize>,
+}
+
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct Session {
@@ -22,6 +32,8 @@ pub struct Session {
     pub context_tool_chars: Option<usize>,
     #[serde(default)]
     pub in_flight: Option<String>,
+    #[serde(default)]
+    pub context_policy_changes: Vec<ContextPolicyChange>,
 }
 impl Session {
     pub fn new(workspace: &Path, input: &str) -> Result<Self> {
@@ -30,6 +42,7 @@ impl Session {
             usage: vec![],
             context_tool_chars: None,
             in_flight: None,
+            context_policy_changes: vec![],
             workspace: workspace.canonicalize()?,
             messages: vec![json!({"role":"user","content":input})],
         })
@@ -42,6 +55,26 @@ impl Session {
     pub fn validate(&self) -> Result<()> {
         if self.version != 1 || !self.workspace.is_absolute() || self.messages.is_empty() {
             bail!("invalid session header");
+        }
+        let mut last_change: Option<&ContextPolicyChange> = None;
+        for change in &self.context_policy_changes {
+            if change.after_messages == 0
+                || change.after_messages > self.messages.len()
+                || change.previous_tool_chars == change.tool_chars
+            {
+                bail!("invalid context policy audit entry");
+            }
+            if let Some(last) = last_change {
+                if change.after_messages < last.after_messages
+                    || change.previous_tool_chars != last.tool_chars
+                {
+                    bail!("inconsistent context policy audit chain");
+                }
+            }
+            last_change = Some(change);
+        }
+        if last_change.is_some_and(|last| last.tool_chars != self.context_tool_chars) {
+            bail!("context policy does not match audit history");
         }
         let mut pending = Vec::<String>::new();
         let mut expects_user = true;
@@ -112,6 +145,22 @@ impl Session {
         )?
         .sync_all()?;
         Ok(())
+    }
+    pub fn set_context_policy(&mut self, limit: Option<usize>) -> Result<bool> {
+        self.validate()?;
+        if self.in_flight.is_some() {
+            bail!("cannot change context policy while a tool outcome is uncertain");
+        }
+        if self.context_tool_chars == limit {
+            return Ok(false);
+        }
+        self.context_policy_changes.push(ContextPolicyChange {
+            after_messages: self.messages.len(),
+            previous_tool_chars: self.context_tool_chars,
+            tool_chars: limit,
+        });
+        self.context_tool_chars = limit;
+        Ok(true)
     }
     pub fn append_user(&mut self, input: &str) -> Result<()> {
         self.validate()?;
@@ -254,8 +303,9 @@ where
         bail!("tool {id} has an uncertain outcome; inspect workspace and any surviving processes, then resume with --resolve-in-flight TEXT to record the observed outcome; it will not be replayed");
     }
     if let Some(limit) = trim {
-        s.context_tool_chars = Some(limit);
-        s.save(path)?;
+        if s.set_context_policy(Some(limit))? {
+            s.save(path)?;
+        }
     }
     let mut rounds = 0;
     loop {

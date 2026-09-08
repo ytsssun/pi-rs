@@ -153,8 +153,7 @@ fn main() -> Result<()> {
                 "cannot change context policy while a tool outcome is uncertain; resolve it first"
             );
         }
-        if session.context_tool_chars.is_some() {
-            session.context_tool_chars = None;
+        if session.set_context_policy(None)? {
             session.save(path)?;
         }
     }
