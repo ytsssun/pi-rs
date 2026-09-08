@@ -125,3 +125,5 @@ Verified E044: native live seed/resume now includes `bash`; gpt-5.6-luna autonom
 E045 repetition audit: two clean native live bash seed/resume runs passed; the attempted third run was invalid because the command used an incorrect environment assignment and reused an existing session path. It is excluded from reliability counts; the three-run gate remains open.
 
 Verified E046: corrected third clean native live bash seed/resume run passed. Together with the two valid E045 runs, the three-run reliability gate passes; the prior invalid attempt remains excluded.
+
+Verified E048: native pending marker is flushed even before an assistant entry, allowing reopen recovery. `experiments/native-inflight-recovery.mjs` proves reopen blocks unresolved replay and explicit `resolve_in_flight` succeeds. This is deterministic marker recovery; abrupt process termination during a real provider/tool call remains untested.

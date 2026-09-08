@@ -104,12 +104,13 @@ impl PiSessionStore {
         // write therefore remains visible in this session instance.
         self.content = candidate;
         self.leaf = Value::String(id.clone());
+        let needs_initial_flush = has_assistant || (entry["type"] == "custom" && entry["customType"] == "pi-rs.in-flight.v1");
         if self.flushed {
             OpenOptions::new()
                 .append(true)
                 .open(&self.path)?
                 .write_all(line.as_bytes())?;
-        } else if has_assistant {
+        } else if needs_initial_flush {
             let mut file = OpenOptions::new()
                 .write(true)
                 .create_new(true)
