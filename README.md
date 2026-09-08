@@ -112,3 +112,17 @@ implemented APIs are supported. Original coding tools include bash with host
 permissions. This entry exposes mutation tools without a sandbox; use disposable
 workspaces. `--fixture FILE` substitutes a per-invocation array of Pi assistant
 messages for the model, for deterministic integration checks.
+
+### Live unified-entry recovery probe
+
+With an authorized `.env` containing the provider key, run the live parallel probe in an isolated workspace. The first process creates and reads two files; the second process reopens the same session and reads them again:
+
+```sh
+d=$(mktemp -d); mkdir "$d/workspace"
+node --env-file=.env --import ./vendor/pi-mono/node_modules/tsx/dist/loader.mjs \
+  experiments/native-live-harness.mjs "$d/session.json" parallel "$d/workspace"
+node --env-file=.env --import ./vendor/pi-mono/node_modules/tsx/dist/loader.mjs \
+  experiments/native-live-harness.mjs "$d/session.json" parallel-resume "$d/workspace"
+```
+
+The harness checks file contents independently of the model response and exits nonzero on failure. This demonstrates one live model scenario, not complete Pi compatibility.
