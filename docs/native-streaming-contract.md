@@ -1,5 +1,12 @@
 # Native provider streaming contract
 
+## Current native queue seam
+
+The experimental binding exposes `queue_create`, `queue_push`, `queue_push_batch`,
+`queue_poll` (with optional `wait:true`), and `queue_close`. Batch publication is
+source ordered and returns the first queue error. This is a transport seam only:
+the provider request still needs a managed background handle before it can be
+called a live Node streaming path.
 Reference: pinned Pi commit `9767ba275f3e9a5ee0f5c5342249b629ab1b2282`, `vendor/pi-mono/packages/agent/src/proxy.ts` and `packages/ai` event types.
 
 The Node host must receive ordered `text_delta`, `thinking_delta`, `toolcall_start`, `toolcall_delta`, `toolcall_end`, and terminal `done` or `error` events. A terminal `done` carries the assembled assistant message, stop reason, and usage. A clean EOF without a terminal event is an error. Tool call JSON is assembled incrementally and must be validated only at completion.
