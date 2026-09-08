@@ -10,6 +10,8 @@ pub struct PiRuntime {
     active_tool: Option<Value>,
     tool_updates: Vec<Value>,
     sequence: u64,
+    parallel: bool,
+    batch: Option<(String, Vec<Value>)>,
 }
 impl PiRuntime {
     pub fn is_waiting(&self) -> bool {
@@ -42,6 +44,13 @@ impl PiRuntime {
             store.snapshot()?["entries"].as_array().unwrap().len(),
             self.sequence
         );
+        if self.parallel && self.batch.is_none() && self.tools.len() > 1 {
+            let calls: Vec<Value> = self.tools.drain(..).collect();
+            let batch_id = format!("batch-{id}");
+            self.batch = Some((batch_id.clone(), calls.clone()));
+            self.waiting = Some(("batch".into(), batch_id.clone()));
+            return Ok(json!({"type":"tool_batch","batchId":batch_id,"calls":calls}));
+        }
         if let Some(call) = self.tools.pop_front() {
             self.waiting = Some(("tool".into(), id.clone()));
             self.active_tool = Some(call.clone());
@@ -146,6 +155,19 @@ impl PiRuntime {
                 json!({"type":"message","message":{"role":"user","content":request["prompt"],"timestamp":request["messageTimestamp"].as_u64().unwrap_or(0)}}),
                 timestamp,
             )?;
+            self.parallel = request["parallel"].as_bool().unwrap_or(false);
+            return self.next(store);
+        }
+        if op == "batch_result" {
+            let (batch_id, calls) = self.batch.take().context("no pending batch")?;
+            if request["batchId"] != batch_id { bail!("stale or mismatched batch"); }
+            let results = request["results"].as_array().context("results array required")?;
+            if results.len() != calls.len() { bail!("batch result count mismatch"); }
+            for (call, result) in calls.iter().zip(results) {
+                let message = json!({"role":"toolResult","toolCallId":call["id"],"toolName":call["name"],"content":result.get("content").cloned().unwrap_or(json!([])),"details":result["details"],"isError":result["isError"].as_bool().unwrap_or(false),"timestamp":request["messageTimestamp"].as_u64().unwrap_or(0)});
+                Self::append(store, json!({"type":"message","message":message}), timestamp)?;
+            }
+            self.waiting = None;
             return self.next(store);
         }
         if op == "tool_update" {
