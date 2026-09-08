@@ -16,5 +16,8 @@ try {
   const trace=[];
   const prompt=stage==='parallel-resume'?'Read parallel-a.txt and parallel-b.txt and confirm both contain exactly PARALLEL_OK.':stage==='parallel'?'Create files parallel-a.txt and parallel-b.txt, each containing exactly PARALLEL_OK, then read both and report success.':stage==='resume'?'Now edit native-live-target.txt, then run `test "$(cat native-live-target.txt)" = NATIVE_LIVE_EDITED` with bash and report success.':'Create native-live-target.txt containing exactly NATIVE_LIVE_OK, then edit it to NATIVE_LIVE_EDITED and run a bash test proving the exact content.';
   const result=await drive({manager,host,parallel:stage==='parallel',prompt,stream:nativeProviderStream({model:process.env.PI_RS_MODEL||'gpt-5.4-mini',reasoningEffort:'none',streaming:true}),trace});
-  console.log(JSON.stringify({verified:true,model:process.env.PI_RS_MODEL||'gpt-5.6-luna',trace,session},null,2));
+  const expected=stage==='resume'?'NATIVE_LIVE_EDITED':'NATIVE_LIVE_OK';
+  const actual=readFileSync(resolve(workspace,'native-live-target.txt'),'utf8').trim();
+  if(stage==='resume' && actual!==expected) throw Error(`external assertion failed: expected ${expected}, got ${actual}`);
+  console.log(JSON.stringify({verified:true,model:process.env.PI_RS_MODEL||'gpt-5.4-mini',trace,externalCheck:{expected,actual,passed:actual===expected},session},null,2));
 } finally {await manager.close();}
