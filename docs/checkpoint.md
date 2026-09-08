@@ -227,3 +227,9 @@ Verified E094: Rust SseDecoder handles standard CRLF event separators in additio
 Verified E096: independently reran bounded Rust `StreamQueue` targeted tests and full cargo suite. Capacity, terminal exactly-once, wait wakeup, close, and post-close rejection pass. Queue is not yet exposed through Node-API or connected to HTTP provider.
 
 Verified E097: rebuilt native addon and independently exercised `queue_create`, `queue_push`, `queue_poll`, and `queue_close`; ordered event and terminal propagation pass. Queue is not connected to HTTP provider or an asynchronous producer yet.
+
+### E098 — bounded producer helper (verified)
+- Added `spawn_producer` for dedicated-thread production into `StreamQueue`.
+- Queue close cancels production without error; overflow is surfaced through join result.
+- Evidence: `/Users/stevensun/.cargo/bin/cargo test --locked stream_queue` (4 passed).
+- Commit: `e39ca9b` (pushed `origin/main`).
