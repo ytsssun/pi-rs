@@ -179,3 +179,5 @@ E071 initial termination fixture was superseded due to a test script field typo.
 Verified E073: native batch preflight now supplies Pi-compatible `tool_call` event `input` (retaining args for internal compatibility). The hook-abort fixture asserts input presence; rebuilt native addon passes zero-execution/source-order checks.
 
 Tested E074: native batch execution now invokes Pi `ExtensionRunner.emitToolResult` and applies returned result mutations before Rust persistence. Existing integration and syntax checks pass; dedicated result-hook mutation/throw fixture remains open.
+
+Verified E075: abort fixture now registers an unchanged Pi `tool_result` hook and confirms both blocked outcomes traverse it in source order while zero tools execute. Native addon rebuilt before the run.
