@@ -19,5 +19,9 @@ try {
   const expected=stage==='resume'?'NATIVE_LIVE_EDITED':'NATIVE_LIVE_OK';
   const actual=readFileSync(resolve(workspace,'native-live-target.txt'),'utf8').trim();
   if(stage==='resume' && actual!==expected) throw Error(`external assertion failed: expected ${expected}, got ${actual}`);
-  console.log(JSON.stringify({verified:true,model:process.env.PI_RS_MODEL||'gpt-5.4-mini',trace,externalCheck:{expected,actual,passed:actual===expected},session},null,2));
+  const entries=manager.snapshot().branch;
+  const persistedToolResults=entries.filter(e=>e.type==='message'&&e.message?.role==='toolResult').length;
+  const persistedAssistants=entries.filter(e=>e.type==='message'&&e.message?.role==='assistant').length;
+  if(stage==='resume' && (!persistedToolResults || !persistedAssistants)) throw Error('session assertion failed: missing persisted messages');
+  console.log(JSON.stringify({verified:true,model:process.env.PI_RS_MODEL||'gpt-5.4-mini',trace,externalCheck:{expected,actual,passed:actual===expected},sessionCheck:{persistedToolResults,persistedAssistants},session},null,2));
 } finally {await manager.close();}
