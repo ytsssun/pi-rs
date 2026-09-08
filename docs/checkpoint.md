@@ -248,3 +248,8 @@ Verified E097: rebuilt native addon and independently exercised `queue_create`, 
 - `python3 scripts/build-native-session.py && node experiments/native-batch-producer.mjs` passed.
 - Node can publish ordered events and terminal state through the native queue seam.
 - This remains fixture-only; no network or background provider handle is exposed yet.
+
+### E102 — managed stream status lifecycle (verified)
+- Native fixture verifies stream handle creation, producer status query, blocking event consumption, terminal delivery, and close.
+- Evidence: `python3 scripts/build-native-session.py && node experiments/native-fixture-stream.mjs` => all flags true.
+- This remains deterministic fixture coverage; live provider handle is not yet exposed.
