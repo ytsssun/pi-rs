@@ -133,3 +133,5 @@ Verified E050: native driver now owns the async tool-update barrier. `experiment
 ## Current execution note (2026-09-08)
 
 The next batch implementation is not yet started. Independent clean verification attempted `cargo test --locked` but the current host has no `cargo` executable, so no fresh Rust compile result is claimed. JavaScript fixture verification remains available; restore a Rust toolchain before treating native source changes as build-verified.
+
+Verified E052: the Rust toolchain is installed at `/Users/stevensun/.cargo/bin` but was absent from PATH. Running `/Users/stevensun/.cargo/bin/cargo test --locked` passed all 32 integration/unit tests and doc tests. F051 is superseded as an environment PATH issue; future verification should use the absolute toolchain path or export its bin directory.
