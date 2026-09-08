@@ -185,3 +185,5 @@ Verified E075: abort fixture now registers an unchanged Pi `tool_result` hook an
 Verified E076: native batch `tool_result` hook events now match Pi's declared shape (`type`, `input`, `content`, `details`, `isError`, optional `usage`). Abort fixture asserts the shape and still passes zero execution/source order.
 
 E076 is superseded: strengthening the abort fixture to assert full tool_result event shape exposed that only one blocked outcome reached the hook, contrary to the two-result expectation. No full event-shape compatibility claim is made; investigate before retrying.
+
+Verified E077: blocked batch entries now retain validated arguments and tool metadata. The full tool_result event-shape abort fixture passes with both outcomes observed in source order and zero execution; prior E076 failure was caused by missing metadata on propagated blocked entries.
