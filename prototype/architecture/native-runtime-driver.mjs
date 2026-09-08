@@ -15,7 +15,7 @@ export async function drive({manager,host,prompt,stream,trace=[],onToolUpdate=()
       trace.push({type:'model_start',requestId});
       const canonicalMessages=action.contextEntries.flatMap(sessionEntryToContextMessages);
       const projected=step({event:'project',messages:canonicalMessages});
-      trace.push({type:"context_projection",canonicalMessages:canonicalMessages.length,projectedMessages:projected.length,projectedTextBytes:JSON.stringify(projected).length});
+      trace.push({type:"context_projection",canonicalMessages:canonicalMessages.length,projectedMessages:projected.length,projectedTextBytes:JSON.stringify(projected).length,projected:projected});
       const messages=await host.runner.emitContext(projected);
       const output=await stream({provider:'fixture'}, {systemPrompt:'native architecture experiment',messages,tools:host.requestTools()});
       for await(const _event of output){} // Stream transport consumption, no turn decisions.
