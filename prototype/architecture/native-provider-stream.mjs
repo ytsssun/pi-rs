@@ -4,7 +4,8 @@ import {request} from './native-store-backend.mjs';
 // consumed by the existing JS driver. The model request and credentials remain Rust-owned.
 export function nativeProviderStream({model,reasoningEffort}={}) {
   return async (_model, context) => {
-    const raw=request({op:'provider_chat',model:model||_model?.id||process.env.PI_RS_MODEL||'gpt-5.6-luna',messages:context.messages,tools:context.tools||[],reasoning_effort:reasoningEffort||'none'});
+    const messages=context.systemPrompt?[{role:'system',content:context.systemPrompt},...context.messages]:context.messages;
+    const raw=request({op:'provider_chat',model:model||_model?.id||process.env.PI_RS_MODEL||'gpt-5.6-luna',messages,tools:context.tools||[],reasoning_effort:reasoningEffort||'none'});
     const message=toPiAssistant(raw,model||_model?.id||process.env.PI_RS_MODEL||'gpt-5.6-luna');
     return {async *[Symbol.asyncIterator](){yield {type:'done'};},async result(){return message;}};
   };
