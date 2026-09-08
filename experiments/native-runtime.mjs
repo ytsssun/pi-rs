@@ -20,7 +20,7 @@ async function run(path,stage) {
     }
     const host=await createHost(tsBackend(['todo','long_output','explode']),{sessionManager:manager,extensionPaths:[resolve('vendor/pi-mono/packages/coding-agent/examples/extensions/todo.ts')],factories:[pi=>{
       pi.registerTool({name:'long_output',label:'Long',description:'long output fixture',parameters:{type:'object',properties:{}},execute:async(_id,_args,_signal,onUpdate)=>{executed.push('long_output'); if(onUpdate){await new Promise(r=>setTimeout(r,10)); await onUpdate({content:[{type:'text',text:'partial-1'}],details:{}}); await new Promise(r=>setTimeout(r,10)); await onUpdate({content:[{type:'text',text:'partial-2'}],details:{}});} return {content:[{type:'text',text:longText}],details:{lines:100}};}});
-      pi.registerTool({name:'explode',label:'Error',description:'error fixture',parameters:{type:'object',properties:{}},execute:async()=>{executed.push('explode');throw Error('deliberate tool failure');}});
+      pi.registerTool({name:'explode',label:'Error',description:'error fixture',parameters:{type:'object',properties:{}},execute:async(_id,_args,_signal,onUpdate)=>{executed.push('explode'); if(onUpdate) { await onUpdate({content:[{type:'text',text:'before-rejection'}],details:{}}); } throw Error('deliberate tool failure');}});
       pi.on('context',event=>{for(const m of event.messages)if(m.role==='toolResult')m.content[0].text='plugin:'+m.content[0].text;});
       pi.on('context',event=>({messages:step({event:'project',messages:event.messages})}));
     }]});

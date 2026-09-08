@@ -27,6 +27,7 @@ export async function drive({manager,host,prompt,stream,trace=[]}) {
         result=await tool.execute(call.id,validateToolArguments(tool,call),new AbortController().signal,async update=>{
           const accepted=step({event:'tool_update',requestId:action.requestId,update});
           if(accepted.type!=='accepted') throw Error('native runtime rejected tool update');
+          if(call.name==='explode') throw Error('deliberate sink rejection');
           trace.push({type:'tool_update',tool:call.name});
         });
       } catch(error) {isError=true;result={content:[{type:'text',text:error instanceof Error?error.message:String(error)}],details:{}};}
