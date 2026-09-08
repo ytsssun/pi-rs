@@ -8,6 +8,7 @@ pub struct PiRuntime {
     waiting: Option<(String, String)>,
     tools: VecDeque<Value>,
     active_tool: Option<Value>,
+    tool_updates: Vec<Value>,
     sequence: u64,
 }
 impl PiRuntime {
@@ -145,6 +146,13 @@ impl PiRuntime {
             )?;
             return self.next(store);
         }
+        if op == "tool_update" {
+            let call = self.active_tool.as_ref().context("no active tool")?;
+            if request["requestId"] != self.waiting.as_ref().map(|(_, id)| json!(id)).unwrap_or(Value::Null) { bail!("stale or mismatched update"); }
+            let update = request.get("update").cloned().context("update required")?;
+            self.tool_updates.push(update);
+            return Ok(json!({"type":"accepted","toolCallId":call["id"],"updateCount":self.tool_updates.len()}));
+        }
         let expected_kind = if op == "model_result" {
             "model"
         } else if op == "tool_result" {
@@ -211,6 +219,7 @@ impl PiRuntime {
             )?;
             self.waiting = None;
             self.active_tool = None;
+            self.tool_updates.clear();
         }
         self.next(store)
     }
