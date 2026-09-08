@@ -331,3 +331,6 @@ Streaming and synchronous HTTP requests now use the same Rust `chat_request` enc
 - A live protected-path probe initially modified `.env`, proving sequential runtime bypassed `emitToolCall`.
 - Added the missing hook call; deterministic batch hook regression passed, and a fresh protected live probe exited 0 without creating `.env` (session retained one blocked toolResult and two assistant messages).
 - The prior failure is retained as the bug-finding evidence; this does not claim all extensions are compatible.
+
+### E119 — corrected seed external assertion (verified)
+- Fresh streaming seed run after the harness expectation fix passed its own external assertion: `NATIVE_LIVE_EDITED`; session contained 3 toolResult and 4 assistant messages.
