@@ -113,8 +113,9 @@ impl PiRuntime {
             }
             // Do not silently replay an unfinished persisted tool on reopen.
             let mut unresolved = vec![];
+            let resolved: std::collections::HashSet<Value> = store.snapshot()?["branch"].as_array().unwrap().iter().filter(|e| e["customType"]=="pi-rs.in-flight.v1" && e["data"]["state"]=="resolved").map(|e|e["data"]["toolCallId"].clone()).collect();
             for entry in store.snapshot()?["branch"].as_array().unwrap() {
-                if entry["type"]=="custom" && entry["customType"]=="pi-rs.in-flight.v1" && entry["data"]["state"]=="pending" { unresolved.push(entry["data"]["toolCallId"].clone()); }
+                if entry["type"]=="custom" && entry["customType"]=="pi-rs.in-flight.v1" && entry["data"]["state"]=="pending" && !resolved.contains(&entry["data"]["toolCallId"]) { unresolved.push(entry["data"]["toolCallId"].clone()); }
                 if entry["type"] != "message" {
                     continue;
                 }
@@ -159,6 +160,12 @@ impl PiRuntime {
             if !matches!(name,"write"|"edit"|"bash") { bail!("in-flight marker requires mutation tool"); }
             Self::append(store,json!({"type":"custom","customType":"pi-rs.in-flight.v1","data":{"requestId":request["requestId"],"toolCallId":request["toolCallId"],"toolName":name,"state":"pending"}}),timestamp)?;
             return Ok(json!({"type":"marked"}));
+        }
+        if op == "resolve_in_flight" {
+            let tool_call_id=request["toolCallId"].as_str().context("toolCallId required")?;
+            let outcome=request["outcome"].as_str().context("outcome required")?;
+            Self::append(store,json!({"type":"custom","customType":"pi-rs.in-flight.v1","data":{"requestId":request["requestId"],"toolCallId":tool_call_id,"toolName":request["toolName"],"state":"resolved","outcome":outcome}}),timestamp)?;
+            return Ok(json!({"type":"resolved"}));
         }
         let expected_kind = if op == "model_result" {
             "model"
