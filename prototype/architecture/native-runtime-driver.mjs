@@ -39,13 +39,19 @@ export async function drive({manager,host,prompt,stream,trace=[],onToolUpdate=()
       trace.push({type:'tool_result',requestId,tool:call.name,isError});
     } else if(action.type==='tool_batch') {
       trace.push({type:'tool_batch_start',batchId:action.batchId,calls:action.calls.length});
-      const results=await Promise.all(action.calls.map(async entry=>{
-        const call=entry.call??entry; let result,isError=false;
+      // Preflight the complete batch before admitting any execution. This is
+      // required by pinned Pi's parallel agent loop and prevents partial writes.
+      const prepared=action.calls.map(entry=>{
+        const call=entry.call??entry;
+        const registered=host.runner.getAllRegisteredTools().find(t=>t.definition.name===call.name);
+        if(!registered) throw Error(`Tool ${call.name} not found`);
+        const tool=wrapRegisteredTool(registered,host.runner);
+        return {entry,call,tool,args:validateToolArguments(tool,call)};
+      });
+      const results=await Promise.all(prepared.map(async ({entry,call,tool,args})=>{
+        let result,isError=false;
         try {
-          const registered=host.runner.getAllRegisteredTools().find(t=>t.definition.name===call.name);
-          if(!registered) throw Error(`Tool ${call.name} not found`);
-          const tool=wrapRegisteredTool(registered,host.runner);
-          result=await executeWithUpdates(tool,call.id,validateToolArguments(tool,call),new AbortController().signal,async update=>{
+          result=await executeWithUpdates(tool,call.id,args,new AbortController().signal,async update=>{
             trace.push({type:'tool_update',tool:call.name});
             await onToolUpdate({toolCallId:call.id,toolName:call.name,partialResult:update,requestId:entry.requestId});
           });
