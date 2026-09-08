@@ -117,3 +117,5 @@ Verified E041: isolated native live mutation/resume passed across two processes 
 Verified E042: three fresh isolated native live seed/resume runs with gpt-5.6-luna passed. Each autonomously wrote `NATIVE_LIVE_OK` through unchanged JS `write`, resumed in a new process, read the file, and passed an external exact-content check without steering. This is a small scenario; edit/bash, crash recovery, streaming and broad plugin compatibility remain open.
 
 Verified E043: native live resume autonomously selected `edit`, replaced NATIVE_LIVE_OK with NATIVE_LIVE_EDITED, then selected `read`; external exact-content check passed. This is a simple exact replacement fixture and not full Pi edit semantics; bash, repeated edit runs, crash recovery and broader compatibility remain open.
+
+Post-system-prompt live check: isolated seed/resume with gpt-5.6-luna still completed write, edit and read through unchanged JS tools; external target content was `NATIVE_LIVE_EDITED`. This is a regression smoke, not a new reliability sample.
