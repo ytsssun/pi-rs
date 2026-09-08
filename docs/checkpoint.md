@@ -167,3 +167,5 @@ T066 in progress: live harness now accepts `parallel` stage and passes `parallel
 Verified E067: live `gpt-5.6-luna` with existing `.env` completed the opt-in parallel stage in an isolated workspace. Rust emitted tool batches; unchanged-style JS write/read tools produced two files exactly `PARALLEL_OK`, then model follow-up reads completed. Trace had no steering. This is one live run, not a reliability or performance claim.
 
 Verified E068: three additional fresh isolated live `gpt-5.6-luna` parallel runs passed (3/3). Each produced two batch phases and exact external `PARALLEL_OK` contents for both files, with no steering. This is narrow scenario reliability evidence, not general Pi compatibility or performance evidence.
+
+Verified E069: a live `gpt-5.6-luna` parallel session was closed and reopened in a fresh process; `parallel-resume` independently read both prior files and completed without replaying writes. External contents remained exact `PARALLEL_OK`. One recovery run, no steering.
