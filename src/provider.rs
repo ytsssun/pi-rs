@@ -10,6 +10,21 @@ pub fn parse_sse_data(data: &str) -> Result<Option<Value>> {
     Ok(Some(serde_json::from_str(&payload).context("invalid SSE JSON payload")?))
 }
 
+#[derive(Default)]
+pub struct SseDecoder { buffer: String }
+impl SseDecoder {
+    pub fn push(&mut self, chunk: &str) -> Result<Vec<Option<Value>>> {
+        self.buffer.push_str(chunk);
+        let mut out = Vec::new();
+        while let Some(pos) = self.buffer.find("\n\n") {
+            let event = self.buffer[..pos].to_string(); self.buffer.drain(..pos + 2);
+            if event.lines().any(|l| l.starts_with("data:")) { out.push(parse_sse_data(&event)?); }
+        }
+        Ok(out)
+    }
+    pub fn finish(self) -> Result<()> { if self.buffer.trim().is_empty() { Ok(()) } else { bail!("SSE ended with incomplete event") } }
+}
+
 pub fn client() -> Result<Client> {
     Ok(Client::builder()
         .timeout(std::time::Duration::from_secs(120))
@@ -45,11 +60,16 @@ pub fn openai_chat(client: &Client, base: &str, key: &str, model: &str, messages
 
 #[cfg(test)]
 mod tests {
-    use super::parse_sse_data;
+    use super::{parse_sse_data, SseDecoder};
     #[test]
     fn parses_multiline_data_and_done() {
         assert_eq!(parse_sse_data("event: message\ndata: {\"x\":\ndata: 1}\n\n").unwrap().unwrap()["x"], 1);
         assert!(parse_sse_data("data: [DONE]\n\n").unwrap().is_none());
         assert!(parse_sse_data("data: nope\n").is_err());
+        let mut decoder = SseDecoder::default();
+        assert!(decoder.push("data: {\"a\":").unwrap().is_empty());
+        let events = decoder.push("1}\n\ndata: [DONE]\n\n").unwrap();
+        assert_eq!(events.len(), 2); assert_eq!(events[0].as_ref().unwrap()["a"], 1); assert!(events[1].is_none());
+        assert!(decoder.finish().is_ok());
     }
 }
