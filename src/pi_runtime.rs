@@ -45,8 +45,9 @@ impl PiRuntime {
             self.sequence
         );
         if self.parallel && self.batch.is_none() && self.tools.len() > 1 {
-            let calls: Vec<Value> = self.tools.drain(..).collect();
+            let mut calls: Vec<Value> = self.tools.drain(..).collect();
             let batch_id = format!("batch-{id}");
+            for call in &mut calls { self.sequence = self.sequence.checked_add(1).context("request sequence exhausted")?; call["requestId"] = json!(format!("{}:{}", store.snapshot()?["entries"].as_array().unwrap().len(), self.sequence)); }
             self.batch = Some((batch_id.clone(), calls.clone()));
             self.waiting = Some(("batch".into(), batch_id.clone()));
             return Ok(json!({"type":"tool_batch","batchId":batch_id,"calls":calls}));
@@ -164,6 +165,7 @@ impl PiRuntime {
             let results = request["results"].as_array().context("results array required")?;
             if results.len() != calls.len() { bail!("batch result count mismatch"); }
             for (call, result) in calls.iter().zip(results) {
+                if result["requestId"] != call["requestId"] { bail!("batch result requestId mismatch"); }
                 let message = json!({"role":"toolResult","toolCallId":call["id"],"toolName":call["name"],"content":result.get("content").cloned().unwrap_or(json!([])),"details":result["details"],"isError":result["isError"].as_bool().unwrap_or(false),"timestamp":request["messageTimestamp"].as_u64().unwrap_or(0)});
                 Self::append(store, json!({"type":"message","message":message}), timestamp)?;
             }
