@@ -34,8 +34,9 @@ export async function createHost(backend, { factories = [], cwd = process.cwd(),
   runner.onError(({ event, error }) => errors.push({ event, error }));
   const actions = Object.fromEntries([
     'sendMessage', 'sendUserMessage', 'appendEntry', 'setSessionName', 'getSessionName', 'setLabel',
-    'getCommands', 'setModel', 'getThinkingLevel', 'setThinkingLevel', 'refreshTools',
+    'getCommands', 'setModel', 'setThinkingLevel', 'refreshTools',
   ].map((name) => [name, unsupported(name)]));
+  Object.assign(actions, { getThinkingLevel: () => 'off' });
   Object.assign(actions, {
     getActiveTools: () => {
       const names = backend.getActiveTools();
