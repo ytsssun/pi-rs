@@ -169,7 +169,7 @@ fn process_lock_rejects_owner_releases_on_death_and_preserves_suffix() {
         unsafe { libc::flock(lock.as_raw_fd(), libc::LOCK_EX | libc::LOCK_NB) },
         0
     );
-    let blocked = Command::new(env!("CARGO_BIN_EXE_pi-rs"))
+    let blocked = Command::new(env!("CARGO_BIN_EXE_pi-rs-legacy"))
         .args(["--input", "hi", "--session"])
         .arg(&p)
         .arg("--fixture")
@@ -182,7 +182,7 @@ fn process_lock_rejects_owner_releases_on_death_and_preserves_suffix() {
     drop(lock);
     let listener = TcpListener::bind("127.0.0.1:0").unwrap();
     listener.set_nonblocking(true).unwrap();
-    let mut child = Command::new(env!("CARGO_BIN_EXE_pi-rs"))
+    let mut child = Command::new(env!("CARGO_BIN_EXE_pi-rs-legacy"))
         .args(["--input", "hi", "--session"])
         .arg(&p)
         .args(["--model", "test"])
@@ -214,7 +214,7 @@ fn process_lock_rejects_owner_releases_on_death_and_preserves_suffix() {
         accepted.is_some(),
         "CLI never reached model while holding lock"
     );
-    let resumed = Command::new(env!("CARGO_BIN_EXE_pi-rs"))
+    let resumed = Command::new(env!("CARGO_BIN_EXE_pi-rs-legacy"))
         .args(["--resume", "--session"])
         .arg(&p)
         .arg("--fixture")

@@ -2,7 +2,7 @@
 """Read pagination across process exit. Loopback HTTP double, real file reads."""
 import http.server,json,os,pathlib,subprocess,tempfile,threading
 ROOT=pathlib.Path(__file__).resolve().parent.parent
-BIN=pathlib.Path(os.environ.get('PI_RS_BIN',ROOT/'target/debug/pi-rs'))
+BIN=pathlib.Path(os.environ.get('PI_RS_BIN',ROOT/'target/debug/pi-rs-legacy'))
 requests=[];checks=[]
 def check(name,value):
     if not value: raise AssertionError(name)

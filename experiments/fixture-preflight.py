@@ -6,7 +6,7 @@ with tempfile.TemporaryDirectory(prefix='pi-fixture-preflight-') as tmp:
     wd=pathlib.Path(tmp); session=wd/'session.json'; good=wd/'good.json'; bad=wd/'bad.json'
     good.write_text('[{"role":"assistant","content":"done"}]');bad.write_text('{')
     def cli(*args):
-        return subprocess.run([str(root/'target/debug/pi-rs'),'--session',str(session),*map(str,args)],capture_output=True,text=True,timeout=10)
+        return subprocess.run([str(root/'target/debug/pi-rs-legacy'),'--session',str(session),*map(str,args)],capture_output=True,text=True,timeout=10)
     first=cli('--input','start','--workspace',wd,'--fixture',good)
     assert first.returncode==0,first.stderr
     original=session.read_bytes()

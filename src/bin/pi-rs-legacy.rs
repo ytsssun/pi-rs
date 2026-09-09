@@ -1,0 +1,192 @@
+use anyhow::{bail, Context, Result};
+use pi_rs::{appended_path, run_with_options, Session};
+use serde_json::Value;
+use std::{env, fs, path::Path};
+fn main() -> Result<()> {
+    let args: Vec<String> = env::args().skip(1).collect();
+    if args.is_empty() || args.iter().any(|a| a == "--help") {
+        println!("pi-rs-legacy (--input TEXT | --resume) --session FILE [--workspace DIR] (--fixture FILE | --model NAME) [--max-rounds N] [--reasoning-effort none|low|medium|high|xhigh|max] [--context-tool-chars N|none]\nReal calls use OPENAI_API_KEY and optional OPENAI_BASE_URL (default https://api.openai.com/v1). Default tool: paginated UTF-8 workspace read; write, edit and bash require --allow-mutations. Resume with --input TEXT appends a turn only after completion. --allow-mutations enables write/edit/bash for this invocation. --resolve-in-flight TEXT records an inspected uncertain outcome without replay. Fixtures use the full-session assistant message index, including previous turns. Context-tool-chars persists; use none to restore full canonical tool results in the model view.");
+        return Ok(());
+    }
+    let mut options = std::collections::HashMap::new();
+    let mut resume = false;
+    let mut allow_mutations = false;
+    let mut i = 0;
+    while i < args.len() {
+        if args[i] == "--allow-mutations" {
+            allow_mutations = true;
+            i += 1;
+            continue;
+        }
+        if args[i] == "--resume" {
+            if resume {
+                bail!("duplicate resume");
+            }
+            resume = true;
+            i += 1;
+            continue;
+        }
+        let key = args[i].as_str();
+        if ![
+            "--input",
+            "--session",
+            "--workspace",
+            "--fixture",
+            "--model",
+            "--reasoning-effort",
+            "--max-rounds",
+            "--context-tool-chars",
+            "--resolve-in-flight",
+        ]
+        .contains(&key)
+        {
+            bail!("unknown argument {key}");
+        }
+        let value = args.get(i + 1).context("missing argument value")?.clone();
+        if options.insert(key.to_owned(), value).is_some() {
+            bail!("duplicate option {key}");
+        }
+        i += 2;
+    }
+    let path = Path::new(options.get("--session").context("--session required")?);
+    if !resume && !options.contains_key("--input") {
+        bail!("provide --input or --resume");
+    }
+    if options.contains_key("--fixture") == options.contains_key("--model") {
+        bail!("provide exactly one of --fixture or --model");
+    }
+    if let Some(effort) = options.get("--reasoning-effort") {
+        if options.contains_key("--fixture") {
+            bail!("--reasoning-effort requires --model");
+        }
+        if !["none", "low", "medium", "high", "xhigh", "max"].contains(&effort.as_str()) {
+            bail!("unsupported --reasoning-effort");
+        }
+    }
+    let rounds: usize = options
+        .get("--max-rounds")
+        .map(String::as_str)
+        .unwrap_or("8")
+        .parse()?;
+    if !(1..=100).contains(&rounds) {
+        bail!("rounds must be 1..100");
+    }
+    let context_policy = options
+        .get("--context-tool-chars")
+        .map(|s| -> Result<Option<usize>> {
+            if s == "none" {
+                Ok(None)
+            } else {
+                Ok(Some(s.parse::<usize>()?))
+            }
+        })
+        .transpose()?;
+    let trim = context_policy.flatten();
+    if options.contains_key("--resolve-in-flight") && (!resume || options.contains_key("--input")) {
+        bail!("--resolve-in-flight requires --resume without --input");
+    }
+    // Validate local transport input before creating or changing durable state.
+    let fixture: Option<Vec<Value>> = options
+        .get("--fixture")
+        .map(|p| -> Result<_> { Ok(serde_json::from_slice(&fs::read(p)?)?) })
+        .transpose()?;
+    // Keep the lock inode permanently. flock ownership ends when this process dies.
+    let lock_path = appended_path(path, ".lock");
+    let _lock = fs::OpenOptions::new()
+        .read(true)
+        .write(true)
+        .create(true)
+        .truncate(false)
+        .open(&lock_path)
+        .context("cannot open session lock; create its parent directory first")?;
+    #[cfg(unix)]
+    {
+        use std::os::fd::AsRawFd;
+        if unsafe { libc::flock(_lock.as_raw_fd(), libc::LOCK_EX | libc::LOCK_NB) } != 0 {
+            bail!("session locked by another process");
+        }
+    }
+    #[cfg(not(unix))]
+    {
+        bail!("session process locking currently requires Unix");
+    }
+    let mut session = if resume {
+        Session::load(path)?
+    } else {
+        if path.exists() {
+            bail!("session exists; use --resume or another path");
+        }
+        let s = Session::new(
+            Path::new(
+                options
+                    .get("--workspace")
+                    .map(String::as_str)
+                    .unwrap_or("."),
+            ),
+            &options["--input"],
+        )?;
+        s.save(path)?;
+        s
+    };
+    if resume {
+        if let Some(workspace) = options.get("--workspace") {
+            if Path::new(workspace).canonicalize()? != session.workspace {
+                bail!("--workspace does not match the saved session workspace");
+            }
+        }
+    }
+    if let Some(outcome) = options.get("--resolve-in-flight") {
+        session.resolve_in_flight(outcome)?;
+        session.save(path)?;
+    }
+    if resume {
+        if let Some(input) = options.get("--input") {
+            session.append_user(input)?;
+            session.save(path)?;
+        }
+    }
+    let mut definitions = pi_rs::tools::definitions();
+    if !allow_mutations {
+        definitions
+            .as_array_mut()
+            .unwrap()
+            .retain(|t| t["function"]["name"] == "read");
+    }
+    let client = pi_rs::provider::client()?;
+    if context_policy == Some(None) {
+        if session.in_flight.is_some() {
+            bail!(
+                "cannot change context policy while a tool outcome is uncertain; resolve it first"
+            );
+        }
+        if session.set_context_policy(None)? {
+            session.save(path)?;
+        }
+    }
+    let answer = run_with_options(
+        &mut session,
+        path,
+        rounds,
+        trim,
+        allow_mutations,
+        |messages, cursor| {
+            if let Some(f) = &fixture {
+                return f.get(cursor).cloned().context("fixture exhausted");
+            }
+            let key = env::var("OPENAI_API_KEY").context("OPENAI_API_KEY missing")?;
+            let base =
+                env::var("OPENAI_BASE_URL").unwrap_or_else(|_| "https://api.openai.com/v1".into());
+            pi_rs::provider::openai_chat(
+                &client,
+                &base,
+                &key,
+                options["--model"].as_str(),
+                messages,
+                &definitions,
+                options.get("--reasoning-effort").map(String::as_str),
+            )
+        },
+    )?;
+    println!("{answer}");
+    Ok(())
+}

@@ -41,7 +41,7 @@ def main():
     p.add_argument('--gate', type=Path, help='previous successful summary.json')
     a = p.parse_args()
     os.umask(0o077)
-    binary = ROOT / 'target/debug/pi-rs'
+    binary = ROOT / 'target/debug/pi-rs-legacy'
     output = a.output.resolve()
     if ROOT / '.runs' not in output.parents:
         p.error('output must be a new directory below project .runs')

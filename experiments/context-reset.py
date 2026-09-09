@@ -19,7 +19,7 @@ try:
         session=wd/'session.json'
         env={**os.environ, 'OPENAI_API_KEY':'local-test-only','OPENAI_BASE_URL':f'http://127.0.0.1:{server.server_port}/v1'}
         def cli(*args):
-            return subprocess.run([str(root/'target/debug/pi-rs'),'--session',str(session),'--model','local',*map(str,args)],env=env,capture_output=True,text=True,timeout=10)
+            return subprocess.run([str(root/'target/debug/pi-rs-legacy'),'--session',str(session),'--model','local',*map(str,args)],env=env,capture_output=True,text=True,timeout=10)
         first=cli('--input','read','--workspace',wd,'--context-tool-chars','2')
         assert first.returncode==0,first.stderr
         before=json.loads(session.read_text())

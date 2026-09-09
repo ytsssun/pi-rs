@@ -34,7 +34,7 @@ if options.edit:
 fixture_path = base / 'fixture.json'
 fixture_path.write_text(json.dumps(fixture, indent=2))
 session = base / 'session.json'
-cmd = [str(ROOT / 'target/debug/pi-rs'), '--session', str(session), '--fixture', str(fixture_path), '--allow-mutations']
+cmd = [str(ROOT / 'target/debug/pi-rs-legacy'), '--session', str(session), '--fixture', str(fixture_path), '--allow-mutations']
 subprocess.run(cmd + ['--workspace', str(repo), '--input', 'Fix addition and run its test'], check=True)
 subprocess.run(cmd + ['--resume', '--input', 'Add multiplication and test both operations'], check=True)
 history = json.loads(session.read_text())['messages']

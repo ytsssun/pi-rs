@@ -1,5 +1,15 @@
 # Current checkpoint
 
+Formal Cargo `pi-rs` now launches the existing Node host with Rust Node-API runtime and original Pi tools/extensions. Build: `python3 scripts/build-native-session.py` then `cargo build --locked --bin pi-rs`. Source checkout and Node dependencies remain required; this is not a standalone package.
+
+Deterministic external acceptance: `python3 experiments/formal-cli.py` passes original write → new-process resume/edit, exact filesystem assertions, canonical prefix retention, and unchanged protected-path extension rejection. No live call was performed for this launcher migration. Legacy Rust snapshot CLI is preserved as `pi-rs-legacy`; historical harnesses explicitly target it.
+
+Next critical path: validate a live coding/test/resume task through the formal binary, then close lifecycle/blocked-tool-result conformance gaps in the existing Node-API driver. Do not add a second sidecar runtime. Full parity remains unmeasured; define an explicit upstream capability denominator before reporting a percentage.
+
+## Historical checkpoint (later corrections take precedence)
+
+# Current checkpoint
+
 E194: registered extension commands are now returned by pi.getCommands; regression reproduced before the fix and passes afterward. Prompt/skill command sources remain open. Next: validate command collision/namespacing against pinned upstream, then connect command execution to the unified entry. H031 rollback blocker is withdrawn: 6cbd0ed is an ancestor of d46844f; unchanged branch pointers were misinterpreted.
 
 E193 revalidates live actual-CLI provider continuation from the authoritative baseline: write in one process, edit after fresh --resume, exact external assertion passes.

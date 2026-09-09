@@ -1,6 +1,12 @@
 # Runtime details and compatibility limits
 
-## Behavior and recovery
+## Default CLI
+
+The default `pi-rs` launches the Node host with the Rust Node-API runtime and original Pi tools. Requires the source checkout, built addon, and upstream dependencies. Both new and resumed turns require explicit workspace and input. Extensions must be supplied on each invocation. Provider settings are not persisted. Full Pi lifecycle, cancellation, discovery and migration remain incomplete.
+
+## Legacy CLI behavior and recovery
+
+The following limits apply to `pi-rs-legacy`, not the original tools used by the default CLI.
 
 - `read`: UTF-8 regular file up to 8 MiB; positive integer `offset` (1-based) and `limit`, with Pi-style 2000-line/50 KiB output truncation and continuation notices. No images. Raw edit input remains capped at 64 KiB and never uses a rendered read page.
 - `write`: `{path,content}`, creates parents and atomically replaces files, maximum 1 MiB. Workspace traversal/symlink restrictions assume no hostile concurrent filesystem mutation.

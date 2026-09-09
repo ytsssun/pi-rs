@@ -2,7 +2,7 @@
 """Black-box acceptance, ephemeral workspace and local HTTP provider double."""
 import hashlib, http.server, json, os, pathlib, subprocess, tempfile, threading
 ROOT=pathlib.Path(__file__).resolve().parent.parent
-BIN=ROOT/'target/debug/pi-rs'
+BIN=ROOT/'target/debug/pi-rs-legacy'
 checks=[]
 def check(name, condition):
     if not condition: raise AssertionError(name)

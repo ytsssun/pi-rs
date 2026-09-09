@@ -4,7 +4,7 @@ Build first. PI_RS_BIN may select a binary built from a clean checkout.
 """
 import hashlib, http.server, json, os, pathlib, subprocess, tempfile, threading, time
 ROOT=pathlib.Path(__file__).resolve().parent.parent
-BIN=pathlib.Path(os.environ.get('PI_RS_BIN',ROOT/'target/debug/pi-rs')).resolve()
+BIN=pathlib.Path(os.environ.get('PI_RS_BIN',ROOT/'target/debug/pi-rs-legacy')).resolve()
 checks=[]
 def check(name,condition):
     if not condition: raise AssertionError(name)
