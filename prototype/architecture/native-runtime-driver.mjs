@@ -13,10 +13,14 @@ export async function drive({manager,host,prompt,stream,trace=[],onToolUpdate=()
     if(action.type==='done') {
       const messages = typeof host.drainMessages === 'function' ? host.drainMessages() : [];
       for (const queued of messages) {
-        if (queued.kind === 'agent' && queued.options?.triggerTurn === false && queued.options?.deliverAs === undefined || queued.options?.deliverAs === 'nextTurn') {
+        if (queued.kind === 'agent' && queued.options?.triggerTurn === false && (queued.options?.deliverAs === undefined || queued.options?.deliverAs === 'nextTurn')) {
           const message = queued.message;
           manager.appendCustomMessageEntry(message.customType, message.content ?? [], message.display, message.details);
           trace.push({type:'message_persisted', kind:queued.kind, customType:message.customType});
+        } else if (queued.kind === 'user' && queued.options?.deliverAs === 'followUp') {
+          const content = typeof queued.message === 'string' ? queued.message : queued.message?.content;
+          manager.appendMessage({role:'user', content: typeof content === 'string' ? content : (content ?? []), timestamp: Date.now()});
+          trace.push({type:'message_persisted', kind:queued.kind, deliverAs:'followUp'});
         } else if (!onMessage) {
           // Do not report delivery when the runtime has no scheduling consumer.
           host.pendingMessages.unshift(...messages.slice(messages.indexOf(queued)));

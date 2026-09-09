@@ -38,9 +38,9 @@ if (stage) {
     assert.equal(entries[note].display, false);
     if (stage === 'resume') {
       host.actions.sendUserMessage('continue', {deliverAs: 'followUp'});
-      await assert.rejects(drive({manager, host, prompt: 'unsupported scheduling', stream}), /requires a scheduling consumer/);
-      assert.equal(host.pendingMessages.length, 1, 'unsupported delivery must remain queued');
-      assert.deepEqual(host.pendingMessages[0].options, {deliverAs: 'followUp'});
+      await drive({manager, host, prompt: 'deferred follow-up', stream});
+      assert.equal(host.pendingMessages.length, 0, 'follow-up is persisted for the next turn');
+      assert.equal(manager.getEntries().filter(e => e.type === 'message' && e.message.role === 'user').at(-1).message, 'continue');
     }
   } finally {manager.close();}
 } else {
