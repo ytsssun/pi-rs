@@ -40,7 +40,7 @@ if (stage) {
       host.actions.sendUserMessage('continue', {deliverAs: 'followUp'});
       await drive({manager, host, prompt: 'deferred follow-up', stream});
       assert.equal(host.pendingMessages.length, 0, 'follow-up is persisted for the next turn');
-      assert.equal(manager.getEntries().filter(e => e.type === 'message' && e.message.role === 'user').at(-1).message, 'continue');
+      assert.equal(manager.getEntries().filter(e => e.type === 'message' && e.message.role === 'user').at(-1).message.content, 'continue');
     }
   } finally {manager.close();}
 } else {
