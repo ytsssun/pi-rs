@@ -31,7 +31,17 @@ export async function createHost(backend, { factories = [], cwd = process.cwd(),
   for (let i = 0; i < factories.length; i++) {
     loaded.extensions.push(await loadExtensionFromFactory(factories[i], cwd, eventBus, loaded.runtime, `<probe-${i}>`));
   }
-  const runner = new ExtensionRunner(loaded.extensions, loaded.runtime, cwd, sessionManager, guardedObject('modelRegistry'));
+  const providers = new Map();
+  const modelRegistry = {
+    registerProvider: (nameOrProvider, config) => {
+      const name = typeof nameOrProvider === 'string' ? nameOrProvider : nameOrProvider?.name;
+      if (!name) throw new Error('provider name required');
+      providers.set(name, typeof nameOrProvider === 'string' ? {name, ...config} : nameOrProvider);
+    },
+    unregisterProvider: name => providers.delete(name),
+    getProviders: () => new Map(providers),
+  };
+  const runner = new ExtensionRunner(loaded.extensions, loaded.runtime, cwd, sessionManager, modelRegistry);
   const errors = [];
   const lifecycleAbort = new AbortController();
   runner.onError(({ event, error }) => errors.push({ event, error }));
@@ -99,7 +109,7 @@ export async function createHost(backend, { factories = [], cwd = process.cwd(),
     assert.ok(definition, `unregistered tool: ${name}`);
     return { name, description: definition.description, parameters: definition.parameters };
   });
-  return { runner, eventBus, errors, execute, requestTools, runtime: loaded.runtime, actions, pendingMessages, drainMessages: () => pendingMessages.splice(0) };
+  return { runner, eventBus, errors, providers, execute, requestTools, runtime: loaded.runtime, actions, pendingMessages, drainMessages: () => pendingMessages.splice(0) };
 }
 
 export async function exercise(backend = tsBackend()) {

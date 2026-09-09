@@ -4,6 +4,10 @@
 
 The default `pi-rs` launches the Node host with the Rust Node-API runtime and original Pi tools. Requires the source checkout, built addon, and upstream dependencies. Both new and resumed turns require explicit workspace and input. Extensions must be supplied on each invocation. Provider settings are not persisted. Full Pi lifecycle, cancellation, discovery and migration remain incomplete.
 
+## Provider registration
+
+Extensions can register named provider configurations through the unchanged `pi.registerProvider(name, config)` API; the host now retains registrations and supports unregister. Model resolution, OAuth/API credential wiring, provider request execution, and scoped model enumeration remain unverified.
+
 ## Extension message delivery
 
 Custom messages sent during execution with explicit `triggerTurn: false` (except `deliverAs: nextTurn`) are appended as upstream-compatible `custom_message` entries after the current execution completes. They enter subsequent model context and survive process restart. Delivery options are retained. Other queued messages require a scheduling consumer; the CLI currently raises an explicit error instead of silently dropping them. Steering, follow-up turns, next-turn delivery, message lifecycle events, and pending-queue crash recovery remain open. Deterministic reproduction: `node --experimental-strip-types experiments/extension-message-recovery.mjs`.
