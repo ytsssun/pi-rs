@@ -200,6 +200,13 @@ impl Registry {
                             .store
                             .append(r["entry"].clone())
                             .map_err(|e| e.to_string()),
+                        "append_compaction" => store.store.append_compaction(
+                            r["id"].as_str().ok_or("id required")?,
+                            r["timestamp"].as_str().ok_or("timestamp required")?,
+                            r["summary"].as_str().ok_or("summary required")?,
+                            r["firstKeptEntryId"].as_str().ok_or("firstKeptEntryId required")?,
+                            r["tokensBefore"].as_i64().ok_or("tokensBefore required")?,
+                        ).map_err(|e| e.to_string()),
                         "branch" => store
                             .store
                             .branch(r["leaf"].clone())

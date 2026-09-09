@@ -71,6 +71,20 @@ impl PiSessionStore {
         self.leaf = leaf;
         Ok(())
     }
+    /// Append a validated Pi v3 compaction entry and advance the branch leaf.
+    pub fn append_compaction(&mut self, id: &str, timestamp: &str, summary: &str, first_kept_entry_id: &str, tokens_before: i64) -> Result<Value> {
+        if id.is_empty() || timestamp.is_empty() || summary.trim().is_empty() || first_kept_entry_id.is_empty() {
+            bail!("invalid compaction fields");
+        }
+        if tokens_before < 0 { bail!("tokensBefore must be nonnegative"); }
+        let snapshot = self.snapshot()?;
+        let entries = snapshot["entries"].as_array().unwrap();
+        if !entries.iter().any(|e| e["id"] == first_kept_entry_id) {
+            bail!("firstKeptEntryId not found");
+        }
+        self.append(serde_json::json!({"type":"compaction", "id":id, "timestamp":timestamp, "summary":summary, "firstKeptEntryId":first_kept_entry_id, "tokensBefore":tokens_before}))
+    }
+
     pub fn append(&mut self, mut entry: Value) -> Result<Value> {
         let id = entry["id"]
             .as_str()
