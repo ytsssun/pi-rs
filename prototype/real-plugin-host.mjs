@@ -37,7 +37,7 @@ export async function createHost(backend, { factories = [], cwd = process.cwd(),
     'setModel', 'setThinkingLevel',
   ].map((name) => [name, unsupported(name)]));
   let thinkingLevel = 'off';
-  Object.assign(actions, { getCommands: () => [], getThinkingLevel: () => thinkingLevel, setThinkingLevel: level => { thinkingLevel = level; }, refreshTools: () => undefined });
+  Object.assign(actions, { getCommands: () => runner.getRegisteredCommands().map(command => ({name: command.invocationName, description: command.description, source: 'extension', sourceInfo: command.sourceInfo})), getThinkingLevel: () => thinkingLevel, setThinkingLevel: level => { thinkingLevel = level; }, refreshTools: () => undefined });
   Object.assign(actions, {
     getActiveTools: () => {
       const names = backend.getActiveTools();

@@ -1,5 +1,7 @@
 # Current checkpoint
 
+E194: registered extension commands are now returned by pi.getCommands; regression reproduced before the fix and passes afterward. Prompt/skill command sources remain open. Next: validate command collision/namespacing against pinned upstream, then connect command execution to the unified entry. H031 rollback blocker is withdrawn: 6cbd0ed is an ancestor of d46844f; unchanged branch pointers were misinterpreted.
+
 E193 revalidates live actual-CLI provider continuation from the authoritative baseline: write in one process, edit after fresh --resume, exact external assertion passes.
 
 E192 verifies host action thinking-level roundtrip (off → high) through the bound extension runtime; this is in-process state only.
