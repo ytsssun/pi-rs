@@ -12,7 +12,7 @@ Reference: pinned Pi commit `9767ba275f3e9a5ee0f5c5342249b629ab1b2282`. This is 
 
 ## Partial
 
-- Extension messages: `triggerTurn:false` custom messages persist and re-enter context; steer, follow-up, and next-turn scheduling are not implemented.
+- Extension messages: `triggerTurn:false` and deferred `nextTurn` custom messages persist and re-enter context; in-turn steer and follow-up scheduling are not implemented.
 - Provider support: registration is retained; model resolution, scoped models, credentials refresh, OAuth, and provider breadth are incomplete.
 - Extension lifecycle: selected events and error propagation work; full 15-event ordering, cancellation, UI, and command context semantics remain unverified.
 - Session format: native snapshots and recovery are robust, but Pi SessionManager migration/import/export parity is incomplete.

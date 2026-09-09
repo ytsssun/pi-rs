@@ -13,7 +13,7 @@ if (stage) {
   try {
     const host = await createHost(tsBackend(), {sessionManager: manager, extensionPaths: [], factories: [pi => {
       if (stage === 'seed') pi.on('context', () => {
-        pi.sendMessage({customType: 'audit-note', content: 'remember this', display: false, details: {step: 1}}, {triggerTurn: false});
+        pi.sendMessage({customType: 'audit-note', content: 'remember this', display: false, details: {step: 1}}, {triggerTurn: false, deliverAs: 'nextTurn'});
       });
     }]});
     let requests = 0;
