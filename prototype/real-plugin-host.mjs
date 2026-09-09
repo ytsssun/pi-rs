@@ -32,10 +32,26 @@ export async function createHost(backend, { factories = [], cwd = process.cwd(),
   const runner = new ExtensionRunner(loaded.extensions, loaded.runtime, cwd, sessionManager, guardedObject('modelRegistry'));
   const errors = [];
   runner.onError(({ event, error }) => errors.push({ event, error }));
+  let sessionName;
+  const labels = new Map();
   const actions = Object.fromEntries([
-    'sendMessage', 'sendUserMessage', 'appendEntry', 'setSessionName', 'getSessionName', 'setLabel',
-    'setModel', 'setThinkingLevel',
+    'sendMessage', 'sendUserMessage', 'setModel',
   ].map((name) => [name, unsupported(name)]));
+  Object.assign(actions, {
+    appendEntry: async (entry) => {
+      assert.ok(sessionManager && typeof sessionManager.appendCustomEntry === 'function', 'sessionManager.appendCustomEntry required');
+      return sessionManager.appendCustomEntry('pi-rs.extension.entry.v1', entry);
+    },
+    setSessionName: async (name) => {
+      sessionName = String(name);
+      if (typeof sessionManager.appendCustomEntry === 'function') await sessionManager.appendCustomEntry('session_name', {name: sessionName});
+    },
+    getSessionName: () => sessionName,
+    setLabel: async (key, value) => {
+      labels.set(String(key), String(value));
+      if (typeof sessionManager.appendCustomEntry === 'function') await sessionManager.appendCustomEntry('session_label', {key: String(key), value: String(value)});
+    },
+  });
   let thinkingLevel = 'off';
   Object.assign(actions, { getCommands: () => runner.getRegisteredCommands().map(command => ({name: command.invocationName, description: command.description, source: 'extension', sourceInfo: command.sourceInfo})), getThinkingLevel: () => thinkingLevel, setThinkingLevel: level => { thinkingLevel = level; }, refreshTools: () => undefined });
   Object.assign(actions, {
