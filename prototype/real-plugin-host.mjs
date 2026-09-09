@@ -33,6 +33,7 @@ export async function createHost(backend, { factories = [], cwd = process.cwd(),
   }
   const runner = new ExtensionRunner(loaded.extensions, loaded.runtime, cwd, sessionManager, guardedObject('modelRegistry'));
   const errors = [];
+  const lifecycleAbort = new AbortController();
   runner.onError(({ event, error }) => errors.push({ event, error }));
   let sessionName;
   const labels = new Map();
@@ -83,7 +84,7 @@ export async function createHost(backend, { factories = [], cwd = process.cwd(),
   const contextActions = Object.fromEntries([
     'getSignal',
   ].map((name) => [name, unsupported(name)]));
-  Object.assign(contextActions, { getScopedModels: () => [], getSystemPrompt: () => '', abort: () => runner.invalidate('aborted by extension'), shutdown: () => runner.invalidate('shutdown requested'), getModel: () => selectedModel, isIdle: () => pendingMessages.length === 0, isProjectTrusted: () => true, hasPendingMessages: () => pendingMessages.length > 0 });
+  Object.assign(contextActions, { getSignal: () => lifecycleAbort.signal, getScopedModels: () => [], getSystemPrompt: () => '', abort: () => { lifecycleAbort.abort(); runner.invalidate('aborted by extension'); }, shutdown: () => runner.invalidate('shutdown requested'), getModel: () => selectedModel, isIdle: () => pendingMessages.length === 0, isProjectTrusted: () => true, hasPendingMessages: () => pendingMessages.length > 0 });
   Object.assign(contextActions, { getContextUsage: () => { const entries = typeof sessionManager.getEntries === 'function' ? sessionManager.getEntries() : []; return estimateContextTokens(entries.flatMap(sessionEntryToContextMessages)); }, compact: async (options = {}) => { assert.ok(typeof sessionManager.appendCompaction === 'function', 'sessionManager.appendCompaction required'); return sessionManager.appendCompaction(String(options.summary ?? ''), options.firstKeptEntryId, Number(options.tokensBefore ?? 0)); } });
   runner.bindCore(actions, contextActions);
   const execute = async (name, params) => {
