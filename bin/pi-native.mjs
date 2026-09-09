@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // Experimental user entry: original Pi tools/extension host, Rust loop/store.
-import {readFileSync, existsSync, writeFileSync} from 'node:fs';
+import {readFileSync, existsSync, writeFileSync, appendFileSync} from 'node:fs';
 import {basename, resolve} from 'node:path';
 const args=process.argv.slice(2), options={}, extensions=[];
 if(args.includes('--help')) {
@@ -44,6 +44,7 @@ try {
     let commandError = null;
     try { await command.handler(commandArgs, host.runner.createCommandContext()); } catch (error) { commandError = error instanceof Error ? error.message : String(error); }
     await manager.appendCustomEntry('pi-rs.command.v1', {name: options['--command'], args: commandArgs, ok: commandError === null, error: commandError});
+    if (!existsSync(path)) appendFileSync(path, JSON.stringify({type:'custom',customType:'pi-rs.command.v1',data:{name: options['--command'],args: commandArgs,ok: commandError === null,error: commandError}})+'\n');
     if (commandError) throw Error(`command ${options['--command']} failed: ${commandError}`);
     commandResult = {name: options['--command'], args: commandArgs, dispatched: true};
   }
