@@ -2,7 +2,7 @@
 
 ## Default CLI
 
-The default `pi-rs` launches the Node host with the Rust Node-API runtime and original Pi tools. Requires the source checkout, built addon, and upstream dependencies. Both new and resumed turns require explicit workspace and input. Extensions must be supplied on each invocation. Provider settings are not persisted. Full Pi lifecycle, cancellation, discovery and migration remain incomplete.
+The default `pi-rs` launches the Node host with the Rust Node-API runtime and original Pi tools. Requires the source checkout, built addon, and upstream dependencies. Both new and resumed turns require explicit workspace and input. Extensions must be supplied on each invocation. Provider settings are not persisted. The OpenAI-compatible streaming transport is live-verified for tool continuation, but incremental event exposure to the JS/UI boundary is not yet provided. Full Pi lifecycle, cancellation, discovery and migration remain incomplete.
 
 ## Provider registration
 
