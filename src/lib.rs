@@ -395,3 +395,8 @@ mod context_size_tests {
         assert!(estimate_context_tokens(&json!("🙂🙂🙂🙂")) >= 1);
     }
 }
+
+/// Returns whether a projected context exceeds an explicit conservative limit.
+pub fn context_exceeds_limit(value: &Value, limit_tokens: usize) -> bool {
+    estimate_context_tokens(value) > limit_tokens
+}
