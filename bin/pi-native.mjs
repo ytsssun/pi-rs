@@ -41,7 +41,10 @@ try {
     if (!command) throw Error(`unknown command: ${options['--command']}`);
     const rawArgs = options['--commandArgsParsed'];
     const commandArgs = typeof rawArgs === 'string' ? rawArgs : (rawArgs === undefined ? '' : JSON.stringify(rawArgs));
-    await command.handler(commandArgs, host.runner.createCommandContext());
+    let commandError = null;
+    try { await command.handler(commandArgs, host.runner.createCommandContext()); } catch (error) { commandError = error instanceof Error ? error.message : String(error); }
+    await manager.appendCustomEntry('pi-rs.command.v1', {name: options['--command'], args: commandArgs, ok: commandError === null, error: commandError});
+    if (commandError) throw Error(`command ${options['--command']} failed: ${commandError}`);
     commandResult = {name: options['--command'], args: commandArgs, dispatched: true};
   }
   let index=0;
