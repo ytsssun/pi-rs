@@ -6,6 +6,8 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { createEventBus } from '../vendor/pi-mono/packages/coding-agent/src/core/event-bus.ts';
 import { loadExtensions, loadExtensionFromFactory } from '../vendor/pi-mono/packages/coding-agent/src/core/extensions/loader.ts';
 import { ExtensionRunner } from '../vendor/pi-mono/packages/coding-agent/src/core/extensions/runner.ts';
+import { sessionEntryToContextMessages } from '../vendor/pi-mono/packages/coding-agent/src/core/session-manager.ts';
+import { estimateContextTokens } from '../vendor/pi-mono/packages/coding-agent/src/core/compaction/compaction.ts';
 
 export const pluginPath = fileURLToPath(new URL('../vendor/pi-mono/packages/coding-agent/examples/extensions/kimi-deferred-tools.ts', import.meta.url));
 export const pluginSha256 = createHash('sha256').update(readFileSync(pluginPath)).digest('hex');
@@ -67,9 +69,10 @@ export async function createHost(backend, { factories = [], cwd = process.cwd(),
     getAllTools: () => runner.getAllRegisteredTools().map(({ definition }) => definition),
   });
   const contextActions = Object.fromEntries([
-    'getScopedModels', 'getSignal', 'abort', 'shutdown', 'getContextUsage', 'compact', 'getSystemPrompt',
+    'getScopedModels', 'getSignal', 'abort', 'shutdown', 'getSystemPrompt',
   ].map((name) => [name, unsupported(name)]));
   Object.assign(contextActions, { getModel: () => undefined, isIdle: () => true, isProjectTrusted: () => true, hasPendingMessages: () => false });
+  Object.assign(contextActions, { getContextUsage: () => { const entries = typeof sessionManager.getEntries === 'function' ? sessionManager.getEntries() : []; return estimateContextTokens(entries.flatMap(sessionEntryToContextMessages)); }, compact: async (options = {}) => { assert.ok(typeof sessionManager.appendCompaction === 'function', 'sessionManager.appendCompaction required'); return sessionManager.appendCompaction(String(options.summary ?? ''), options.firstKeptEntryId, Number(options.tokensBefore ?? 0)); } });
   runner.bindCore(actions, contextActions);
   const execute = async (name, params) => {
     assert.ok(backend.getActiveTools().includes(name), `inactive tool: ${name}`);
