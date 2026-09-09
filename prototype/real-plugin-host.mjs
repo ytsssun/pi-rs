@@ -81,9 +81,9 @@ export async function createHost(backend, { factories = [], cwd = process.cwd(),
     getAllTools: () => runner.getAllRegisteredTools().map(({ definition }) => definition),
   });
   const contextActions = Object.fromEntries([
-    'getScopedModels', 'getSignal', 'abort', 'shutdown', 'getSystemPrompt',
+    'getScopedModels', 'getSignal', 'getSystemPrompt',
   ].map((name) => [name, unsupported(name)]));
-  Object.assign(contextActions, { getModel: () => selectedModel, isIdle: () => pendingMessages.length === 0, isProjectTrusted: () => true, hasPendingMessages: () => pendingMessages.length > 0 });
+  Object.assign(contextActions, { abort: () => runner.invalidate('aborted by extension'), shutdown: () => runner.invalidate('shutdown requested'), getModel: () => selectedModel, isIdle: () => pendingMessages.length === 0, isProjectTrusted: () => true, hasPendingMessages: () => pendingMessages.length > 0 });
   Object.assign(contextActions, { getContextUsage: () => { const entries = typeof sessionManager.getEntries === 'function' ? sessionManager.getEntries() : []; return estimateContextTokens(entries.flatMap(sessionEntryToContextMessages)); }, compact: async (options = {}) => { assert.ok(typeof sessionManager.appendCompaction === 'function', 'sessionManager.appendCompaction required'); return sessionManager.appendCompaction(String(options.summary ?? ''), options.firstKeptEntryId, Number(options.tokensBefore ?? 0)); } });
   runner.bindCore(actions, contextActions);
   const execute = async (name, params) => {
