@@ -22,7 +22,6 @@ for(const key of ['--session','--workspace']) if(!options[key]) throw Error(`${k
 if(!options['--input'] && !options['--command']) throw Error('one of --input or --command required');
 if(options['--command-args']) { try { options['--commandArgsParsed']=JSON.parse(options['--command-args']); } catch { throw Error('--command-args must be JSON'); } }
 if (!options['--command'] && !options['--resume'] && Boolean(options['--model'])===Boolean(options['--fixture'])) throw Error('choose exactly one of --model and --fixture');
-if (options['--resume'] && options['--fixture']) throw Error('--fixture cannot be combined with --resume');
 if (options['--command'] && (options['--model'] || options['--fixture'])) throw Error('--command cannot be combined with --model or --fixture');
 if (options['--compact-summary'] && (!options['--compact-first-kept'] || !options['--compact-tokens-before'])) throw Error('--compact-summary requires --compact-first-kept and --compact-tokens-before');
 if (options['--compact-summary'] && !options['--resume']) throw Error('compaction requires --resume');
