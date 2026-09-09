@@ -13,7 +13,7 @@ export async function drive({manager,host,prompt,stream,trace=[],onToolUpdate=()
     if(action.type==='done') {
       const messages = typeof host.drainMessages === 'function' ? host.drainMessages() : [];
       for (const queued of messages) {
-        if (queued.kind === 'agent' && queued.options?.triggerTurn === false && (queued.options?.deliverAs === undefined || queued.options?.deliverAs === 'nextTurn')) {
+        if (queued.kind === 'agent' && (queued.options?.triggerTurn === false || queued.options?.deliverAs === undefined || queued.options?.deliverAs === 'nextTurn' || queued.options?.deliverAs === 'steer')) {
           const message = queued.message;
           manager.appendCustomMessageEntry(message.customType, message.content ?? [], message.display, message.details);
           trace.push({type:'message_persisted', kind:queued.kind, customType:message.customType});
