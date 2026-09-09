@@ -20,16 +20,16 @@ pub fn chat_delta(chunk: &Value) -> Option<&Value> {
 
 /// Accumulates streamed text and tool-call argument fragments.
 #[derive(Default, Debug)]
-pub struct ChatDeltaAccumulator { pub text: String, pub tool_arguments: std::collections::BTreeMap<String, String> }
+pub struct ChatDeltaAccumulator { pub text: String, pub tool_arguments: std::collections::BTreeMap<String, (String, String)> }
 impl ChatDeltaAccumulator {
     pub fn push(&mut self, chunk: &Value) {
         let Some(delta) = chat_delta(chunk) else { return };
         if let Some(s) = delta.get("content").and_then(Value::as_str) { self.text.push_str(s); }
-        if let Some(calls) = delta.get("tool_calls").and_then(Value::as_array) { for c in calls { let key=c.get("id").and_then(Value::as_str).unwrap_or("").to_string(); if let Some(s)=c.pointer("/function/arguments").and_then(Value::as_str) { self.tool_arguments.entry(key).or_default().push_str(s); } } }
+        if let Some(calls) = delta.get("tool_calls").and_then(Value::as_array) { for c in calls { let key=c.get("id").and_then(Value::as_str).unwrap_or("").to_string(); let name=c.pointer("/function/name").and_then(Value::as_str).unwrap_or("").to_string(); if let Some(s)=c.pointer("/function/arguments").and_then(Value::as_str) { let e=self.tool_arguments.entry(key).or_insert((name, String::new())); e.1.push_str(s); } } }
     }
     pub fn message(&self) -> Value {
         let mut content = Vec::new(); if !self.text.is_empty() { content.push(json!({"type":"text","text":self.text})); }
-        for (id,args) in &self.tool_arguments { content.push(json!({"type":"toolCall","id":id,"name":"","arguments":args})); }
+        for (id,(name,args)) in &self.tool_arguments { content.push(json!({"type":"toolCall","id":id,"name":name,"arguments":args})); }
         json!({"role":"assistant","content":content})
     }
 }
