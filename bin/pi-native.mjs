@@ -36,10 +36,13 @@ const {createHost,tsBackend}=await import('../prototype/real-plugin-host.mjs');
 const {drive}=await import('../prototype/architecture/native-runtime-driver.mjs');
 const {nativeProviderStream}=await import('../prototype/architecture/native-provider-stream.mjs');
 const {createCodingTools}=await import('../vendor/pi-mono/packages/coding-agent/src/core/tools/index.ts');
+const {ModelRuntime}=await import('../vendor/pi-mono/packages/coding-agent/src/core/model-runtime.ts');
 const tools=createCodingTools(cwd);
 const manager=await createBackend({path,cwd,mode:options['--resume']?'open':'create'});
 const savedModel = manager.snapshot().entries.slice().reverse().find(e=>e.type==='custom' && e.customType==='pi-rs.model.v1')?.data?.model;
 const selectedModel = options['--model'] || savedModel;
+let resolvedModel;
+if (selectedModel) { const slash=selectedModel.indexOf('/'); const provider=slash>0?selectedModel.slice(0,slash):'openai'; const modelId=slash>0?selectedModel.slice(slash+1):selectedModel; const runtime=await ModelRuntime.create({modelsPath:null,refreshOnCreate:false,allowModelNetwork:false}); resolvedModel=runtime.getModel(provider, modelId); if (!resolvedModel) throw Error(`model not found: provider=${provider} id=${modelId}`); }
 if (!options['--command'] && !options['--fixture'] && !selectedModel) throw Error('--model required for new sessions or when no saved model exists');
 if (options['--model'] && options['--resume'] && options['--model'] !== savedModel) { /* explicit override is intentional */ }
   if (options['--branch']) await manager.branch(options['--branch']);
