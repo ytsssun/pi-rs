@@ -51,9 +51,9 @@ export async function createHost(backend, { factories = [], cwd = process.cwd(),
   Object.assign(actions, {
     sendMessage: async (message) => { pendingMessages.push({ kind: 'agent', message }); },
     sendUserMessage: async (message) => { pendingMessages.push({ kind: 'user', message }); },
-    appendEntry: async (entry) => {
+    appendEntry: (customType, data) => {
       assert.ok(sessionManager && typeof sessionManager.appendCustomEntry === 'function', 'sessionManager.appendCustomEntry required');
-      return sessionManager.appendCustomEntry('pi-rs.extension.entry.v1', entry);
+      sessionManager.appendCustomEntry(customType, data);
     },
     setSessionName: async (name) => {
       sessionName = String(name);

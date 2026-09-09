@@ -6,6 +6,8 @@ Deterministic external acceptance: `python3 experiments/formal-cli.py` passes or
 
 Live baseline now verified: gpt-5.4-mini completed bug, behavior, and fresh-process resume scenarios 9/9 with no steering (E223). Context-editing long-task validation has three preserved model-behavior failures: the model omitted a requirement read from diagnostics; runtime/provider/tool paths remained healthy (E224/E225). Extension message bindings (sendMessage/sendUserMessage) now enqueue deterministic agent/user messages and expose pending state (E235); real consumer-loop integration remains unverified. Next critical path: independently validate context projection bytes and then close lifecycle/blocked-tool-result conformance gaps in the existing Node-API driver. Do not add a second sidecar runtime. Full parity remains unmeasured; define an explicit upstream capability denominator before reporting a percentage.
 
+E242: extension `pi.appendEntry(customType, data)` now preserves both arguments through the original loader and native store; separate-process recovery passes after the first assistant message flush. Reproduce: `node --experimental-strip-types experiments/extension-entry-recovery.mjs`. Custom-only sessions retain upstream deferred persistence. Remaining priority: actual consumer semantics for queued extension messages and an evidence-backed parity denominator.
+
 ## Historical checkpoint (later corrections take precedence)
 
 # Current checkpoint
