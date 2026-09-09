@@ -19,7 +19,8 @@ for(let i=0;i<args.length;i++) {
 for(const key of ['--session','--workspace']) if(!options[key]) throw Error(`${key} required`);
 if(!options['--input'] && !options['--command']) throw Error('one of --input or --command required');
 if(options['--command-args']) { try { options['--commandArgsParsed']=JSON.parse(options['--command-args']); } catch { throw Error('--command-args must be JSON'); } }
-if(Boolean(options['--model'])===Boolean(options['--fixture'])) throw Error('choose exactly one of --model and --fixture');
+if (!options['--command'] && Boolean(options['--model'])===Boolean(options['--fixture'])) throw Error('choose exactly one of --model and --fixture');
+if (options['--command'] && (options['--model'] || options['--fixture'])) throw Error('--command cannot be combined with --model or --fixture');
 const path=resolve(options['--session']), cwd=resolve(options['--workspace']);
 if(existsSync(path)!==Boolean(options['--resume'])) throw Error('session existence does not match --resume');
 let fixture;
