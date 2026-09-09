@@ -1,5 +1,11 @@
 # pi-rs
 
+**A Rust core for the Pi coding-agent ecosystem.**
+
+Pi-rs is an experimental reimplementation of Pi’s core runtime in Rust. It keeps Pi’s TypeScript/Node.js extension boundary so existing Pi plugins can continue to run while the session, context, recovery, and execution loop evolve independently.
+
+This project is not yet a drop-in replacement for upstream [Pi](https://github.com/badlogic/pi-mono). The compatibility target is the core runtime plus the unchanged Pi ecosystem; compatibility is measured by behavior and evidence, not by a claim that a few demos cover every plugin.
+
 An experimental Rust coding-agent runtime with narrowly tested Pi compatibility. It can change files, execute tests, save a session, exit and continue a new user turn. Real OpenAI model coding and cross-process continuation have been independently verified on small fixed tasks. The first Luna baseline completed 8/9 tasks fully; one run omitted testing its new behavior despite correct code. See [live review](experiments/live-luna-review.md) and [current checkpoint](docs/checkpoint.md) for retry status and limitations. This is not yet a drop-in Pi replacement.
 
 ## Direction
@@ -60,16 +66,9 @@ provider configuration errors from task failures.
 
 Without `--allow-mutations`, only read is advertised and fabricated write/edit/bash calls return errors. With it, **bash runs with your host user's authority**, in the saved workspace. It is not a sandbox. Use a trusted disposable repository for experiments, and keep session state outside that repository. Codex login is not assumed to be a generic provider API key. Never commit credentials or real session content.
 
-## Behavior and recovery
+## Runtime details
 
-- `read`: UTF-8 regular file up to 8 MiB; positive integer `offset` (1-based) and `limit`, with Pi-style 2000-line/50 KiB output truncation and continuation notices. No images. Raw edit input remains capped at 64 KiB and never uses a rendered read page.
-- `write`: `{path,content}`, creates parents and atomically replaces files, maximum 1 MiB. Workspace traversal/symlink restrictions assume no hostile concurrent filesystem mutation.
-- `edit`: `{path,edits:[{oldText,newText}]}` targets original file ranges without cascading; BOM/newline handling and ambiguity rules are compared against pinned Pi. Source maximum 64 KiB. Fuzzy-only replacements, legacy argument coercion and rendered diff metadata are not supported; see [exact-profile evidence](experiments/edit-differential.md).
-- `bash`: `{command,timeout?}`, integer seconds, default 30/max 300; retains at most 32 KiB per stdout/stderr stream. Nonzero exit/timeout becomes an error tool result. Normal shell exit/timeout kills ordinary background descendants in its process group. Detached processes or abrupt runtime death are not contained.
-- `--resume` continues unfinished work or returns the saved final result. `--resume --input TEXT` appends only after the prior turn completed. A mismatched explicit workspace is rejected.
-- `--context-tool-chars N` persists a model-view truncation policy across resumes. Use `--context-tool-chars none` to clear it and restore full canonical tool results to the model view. Canonical tool results remain intact. Each real policy change appends a native `context_policy_changes` entry with previous/new limits and canonical message count. Reapplying the same limit adds no entry. This is a logical audit inside atomic snapshots, not a tamper-proof external log or branch system.
-- Native v1 JSON snapshots use fsync/rename and an appended `.lock` file with Unix flock. Old v1 sessions load with default new fields. Leave the permanent lock file in place; ownership releases on process death. A leftover `.tmp` from interrupted save requires inspection before removal; no automatic promotion of incomplete snapshots.
-- Before a write/edit/bash effect, an `in_flight` marker is saved. If the process dies before the result is saved, resume refuses automatic replay. Inspect files and surviving processes, then use `--resume --resolve-in-flight 'observed outcome'` with the normal model/fixture arguments. This records an operator-supplied result and continues; it does not re-run that call or prove exactly-once effects. Do not resolve while the original process is still changing files.
+Detailed tool limits, recovery semantics, context editing behavior, and known compatibility gaps live in [runtime details](docs/runtime-details.md).
 
 ## Verify the bounded compatibility profiles
 
@@ -92,37 +91,15 @@ Node 22.18+ is used for TypeScript stripping. Fixed Pi reference: `9767ba275f3e9
 
 Query durable tasks with `python3 scripts/board.py list`. Root and adapted-source licensing are recorded in LICENSE, NOTICE and compatibility/NOTICE. Full transitive distribution audit remains open before public release.
 
-## Experimental unified entry
+## Run the Rust-backed entry
 
-`bin/pi-native.mjs` connects the Rust Node-API loop/store to original Pi coding
- tool definitions and the existing extension host. It remains experimental and
- does not replace the legacy `cargo run` CLI yet. Build the addon and upstream
- dependencies first using `python3 scripts/build-native-session.py` and the
- documented upstream bootstrap.
+Build the native addon and upstream dependencies, then run `bin/pi-rs.mjs`:
 
 ```sh
-node --import ./vendor/pi-mono/node_modules/tsx/dist/loader.mjs bin/pi-native.mjs \
-  --session /absolute/new-session.jsonl --workspace /absolute/disposable-repo \
+python3 scripts/build-native-session.py
+node --import ./vendor/pi-mono/node_modules/tsx/dist/loader.mjs bin/pi-rs.mjs \
+  --session /absolute/new-session.json --workspace /absolute/disposable-repo \
   --input 'Read the repository' --model MODEL_ID
 ```
 
-Use `--resume` with the same session/workspace and a new input for another turn.
-`--extension FILE` loads an unchanged extension; only the host's currently
-implemented APIs are supported. Original coding tools include bash with host
-permissions. This entry exposes mutation tools without a sandbox; use disposable
-workspaces. `--fixture FILE` substitutes a per-invocation array of Pi assistant
-messages for the model, for deterministic integration checks. The array must include every assistant response requested by the loop, including responses after tool results; exhaustion is a deliberate error.
-
-### Live unified-entry recovery probe
-
-With an authorized `.env` containing the provider key, run the live parallel probe in an isolated workspace. The first process creates and reads two files; the second process reopens the same session and reads them again:
-
-```sh
-d=$(mktemp -d); mkdir "$d/workspace"
-node --env-file=.env --import ./vendor/pi-mono/node_modules/tsx/dist/loader.mjs \
-  experiments/native-live-harness.mjs "$d/session.json" parallel "$d/workspace"
-node --env-file=.env --import ./vendor/pi-mono/node_modules/tsx/dist/loader.mjs \
-  experiments/native-live-harness.mjs "$d/session.json" parallel-resume "$d/workspace"
-```
-
-The harness checks file contents independently of the model response and exits nonzero on failure. This demonstrates one live model scenario, not complete Pi compatibility.
+Use `--resume` with the same session and workspace. The entry is experimental; use a disposable workspace because mutation tools and `bash` run with the host user’s permissions. Fixture usage and live recovery probes are documented in [runtime details](docs/runtime-details.md).

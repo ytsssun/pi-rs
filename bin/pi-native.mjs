@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // Experimental user entry: original Pi tools/extension host, Rust loop/store.
 import {readFileSync, existsSync, writeFileSync} from 'node:fs';
-import {resolve} from 'node:path';
+import {basename, resolve} from 'node:path';
 const args=process.argv.slice(2), options={}, extensions=[];
 if(args.includes('--help')) {
   console.log('pi-native --session FILE --workspace DIR --input TEXT (--model ID | --fixture FILE) [--resume] [--extension FILE]');
