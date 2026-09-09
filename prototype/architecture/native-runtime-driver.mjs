@@ -5,14 +5,26 @@ import {request} from './native-store-backend.mjs';
 import {sessionEntryToContextMessages} from '../../vendor/pi-mono/packages/coding-agent/src/core/session-manager.ts';
 import {wrapRegisteredTool} from '../../vendor/pi-mono/packages/coding-agent/src/core/extensions/wrapper.ts';
 import {validateToolArguments} from '../../vendor/pi-mono/packages/ai/src/utils/validation.ts';
-export async function drive({manager,host,prompt,stream,trace=[],onToolUpdate=()=>{},onMessage=()=>{},propagateUpdateErrors=false,parallel=false}) {
+export async function drive({manager,host,prompt,stream,trace=[],onToolUpdate=()=>{},onMessage,propagateUpdateErrors=false,parallel=false}) {
   const step=payload=>request({op:'runtime',handle:manager.handle,...payload});
   let action=step({event:'begin',prompt,parallel});
   trace.push({type:'turn_start'});
   for(let count=0;count<32;count++) {
     if(action.type==='done') {
       const messages = typeof host.drainMessages === 'function' ? host.drainMessages() : [];
-      for (const queued of messages) { await onMessage(queued); trace.push({type:'message_consumed', kind:queued.kind}); }
+      for (const queued of messages) {
+        if (queued.kind === 'agent' && queued.options?.triggerTurn === false && queued.options?.deliverAs !== 'nextTurn') {
+          const message = queued.message;
+          manager.appendCustomMessageEntry(message.customType, message.content ?? [], message.display, message.details);
+          trace.push({type:'message_persisted', kind:queued.kind, customType:message.customType});
+        } else if (!onMessage) {
+          // Do not report delivery when the runtime has no scheduling consumer.
+          host.pendingMessages.unshift(...messages.slice(messages.indexOf(queued)));
+          throw Error('Extension message requires a scheduling consumer: triggerTurn/steer/followUp/nextTurn is not implemented');
+        }
+        if (onMessage) await onMessage(queued);
+        trace.push({type:'message_consumed', kind:queued.kind});
+      }
       trace.push({type:'turn_end',consumedMessages:messages.length}); return {action,trace,consumedMessages:messages};
     }
     const requestId=action.requestId;

@@ -49,8 +49,8 @@ export async function createHost(backend, { factories = [], cwd = process.cwd(),
   const pendingMessages = [];
   const actions = Object.fromEntries(['setModel'].map((name) => [name, unsupported(name)]));
   Object.assign(actions, {
-    sendMessage: async (message) => { pendingMessages.push({ kind: 'agent', message }); },
-    sendUserMessage: async (message) => { pendingMessages.push({ kind: 'user', message }); },
+    sendMessage: (message, options) => { pendingMessages.push({ kind: 'agent', message, options }); },
+    sendUserMessage: (message, options) => { pendingMessages.push({ kind: 'user', message, options }); },
     appendEntry: (customType, data) => {
       assert.ok(sessionManager && typeof sessionManager.appendCustomEntry === 'function', 'sessionManager.appendCustomEntry required');
       sessionManager.appendCustomEntry(customType, data);
