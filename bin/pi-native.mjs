@@ -57,7 +57,7 @@ try {
   let index=0;
   const stream=fixture?async()=>{const message=fixture[index++]; if(!message)throw Error(`fixture exhausted after ${index} assistant responses; provide the next assistant message for the tool result`);return {async *[Symbol.asyncIterator](){},async result(){return message;}};}:nativeProviderStream({model:options['--model'],streaming:true});
   const result=options['--input'] ? await drive({manager,host,prompt:options['--input'],stream}) : null;
-  const report={result,command:commandResult,session:path,fixture:Boolean(fixture),extensionErrors:host.errors};
+  const report={result,command:commandResult,compaction:options['--compact-summary']?manager.snapshot().contextEntries.find(e=>e.type==='compaction')??null:null,session:path,fixture:Boolean(fixture),extensionErrors:host.errors};
   if(options['--trace-file']) writeFileSync(resolve(options['--trace-file']),JSON.stringify(report,null,2)+'\n');
   console.log(JSON.stringify(report));
 } finally {await manager.close();}
