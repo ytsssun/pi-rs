@@ -1,0 +1,10 @@
+import assert from 'node:assert/strict';
+import {createHost,tsBackend} from '../prototype/real-plugin-host.mjs';
+const seen=[];
+const host=await createHost(tsBackend([]),{factories:[pi=>pi.registerCommand('greet',{description:'greet a user',handler:async(args,ctx)=>{seen.push({args,hasCtx:!!ctx});}})]});
+const commands=host.actions.getCommands();
+assert.deepEqual(commands.map(c=>c.name),['greet']);
+const command=host.runner.getCommand('greet'); assert.ok(command);
+await command.handler('Ada',host.runner.createCommandContext());
+assert.deepEqual(seen,[{args:'Ada',hasCtx:true}]);
+console.log(JSON.stringify({verified:true,registered:commands,dispatch:seen}));
