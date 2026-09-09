@@ -10,7 +10,7 @@ Extensions can register named provider configurations through the unchanged `pi.
 
 ## Extension message delivery
 
-Custom messages sent during execution with explicit `triggerTurn: false` (except `deliverAs: nextTurn`) are appended as upstream-compatible `custom_message` entries after the current execution completes. They enter subsequent model context and survive process restart. Delivery options are retained. Headless `steer`, `followUp`, and `nextTurn` are currently persisted at turn end as deferred fallbacks; they do not interrupt an in-flight provider request or start a nested turn. Message lifecycle events and pending-queue crash recovery remain open. Deterministic reproduction: `node --experimental-strip-types experiments/extension-message-recovery.mjs`.
+Custom messages sent during execution with explicit `triggerTurn: false` or deferred delivery options are appended as upstream-compatible `custom_message` entries after the current execution completes. They enter subsequent model context and survive process restart. Delivery options are retained. Headless `steer`, `followUp`, and `nextTurn` are currently persisted at turn end as deferred fallbacks; they do not interrupt an in-flight provider request or start a nested turn. Message lifecycle events and pending-queue crash recovery remain open. Deterministic reproduction: `node --experimental-strip-types experiments/extension-message-recovery.mjs`.
 
 ## Legacy CLI behavior and recovery
 
