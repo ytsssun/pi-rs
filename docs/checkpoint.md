@@ -6,6 +6,8 @@ Deterministic external acceptance: `python3 experiments/formal-cli.py` passes or
 
 Live baseline now verified: gpt-5.4-mini completed bug, behavior, and fresh-process resume scenarios 9/9 with no steering (E223). Context-editing long-task validation has three preserved model-behavior failures: the model omitted a requirement read from diagnostics; runtime/provider/tool paths remained healthy (E224/E225). E243 verifies explicit non-trigger custom messages persist after execution and enter fresh-process model context. Other message scheduling modes fail explicitly without a consumer; full message delivery remains incomplete. Next critical path: implement Rust-owned extension message scheduling and verify upstream ordering at tool boundaries; define the parity inventory alongside this work. E226 already inspected context projection bytes. Do not add a second sidecar runtime. Full parity remains unmeasured; define an explicit upstream capability denominator before reporting a percentage.
 
+E252: live long-read context projection passed with `--context-tool-chars 1200`: model selected read/bash/write/bash and wrote exact LONG_OK; canonical history retained.
+
 E251: three independent live formal CLI coding/recovery runs passed 3/3 with gpt-5.6-luna, no steering; each fresh process read, edited, and bash-verified exact content.
 
 E250: live formal CLI now verified real tool execution and fresh-process continuation: gpt-5.6-luna independently selected write/bash, then read/write/bash after --resume; exact external assertions passed (E249/E250).
