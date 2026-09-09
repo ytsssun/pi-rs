@@ -5,18 +5,20 @@ import {basename, resolve} from 'node:path';
 const args=process.argv.slice(2), options={}, extensions=[];
 if(args.includes('--help')) {
   const invocationName = basename(process.argv[1] ?? 'pi-rs').replace(/\.mjs$/, '');
-  console.log(`${invocationName} --session FILE --workspace DIR --input TEXT (--model ID | --fixture FILE) [--resume] [--extension FILE] [--context-tool-chars N|none] [--trace-file FILE]`);
+  console.log(`${invocationName} --session FILE --workspace DIR --input TEXT (--model ID | --fixture FILE) [--resume] [--extension FILE] [--context-tool-chars N|none] [--trace-file FILE] [--command NAME] [--command-args JSON]`);
   process.exit(0);
 }
 for(let i=0;i<args.length;i++) {
   const key=args[i];
   if(key==='--resume') {if(options[key]) throw Error('duplicate --resume'); options[key]=true; continue;}
-  if(!['--session','--workspace','--input','--model','--fixture','--extension','--context-tool-chars','--trace-file'].includes(key)) throw Error(`unknown option ${key}`);
+  if(!['--session','--workspace','--input','--model','--fixture','--extension','--context-tool-chars','--trace-file','--command','--command-args'].includes(key)) throw Error(`unknown option ${key}`);
   const value=args[++i]; if(!value||value.startsWith('--')) throw Error(`missing value for ${key}`);
   if(key==='--extension') extensions.push(resolve(value));
   else {if(key in options) throw Error(`duplicate ${key}`); options[key]=value;}
 }
-for(const key of ['--session','--workspace','--input']) if(!options[key]) throw Error(`${key} required`);
+for(const key of ['--session','--workspace']) if(!options[key]) throw Error(`${key} required`);
+if(!options['--input'] && !options['--command']) throw Error('one of --input or --command required');
+if(options['--command-args']) { try { options['--commandArgsParsed']=JSON.parse(options['--command-args']); } catch { throw Error('--command-args must be JSON'); } }
 if(Boolean(options['--model'])===Boolean(options['--fixture'])) throw Error('choose exactly one of --model and --fixture');
 const path=resolve(options['--session']), cwd=resolve(options['--workspace']);
 if(existsSync(path)!==Boolean(options['--resume'])) throw Error('session existence does not match --resume');
@@ -32,10 +34,19 @@ const manager=await createBackend({path,cwd,mode:options['--resume']?'open':'cre
 try {
   const host=await createHost(tsBackend(tools.map(t=>t.name)),{cwd,sessionManager:manager,extensionPaths:extensions,factories:[pi=>{for(const tool of tools) pi.registerTool(tool);} ]});
   if(options['--context-tool-chars']!==undefined) { const raw=options['--context-tool-chars']; manager.setContextPolicy(raw==='none'?null:Number(raw)); }
+  let commandResult;
+  if (options['--command']) {
+    const command = host.runner.getCommand(options['--command']);
+    if (!command) throw Error(`unknown command: ${options['--command']}`);
+    const rawArgs = options['--commandArgsParsed'];
+    const commandArgs = typeof rawArgs === 'string' ? rawArgs : (rawArgs === undefined ? '' : JSON.stringify(rawArgs));
+    await command.handler(commandArgs, host.runner.createCommandContext());
+    commandResult = {name: options['--command'], args: commandArgs, dispatched: true};
+  }
   let index=0;
   const stream=fixture?async()=>{const message=fixture[index++]; if(!message)throw Error(`fixture exhausted after ${index} assistant responses; provide the next assistant message for the tool result`);return {async *[Symbol.asyncIterator](){},async result(){return message;}};}:nativeProviderStream({model:options['--model'],streaming:true});
-  const result=await drive({manager,host,prompt:options['--input'],stream});
-  const report={result,session:path,fixture:Boolean(fixture),extensionErrors:host.errors};
+  const result=options['--input'] ? await drive({manager,host,prompt:options['--input'],stream}) : null;
+  const report={result,command:commandResult,session:path,fixture:Boolean(fixture),extensionErrors:host.errors};
   if(options['--trace-file']) writeFileSync(resolve(options['--trace-file']),JSON.stringify(report,null,2)+'\n');
   console.log(JSON.stringify(report));
 } finally {await manager.close();}
