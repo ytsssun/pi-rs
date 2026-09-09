@@ -4,7 +4,7 @@ Formal Cargo `pi-rs` now launches the existing Node host with Rust Node-API runt
 
 Deterministic external acceptance: `python3 experiments/formal-cli.py` passes original write → new-process resume/edit, exact filesystem assertions, canonical prefix retention, and unchanged protected-path extension rejection. No live call was performed for this launcher migration. Legacy Rust snapshot CLI is preserved as `pi-rs-legacy`; historical harnesses explicitly target it.
 
-Next critical path: validate a live coding/test/resume task through the formal binary, then close lifecycle/blocked-tool-result conformance gaps in the existing Node-API driver. Do not add a second sidecar runtime. Full parity remains unmeasured; define an explicit upstream capability denominator before reporting a percentage.
+Live baseline now verified: gpt-5.4-mini completed bug, behavior, and fresh-process resume scenarios 9/9 with no steering (E223). Context-editing long-task validation has three preserved model-behavior failures: the model omitted a requirement read from diagnostics; runtime/provider/tool paths remained healthy (E224/E225). Next critical path: independently validate context projection bytes and then close lifecycle/blocked-tool-result conformance gaps in the existing Node-API driver. Do not add a second sidecar runtime. Full parity remains unmeasured; define an explicit upstream capability denominator before reporting a percentage.
 
 ## Historical checkpoint (later corrections take precedence)
 
