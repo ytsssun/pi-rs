@@ -386,6 +386,7 @@ pub fn estimate_context_tokens(value: &Value) -> usize {
     value.to_string().len().saturating_add(3) / 4
 }
 
+#[allow(clippy::items_after_test_module)]
 #[cfg(test)]
 mod context_size_tests {
     use super::*;

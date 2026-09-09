@@ -67,6 +67,7 @@ pub fn openai_chat(client: &Client, base: &str, key: &str, model: &str, messages
 
 /// OpenAI-compatible streaming request. Each decoded SSE payload is delivered
 /// in arrival order; `[DONE]` is delivered as `None` and ends the callback.
+#[allow(clippy::too_many_arguments)]
 pub fn openai_chat_stream<F: FnMut(Option<Value>) -> Result<()>>(client: &Client, base: &str, key: &str, model: &str, messages: &[Value], tools: &Value, reasoning_effort: Option<&str>, mut on_event: F) -> Result<()> {
     let mut request = chat_request(model, messages, tools, reasoning_effort);
     request["stream"] = json!(true);
@@ -87,6 +88,7 @@ pub fn openai_chat_stream<F: FnMut(Option<Value>) -> Result<()>>(client: &Client
 
 /// Run a streaming request and publish decoded payloads to a bounded queue.
 /// The terminal `[DONE]` marker is represented by a terminal event.
+#[allow(clippy::too_many_arguments)]
 pub fn openai_chat_stream_to_queue(client: &Client, base: &str, key: &str, model: &str, messages: &[Value], tools: &Value, reasoning_effort: Option<&str>, queue: Arc<StreamQueue>) -> Result<()> {
     openai_chat_stream(client, base, key, model, messages, tools, reasoning_effort, |event| {
         let terminal = event.is_none();
