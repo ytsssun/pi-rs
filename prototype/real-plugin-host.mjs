@@ -40,10 +40,14 @@ export async function createHost(backend, { factories = [], cwd = process.cwd(),
     if (entry?.customType === 'session_name') sessionName = entry.data?.name;
     if (entry?.customType === 'session_label') labels.set(String(entry.data?.key), String(entry.data?.value));
   }
-  const actions = Object.fromEntries([
-    'sendMessage', 'sendUserMessage', 'setModel',
-  ].map((name) => [name, unsupported(name)]));
+  // Messages are queued at the host boundary; the outer runtime drains this
+  // queue after extension dispatch. Keeping the queue explicit makes the
+  // contract deterministic without pretending to run a provider here.
+  const pendingMessages = [];
+  const actions = Object.fromEntries(['setModel'].map((name) => [name, unsupported(name)]));
   Object.assign(actions, {
+    sendMessage: async (message) => { pendingMessages.push({ kind: 'agent', message }); },
+    sendUserMessage: async (message) => { pendingMessages.push({ kind: 'user', message }); },
     appendEntry: async (entry) => {
       assert.ok(sessionManager && typeof sessionManager.appendCustomEntry === 'function', 'sessionManager.appendCustomEntry required');
       return sessionManager.appendCustomEntry('pi-rs.extension.entry.v1', entry);
@@ -75,7 +79,7 @@ export async function createHost(backend, { factories = [], cwd = process.cwd(),
   const contextActions = Object.fromEntries([
     'getScopedModels', 'getSignal', 'abort', 'shutdown', 'getSystemPrompt',
   ].map((name) => [name, unsupported(name)]));
-  Object.assign(contextActions, { getModel: () => undefined, isIdle: () => true, isProjectTrusted: () => true, hasPendingMessages: () => false });
+  Object.assign(contextActions, { getModel: () => undefined, isIdle: () => pendingMessages.length === 0, isProjectTrusted: () => true, hasPendingMessages: () => pendingMessages.length > 0 });
   Object.assign(contextActions, { getContextUsage: () => { const entries = typeof sessionManager.getEntries === 'function' ? sessionManager.getEntries() : []; return estimateContextTokens(entries.flatMap(sessionEntryToContextMessages)); }, compact: async (options = {}) => { assert.ok(typeof sessionManager.appendCompaction === 'function', 'sessionManager.appendCompaction required'); return sessionManager.appendCompaction(String(options.summary ?? ''), options.firstKeptEntryId, Number(options.tokensBefore ?? 0)); } });
   runner.bindCore(actions, contextActions);
   const execute = async (name, params) => {
@@ -90,7 +94,7 @@ export async function createHost(backend, { factories = [], cwd = process.cwd(),
     assert.ok(definition, `unregistered tool: ${name}`);
     return { name, description: definition.description, parameters: definition.parameters };
   });
-  return { runner, eventBus, errors, execute, requestTools, runtime: loaded.runtime, actions };
+  return { runner, eventBus, errors, execute, requestTools, runtime: loaded.runtime, actions, pendingMessages, drainMessages: () => pendingMessages.splice(0) };
 }
 
 export async function exercise(backend = tsBackend()) {
