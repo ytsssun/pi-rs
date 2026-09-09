@@ -16,7 +16,10 @@ with tempfile.TemporaryDirectory(prefix='pi-rs-formal-') as temp:
         if extension: args+=['--extension',str(ROOT/'vendor/pi-mono/packages/coding-agent/examples/extensions/protected-paths.ts')]
         result=subprocess.run(args,cwd=base,text=True,capture_output=True,timeout=30)
         assert result.returncode==0, result.stderr
-        return json.loads(result.stdout)
+        report=json.loads(result.stdout)
+        usage=[e for e in report['result']['trace'] if e['type']=='context_usage']
+        assert usage and all(e['estimator']=='pinned-pi' and e['tokens']==e['usageTokens']+e['trailingTokens'] and e['serializedBytes']>0 for e in usage)
+        return report
     done=assistant([dict(type='text',text='done')])
     run([call('write',dict(path='target.txt',content='FIRST')),done])
     assert (workspace/'target.txt').read_bytes()==b'FIRST'

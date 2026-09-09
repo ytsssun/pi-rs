@@ -379,8 +379,9 @@ where
 
 pub mod sidecar;
 
-/// Conservative model-view size estimate used for bounded compaction experiments.
-/// This is deliberately an upper bound (four UTF-8 bytes per token), not a provider tokenizer.
+/// Rough serialized-JSON UTF-8 bytes/4 heuristic.
+/// Not an upper bound, provider tokenizer, or upstream Pi context estimate.
+/// Do not use this value alone to enforce a model context window.
 pub fn estimate_context_tokens(value: &Value) -> usize {
     value.to_string().len().saturating_add(3) / 4
 }
@@ -389,14 +390,16 @@ pub fn estimate_context_tokens(value: &Value) -> usize {
 mod context_size_tests {
     use super::*;
     #[test]
-    fn estimate_is_conservative_and_deterministic() {
+    fn serialized_size_estimate_and_threshold_boundaries() {
         let v = json!({"role":"tool","content":"abcdefgh"});
         assert_eq!(estimate_context_tokens(&v), v.to_string().len().div_ceil(4));
-        assert!(estimate_context_tokens(&json!("🙂🙂🙂🙂")) >= 1);
+        assert_eq!(estimate_context_tokens(&json!("🙂🙂🙂🙂")), 5);
+        assert!(!context_exceeds_limit(&json!("🙂🙂🙂🙂"), 5));
+        assert!(context_exceeds_limit(&json!("🙂🙂🙂🙂"), 4));
     }
 }
 
-/// Returns whether a projected context exceeds an explicit conservative limit.
+/// Compares the rough serialized-JSON estimate with an explicit heuristic limit.
 pub fn context_exceeds_limit(value: &Value, limit_tokens: usize) -> bool {
     estimate_context_tokens(value) > limit_tokens
 }

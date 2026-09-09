@@ -1,3 +1,4 @@
+import {estimateContextTokens} from '../../vendor/pi-mono/packages/coding-agent/src/core/compaction/compaction.ts';
 // JS dispatches Rust actions; Rust decides sequencing and persists model/tool results.
 import {executeWithUpdates} from './tool-update-barrier.mjs';
 import {request} from './native-store-backend.mjs';
@@ -17,6 +18,7 @@ export async function drive({manager,host,prompt,stream,trace=[],onToolUpdate=()
       const projected=step({event:'project',messages:canonicalMessages});
       trace.push({type:"context_projection",canonicalMessages:canonicalMessages.length,projectedMessages:projected.length,projectedTextBytes:JSON.stringify(projected).length,projected:projected});
       const messages=await host.runner.emitContext(projected);
+      trace.push({type:"context_usage", ...estimateContextTokens(messages), serializedBytes:Buffer.byteLength(JSON.stringify(messages), "utf8"), estimator:"pinned-pi"});
       const output=await stream({provider:'fixture'}, {systemPrompt:'native architecture experiment',messages,tools:host.requestTools()});
       for await(const _event of output){} // Stream transport consumption, no turn decisions.
       action=step({event:'model_result',requestId,message:await output.result()});
