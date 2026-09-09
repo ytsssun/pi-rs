@@ -20,8 +20,9 @@ impl ExtensionSidecar {
         let mut line = String::new();
         if self.output.read_line(&mut line).context("read sidecar response")? == 0 { bail!("sidecar exited before response"); }
         let response: Value = serde_json::from_str(&line).context("parse sidecar response")?;
+        if response["id"].as_u64() != Some(id) { bail!("sidecar response id mismatch"); }
         if !response["error"].is_null() { bail!("sidecar error: {}", response["error"]); }
         Ok(response["result"].clone())
     }
 }
-impl Drop for ExtensionSidecar { fn drop(&mut self) { let _ = self.child.kill(); } }
+impl Drop for ExtensionSidecar { fn drop(&mut self) { let _ = self.child.kill(); let _ = self.child.wait(); } }
