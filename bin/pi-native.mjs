@@ -11,7 +11,7 @@ if(args.includes('--help')) {
 for(let i=0;i<args.length;i++) {
   const key=args[i];
   if(key==='--resume' || key==='--reset-branch') {if(options[key]) throw Error(`duplicate ${key}`); options[key]=true; continue;}
-  if(!['--session','--workspace','--input','--model','--fixture','--extension','--context-tool-chars','--trace-file','--command','--command-args','--branch','--reset-branch','--branch','--reset-branch'].includes(key)) throw Error(`unknown option ${key}`);
+  if(!['--session','--workspace','--input','--model','--fixture','--extension','--context-tool-chars','--trace-file','--command','--command-args','--branch','--reset-branch','--compact-summary','--compact-first-kept','--compact-tokens-before','--branch','--reset-branch','--compact-summary','--compact-first-kept','--compact-tokens-before'].includes(key)) throw Error(`unknown option ${key}`);
   const value=args[++i]; if(!value||value.startsWith('--')) throw Error(`missing value for ${key}`);
   if(key==='--extension') extensions.push(resolve(value));
   else {if(key in options) throw Error(`duplicate ${key}`); options[key]=value;}
@@ -21,6 +21,8 @@ if(!options['--input'] && !options['--command']) throw Error('one of --input or 
 if(options['--command-args']) { try { options['--commandArgsParsed']=JSON.parse(options['--command-args']); } catch { throw Error('--command-args must be JSON'); } }
 if (!options['--command'] && Boolean(options['--model'])===Boolean(options['--fixture'])) throw Error('choose exactly one of --model and --fixture');
 if (options['--command'] && (options['--model'] || options['--fixture'])) throw Error('--command cannot be combined with --model or --fixture');
+if (options['--compact-summary'] && (!options['--compact-first-kept'] || !options['--compact-tokens-before'])) throw Error('--compact-summary requires --compact-first-kept and --compact-tokens-before');
+if (options['--compact-summary'] && !options['--resume']) throw Error('compaction requires --resume');
 if (options['--branch'] && options['--reset-branch']) throw Error('--branch cannot be combined with --reset-branch');
 if ((options['--branch'] || options['--reset-branch']) && !options['--resume']) throw Error('branch selection requires --resume');
 const path=resolve(options['--session']), cwd=resolve(options['--workspace']);
@@ -36,8 +38,10 @@ const tools=createCodingTools(cwd);
 const manager=await createBackend({path,cwd,mode:options['--resume']?'open':'create'});
 if (options['--branch']) await manager.branch(options['--branch']);
 if (options['--reset-branch']) await manager.resetLeaf();
+if (options['--compact-summary']) await manager.appendCompaction(options['--compact-summary'], options['--compact-first-kept'], Number(options['--compact-tokens-before']));
   if (options['--branch']) await manager.branch(options['--branch']);
   if (options['--reset-branch']) await manager.resetLeaf();
+if (options['--compact-summary']) await manager.appendCompaction(options['--compact-summary'], options['--compact-first-kept'], Number(options['--compact-tokens-before']));
 try {
   const host=await createHost(tsBackend(tools.map(t=>t.name)),{cwd,sessionManager:manager,extensionPaths:extensions,factories:[pi=>{for(const tool of tools) pi.registerTool(tool);} ]});
   if(options['--context-tool-chars']!==undefined) { const raw=options['--context-tool-chars']; manager.setContextPolicy(raw==='none'?null:Number(raw)); }
