@@ -27,6 +27,11 @@ impl ChatDeltaAccumulator {
         if let Some(s) = delta.get("content").and_then(Value::as_str) { self.text.push_str(s); }
         if let Some(calls) = delta.get("tool_calls").and_then(Value::as_array) { for c in calls { let key=c.get("id").and_then(Value::as_str).unwrap_or("").to_string(); if let Some(s)=c.pointer("/function/arguments").and_then(Value::as_str) { self.tool_arguments.entry(key).or_default().push_str(s); } } }
     }
+    pub fn message(&self) -> Value {
+        let mut content = Vec::new(); if !self.text.is_empty() { content.push(json!({"type":"text","text":self.text})); }
+        for (id,args) in &self.tool_arguments { content.push(json!({"type":"toolCall","id":id,"name":"","arguments":args})); }
+        json!({"role":"assistant","content":content})
+    }
 }
 
 #[derive(Default)]
