@@ -11,7 +11,7 @@ if(args.includes('--help')) {
 for(let i=0;i<args.length;i++) {
   const key=args[i];
   if(key==='--resume' || key==='--reset-branch') {if(options[key]) throw Error(`duplicate ${key}`); options[key]=true; continue;}
-  if(!['--session','--workspace','--input','--model','--fixture','--extension','--context-tool-chars','--trace-file','--command','--command-args','--branch','--reset-branch'].includes(key)) throw Error(`unknown option ${key}`);
+  if(!['--session','--workspace','--input','--model','--fixture','--extension','--context-tool-chars','--trace-file','--command','--command-args','--branch','--reset-branch','--branch','--reset-branch'].includes(key)) throw Error(`unknown option ${key}`);
   const value=args[++i]; if(!value||value.startsWith('--')) throw Error(`missing value for ${key}`);
   if(key==='--extension') extensions.push(resolve(value));
   else {if(key in options) throw Error(`duplicate ${key}`); options[key]=value;}
@@ -34,6 +34,8 @@ const {nativeProviderStream}=await import('../prototype/architecture/native-prov
 const {createCodingTools}=await import('../vendor/pi-mono/packages/coding-agent/src/core/tools/index.ts');
 const tools=createCodingTools(cwd);
 const manager=await createBackend({path,cwd,mode:options['--resume']?'open':'create'});
+if (options['--branch']) await manager.branch(options['--branch']);
+if (options['--reset-branch']) await manager.resetLeaf();
   if (options['--branch']) await manager.branch(options['--branch']);
   if (options['--reset-branch']) await manager.resetLeaf();
 try {
