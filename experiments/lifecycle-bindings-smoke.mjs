@@ -1,0 +1,11 @@
+import assert from 'node:assert/strict';
+import { createHost } from '../prototype/real-plugin-host.mjs';
+const entries=[];
+const manager={getEntries:()=>entries,appendCustomEntry:(customType,data)=>{entries.push({customType,data});}};
+const backend={getActiveTools:()=>[],setActiveTools:()=>{}};
+const host=await createHost(backend,{extensionPaths:[],sessionManager:manager});
+await host.actions.setSessionName('smoke'); await host.actions.setLabel('phase','test'); await host.actions.setThinkingLevel('high');
+await host.actions.sendMessage('agent'); await host.actions.sendUserMessage('user');
+assert.equal(host.actions.getSessionName(),'smoke'); assert.equal(host.pendingMessages.length,2); assert.equal(host.contextActions?.getModel,undefined);
+const reopened=await createHost(backend,{extensionPaths:[],sessionManager:manager}); assert.equal(reopened.actions.getSessionName(),'smoke');
+console.log(JSON.stringify({passed:true,entries:entries.length,messages:host.drainMessages().length}));
