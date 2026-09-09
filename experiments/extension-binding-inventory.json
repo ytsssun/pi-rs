@@ -1,0 +1,26 @@
+{
+  "upstreamCommit": "9767ba275f3e9a5ee0f5c5342249b629ab1b2282",
+  "actions": {
+    "total": 14,
+    "implemented": 14,
+    "names": [
+      "sendMessage",
+      "sendUserMessage",
+      "appendEntry",
+      "setSessionName",
+      "getSessionName",
+      "setLabel",
+      "getActiveTools",
+      "getAllTools",
+      "setActiveTools",
+      "refreshTools",
+      "getCommands",
+      "setModel",
+      "getThinkingLevel",
+      "setThinkingLevel"
+    ],
+    "missing": []
+  },
+  "contextAssignments": 16,
+  "method": "static signature inventory; implementation requires runtime execution"
+}
