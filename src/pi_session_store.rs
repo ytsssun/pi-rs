@@ -78,9 +78,9 @@ impl PiSessionStore {
         }
         if tokens_before < 0 { bail!("tokensBefore must be nonnegative"); }
         let snapshot = self.snapshot()?;
-        let entries = snapshot["entries"].as_array().unwrap();
+        let entries = snapshot["branch"].as_array().unwrap();
         if !entries.iter().any(|e| e["id"] == first_kept_entry_id) {
-            bail!("firstKeptEntryId not found");
+            bail!("firstKeptEntryId not found on current branch");
         }
         self.append(serde_json::json!({"type":"compaction", "id":id, "timestamp":timestamp, "summary":summary, "firstKeptEntryId":first_kept_entry_id, "tokensBefore":tokens_before}))
     }
