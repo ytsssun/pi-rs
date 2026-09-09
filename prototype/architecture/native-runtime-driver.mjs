@@ -11,7 +11,15 @@ export async function drive({manager,host,prompt,stream,trace=[],onToolUpdate=()
   trace.push({type:'turn_start'});
   for(let count=0;count<32;count++) {
     if(action.type==='done') {
-      const messages = typeof host.drainMessages === 'function' ? host.drainMessages() : [];
+      const drainedMessages = typeof host.drainMessages === 'function' ? host.drainMessages() : [];
+      // Rust-owned turn-boundary scheduler: preserve FIFO within a class while
+      // giving steer/follow-up work precedence over deferred next-turn work.
+      // This is deterministic and keeps the Node plugin API unchanged.
+      const rank = queued => queued?.options?.deliverAs === 'steer' ? 0
+        : queued?.options?.deliverAs === 'followUp' ? 1 : 2;
+      const messages = drainedMessages.map((message, index) => ({message, index}))
+        .sort((a, b) => rank(a.message) - rank(b.message) || a.index - b.index)
+        .map(({message}) => message);
       for (const queued of messages) {
         if (queued.kind === 'agent' && (queued.options?.triggerTurn === false || queued.options?.deliverAs === undefined || queued.options?.deliverAs === 'nextTurn' || queued.options?.deliverAs === 'steer')) {
           const message = queued.message;
