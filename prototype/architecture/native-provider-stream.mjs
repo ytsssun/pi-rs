@@ -15,7 +15,7 @@ export function nativeProviderStream({model,reasoningEffort,streaming=false}={})
       for (const item of canonical.content) {
         if (item.type==='toolCall' && (!item.arguments || Array.isArray(item.arguments) || typeof item.arguments!=='object')) throw Error('tool arguments must be an object');
       }
-      const message={...canonical,role:'assistant',model:selectedModel,provider:'openai',api:'openai-completions',timestamp:Date.now()};
+      const message={...canonical,role:'assistant',model:selectedModel,provider:_model?.provider||'openai',api:_model?.api||'openai-completions',timestamp:Date.now()};
       return {async *[Symbol.asyncIterator](){yield {type:'done'};},async result(){return message;}};
     }
     const raw=request({op:'provider_chat',model:model||_model?.id||process.env.PI_RS_MODEL||'gpt-5.6-luna',messages,tools:context.tools||[],reasoning_effort:reasoningEffort||'none',base_url:_model?.baseUrl});
@@ -35,6 +35,6 @@ export function toPiAssistant(raw, model) {
     content.push({type:'toolCall',id:call.id,name:call.function.name,arguments:args});
   }
   return {role:'assistant',content,stopReason:raw.tool_calls?.length?'toolUse':'stop',
-    model,provider:'openai',api:'openai-completions',timestamp:Date.now(),
+    model,provider:raw._provider||'openai',api:raw._api||'openai-completions',timestamp:Date.now(),
     ...(raw._provider_usage ? {usage:raw._provider_usage} : {})};
 }
