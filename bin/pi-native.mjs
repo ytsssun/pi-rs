@@ -5,7 +5,7 @@ import {basename, resolve} from 'node:path';
 const args=process.argv.slice(2), options={}, extensions=[];
 if(args.includes('--help')) {
   const invocationName = basename(process.argv[1] ?? 'pi-rs').replace(/\.mjs$/, '');
-  console.log(`${invocationName} --session FILE --workspace DIR --input TEXT (--model ID | --fixture FILE) [--resume] [--extension FILE]`);
+  console.log(`${invocationName} --session FILE --workspace DIR --input TEXT (--model ID | --fixture FILE) [--resume]`);
   process.exit(0);
 }
 for(let i=0;i<args.length;i++) {
