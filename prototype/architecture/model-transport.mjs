@@ -5,3 +5,7 @@ export function openAITransportModel(model) {
   if (typeof model.id !== 'string' || !model.id.trim()) throw Error('resolved model id required');
   return model.id;
 }
+
+export function savedBranchModel(manager) {
+  return manager.getBranch().findLast(entry => entry.type === 'custom' && entry.customType === 'pi-rs.model.v1')?.data?.model;
+}
