@@ -20,7 +20,7 @@ cargo build --locked --bin pi-rs
 
 ## Use
 
-Set `OPENAI_API_KEY` and choose a tool-capable model. Run in a disposable repository while evaluating:
+Set `OPENAI_API_KEY` (or place it in a project-local `.env`) and choose a tool-capable model. The current live-verified path uses `gpt-5.6-luna`; run in a disposable repository while evaluating:
 
 ```sh
 ./target/debug/pi-rs --workspace /absolute/path/to/repo \
@@ -42,7 +42,9 @@ Load an extension with `--extension /absolute/path/to/extension.ts`; repeat the 
 python3 experiments/formal-cli.py
 ```
 
-This deterministic acceptance uses scripted model messages and actual tools: write, fresh-process resume/edit, and rejection by an unchanged upstream extension. It does not call a live model.
+This deterministic acceptance uses scripted model messages and actual tools: write, fresh-process resume/edit, and rejection by an unchanged upstream extension. It does not call a live model. For a real provider/tool/recovery check, repeat the two commands above with a temporary workspace; evidence and known gaps are maintained in the [checkpoint](docs/checkpoint.md).
+
+The current usable slice is headless coding with the original Pi tools, OpenAI-compatible model calls, session recovery, context projection, and selected extension bindings. UI prompts, provider OAuth, full lifecycle scheduling, and complete extension parity remain under development. Do not treat the project as a drop-in replacement yet.
 
 ## Project
 
