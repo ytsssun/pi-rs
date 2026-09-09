@@ -26,3 +26,7 @@ OAuth refresh, settings/models.json parsing, provider aliases, and network execu
 ## Deterministic fixture proposal
 
 Create a fixture registry with providers `fixture-a` and `fixture-b`, models `alpha` and `beta`, and credential map containing only `fixture-a`. Assert: `find` resolves both registered models without credentials; `getAvailable` returns only `fixture-a/alpha`; missing `getApiKey` yields stable error code; unregister removes model; replacing `fixture-a` changes resolution deterministically. Run in a fresh process and record command/result in `docs/board.jsonl` as tested (not parity).
+
+## Deterministic pinned ModelRuntime probe (2026-09-08)
+
+`experiments/model-runtime-probe.mjs` constructs the vendored `ModelRuntime` with `modelsPath: null`, `refreshOnCreate: false`, and `allowModelNetwork: false`. Running `node --experimental-strip-types experiments/model-runtime-probe.mjs` produced `{"available":0,"methods":[["getAvailable","function"],["refresh","function"],["registerProvider","function"]]}`. This proves construction and the public availability/refresh/registration methods without network or credentials. The runtime's model catalog is private (no public `all`/`find` methods); resolution is exposed through the underlying `Models` contract used internally. Rust cannot claim equivalent construction until it supplies credential storage, model config/store, builtin provider catalog, and provider composition/auth adapters. No network or live provider verification was attempted.

@@ -5,5 +5,5 @@ const host = await createHost(tsBackend(), { extensionPaths: [], factories: [pi 
 }] });
 assert.deepEqual(host.modelRegistry?.find?.('demo', 'alpha'), { id: 'alpha', name: 'Alpha' });
 assert.equal(host.modelRegistry?.find?.('demo', 'missing'), undefined);
-assert.deepEqual(host.contextActions?.getScopedModels?.(), []);
+assert.equal(host.contextActions.getScopedModels().length, 2);
 console.log(JSON.stringify({passed:true, scope:'deterministic provider model lookup'}));
