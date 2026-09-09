@@ -17,7 +17,7 @@ export async function createBackend({path,cwd=process.cwd(),mode='create'}) {
     setContextPolicy:limit=>call({op:'runtime',event:'policy',limit:limit===undefined?null:limit}),
     getCwd:()=>cwd,
     appendMessage:message=>append({type:'message',message}),appendCustomEntry:(customType,data)=>append({type:'custom',customType,data}),
-    branch:id=>call({op:'branch',leaf:id}),resetLeaf:()=>call({op:'branch',leaf:null}),
+    branch:id=>call({op:'branch',leaf:id}),resetLeaf:()=>call({op:'branch',leaf:null}),appendCompaction:(summary,firstKeptEntryId,tokensBefore)=>call({op:'append_compaction',id:`c${Date.now()}`,timestamp:new Date().toISOString(),summary,firstKeptEntryId,tokensBefore}),
     getBranch:()=>snapshot().branch,getEntries:()=>snapshot().entries,getSessionFile:()=>path,close:()=>call({op:'close'})};
 }
 export {createBackend as createStoreBackend};
