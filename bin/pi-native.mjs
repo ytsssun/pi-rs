@@ -21,7 +21,8 @@ for(let i=0;i<args.length;i++) {
 for(const key of ['--session','--workspace']) if(!options[key]) throw Error(`${key} required`);
 if(!options['--input'] && !options['--command']) throw Error('one of --input or --command required');
 if(options['--command-args']) { try { options['--commandArgsParsed']=JSON.parse(options['--command-args']); } catch { throw Error('--command-args must be JSON'); } }
-if (!options['--command'] && Boolean(options['--model'])===Boolean(options['--fixture'])) throw Error('choose exactly one of --model and --fixture');
+if (!options['--command'] && !options['--resume'] && Boolean(options['--model'])===Boolean(options['--fixture'])) throw Error('choose exactly one of --model and --fixture');
+if (options['--resume'] && options['--fixture']) throw Error('--fixture cannot be combined with --resume');
 if (options['--command'] && (options['--model'] || options['--fixture'])) throw Error('--command cannot be combined with --model or --fixture');
 if (options['--compact-summary'] && (!options['--compact-first-kept'] || !options['--compact-tokens-before'])) throw Error('--compact-summary requires --compact-first-kept and --compact-tokens-before');
 if (options['--compact-summary'] && !options['--resume']) throw Error('compaction requires --resume');
@@ -38,6 +39,10 @@ const {nativeProviderStream}=await import('../prototype/architecture/native-prov
 const {createCodingTools}=await import('../vendor/pi-mono/packages/coding-agent/src/core/tools/index.ts');
 const tools=createCodingTools(cwd);
 const manager=await createBackend({path,cwd,mode:options['--resume']?'open':'create'});
+const savedModel = manager.snapshot().entries.slice().reverse().find(e=>e.type==='custom' && e.customType==='pi-rs.model.v1')?.data?.model;
+const selectedModel = options['--model'] || savedModel;
+if (!options['--command'] && !options['--fixture'] && !selectedModel) throw Error('--model required for new sessions or when no saved model exists');
+if (options['--model'] && options['--resume'] && options['--model'] !== savedModel) { /* explicit override is intentional */ }
   if (options['--branch']) await manager.branch(options['--branch']);
   if (options['--reset-branch']) await manager.resetLeaf();
 if (options['--compact-summary']) await manager.appendCompaction(options['--compact-summary'], options['--compact-first-kept'], Number(options['--compact-tokens-before']));
@@ -57,7 +62,8 @@ try {
     commandResult = {name: options['--command'], args: commandArgs, dispatched: true};
   }
   let index=0;
-  const stream=fixture?async()=>{const message=fixture[index++]; if(!message)throw Error(`fixture exhausted after ${index} assistant responses; provide the next assistant message for the tool result`);return {async *[Symbol.asyncIterator](){},async result(){return message;}};}:nativeProviderStream({model:options['--model'],streaming:true});
+  if (options['--model'] && !options['--command']) await manager.appendCustomEntry('pi-rs.model.v1', {model: options['--model']});
+  const stream=fixture?async()=>{const message=fixture[index++]; if(!message)throw Error(`fixture exhausted after ${index} assistant responses; provide the next assistant message for the tool result`);return {async *[Symbol.asyncIterator](){},async result(){return message;}};}:nativeProviderStream({model:selectedModel,streaming:true});
   const result=options['--input'] ? await drive({manager,host,prompt:options['--input'],stream}) : null;
   const report={result,command:commandResult,compaction:options['--compact-summary']?manager.snapshot().contextEntries.find(e=>e.type==='compaction')??null:null,session:path,fixture:Boolean(fixture),extensionErrors:host.errors};
   if(options['--trace-file']) writeFileSync(resolve(options['--trace-file']),JSON.stringify(report,null,2)+'\n');
