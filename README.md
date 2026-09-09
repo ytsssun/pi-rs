@@ -6,28 +6,34 @@ pi-rs rewrites the core runtime of [Pi](https://github.com/badlogic/pi-mono) in 
 
 This is an early, headless implementation. Basic coding and session continuation have live-model evidence, but full plugin compatibility and a measured 70–80% feature coverage have **not** been established. See [current status](docs/checkpoint.md) for evidence and limitations.
 
-## Build
+## Install
 
-Currently supported as a source-checkout build on macOS/Linux, with Rust, Node.js 22.18+, Python 3, and Git. Keep the checkout and its Node dependencies alongside your build; this is not yet a standalone distributable binary.
+On macOS or Linux, install from source with Rust, Node.js 22.18+, npm, Python 3, and Git:
 
 ```sh
-export PATH="$HOME/.cargo/bin:$PATH"
-sh scripts/bootstrap-upstream.sh
-python3 scripts/build-native-session.py
-cargo build --locked --bin pi-rs
-./target/debug/pi-rs --help
+curl -fsSL https://raw.githubusercontent.com/ytsssun/pi-rs/main/scripts/install.sh | sh
 ```
+
+The installer builds pi-rs and installs the command into `~/.cargo/bin` (or `$CARGO_HOME/bin`). Ensure that directory is on your PATH, then run `pi-rs --help`. It retains the required Node host and runtime files under `~/.local/share/pi-rs`; this is a source installer, not a prebuilt binary download.
+
+Already have a checkout?
+
+```sh
+sh scripts/install.sh --source "$PWD"
+```
+
+To use `~/.local/bin` instead, add `--prefix "$HOME/.local"`. See [installation details](docs/installation.md) for updates, removal, and development builds.
 
 ## Use
 
 Set `OPENAI_API_KEY` (or place it in a project-local `.env`) and choose a tool-capable model. The current live-verified path uses `gpt-5.6-luna`; run in a disposable repository while evaluating:
 
 ```sh
-./target/debug/pi-rs --workspace /absolute/path/to/repo \
+pi-rs --workspace /absolute/path/to/repo \
   --session /absolute/path/to/session.jsonl \
   --input 'Fix the failing test and run it' --model MODEL_ID
 
-./target/debug/pi-rs --resume --workspace /absolute/path/to/repo \
+pi-rs --resume --workspace /absolute/path/to/repo \
   --session /absolute/path/to/session.jsonl \
   --input 'Add a regression test and run it' --model MODEL_ID
 ```
