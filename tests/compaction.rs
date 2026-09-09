@@ -8,7 +8,7 @@ fn append_compaction_validates_and_projects() {
  s.append(json!({"type":"message","id":"m1","timestamp":"2026-01-01T00:00:00Z","message":{"role":"user","content":"x"}})).unwrap();
  let id=s.append_compaction("c1","2026-01-01T00:00:01Z","summary","m1",12).unwrap(); assert_eq!(id,"c1");
  let snap=s.snapshot().unwrap(); assert_eq!(snap["contextEntries"][0]["type"],"compaction");
- assert!(s.append_compaction("c2","t","summary","missing",1).is_err()); assert!(s.append_compaction("c3","t","summary","m1",-1).is_err()); 
+ assert!(s.append_compaction("c2","t","summary","missing",1).is_err()); assert!(s.append_compaction("c3","t","summary","m1",-1).is_err());
  s.branch(json!("m1")).unwrap();
  let before=s.snapshot().unwrap(); let disk=fs::read(&p).unwrap();
  assert!(s.append_compaction("cross","t","summary","c1",12).is_err(), "must reject first-kept entry from abandoned sibling branch");
