@@ -36,6 +36,10 @@ export async function createHost(backend, { factories = [], cwd = process.cwd(),
   runner.onError(({ event, error }) => errors.push({ event, error }));
   let sessionName;
   const labels = new Map();
+  for (const entry of (typeof sessionManager.getEntries === 'function' ? sessionManager.getEntries() : [])) {
+    if (entry?.customType === 'session_name') sessionName = entry.data?.name;
+    if (entry?.customType === 'session_label') labels.set(String(entry.data?.key), String(entry.data?.value));
+  }
   const actions = Object.fromEntries([
     'sendMessage', 'sendUserMessage', 'setModel',
   ].map((name) => [name, unsupported(name)]));
