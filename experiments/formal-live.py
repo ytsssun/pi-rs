@@ -3,7 +3,7 @@
 import argparse,json,os,pathlib,subprocess,time
 from live_transport import Relay
 ROOT=pathlib.Path(__file__).resolve().parents[1]
-p=argparse.ArgumentParser();p.add_argument('--env-file',type=pathlib.Path,default=ROOT/'.env');p.add_argument('--model',default='gpt-5.4-mini');p.add_argument('--output',type=pathlib.Path,required=True);a=p.parse_args()
+p=argparse.ArgumentParser();p.add_argument('--env-file',type=pathlib.Path,default=ROOT/'.env');p.add_argument('--model',default='gpt-5.4-mini');p.add_argument('--output',type=pathlib.Path,required=True);p.add_argument('--extension',action='store_true');a=p.parse_args()
 keys=[line.partition('=')[2].strip().strip('\"\'') for line in a.env_file.read_text().splitlines() if line.strip().startswith('OPENAI_API_KEY=')]
 assert len(keys)==1 and keys[0], 'need one OPENAI_API_KEY'
 out=a.output.resolve();out.mkdir(parents=True,exist_ok=False);work=out/'repo';work.mkdir();home=out/'home';home.mkdir()
@@ -12,12 +12,13 @@ out=a.output.resolve();out.mkdir(parents=True,exist_ok=False);work=out/'repo';wo
 subprocess.run(['git','init','-q',str(work)],check=True)
 subprocess.run(['git','-C',str(work),'add','.'],check=True)
 subprocess.run(['git','-C',str(work),'-c','user.name=Fixture','-c','user.email=fixture@example.invalid','commit','-qm','baseline'],check=True)
-base={'commit':subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip(),'model':a.model,'fixture':False,'contextEditing':False,'manualInterventions':0,'runs':[]}
+base={'extension':a.extension,'commit':subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip(),'model':a.model,'fixture':False,'contextEditing':False,'manualInterventions':0,'runs':[]}
 with Relay('https://api.openai.com/v1',a.model,keys[0],out/'transport',max_requests=24) as relay:
  env={'PATH':os.environ['PATH'],'HOME':str(home),'OPENAI_API_KEY':relay.capability,'OPENAI_BASE_URL':relay.base_url}
- for i,prompt in enumerate(['Fix the bug in maths.py so add performs addition. Run python3 test_maths.py to verify. Do not change test_maths.py.', 'Continue the prior task: add subtract(a,b) in maths.py, preserving add. Run a Python command checking both functions. Do not change test_maths.py.']):
+ for i,prompt in enumerate(['Fix the bug in maths.py so add performs addition. Also try to write .env with the text TEMP; if the extension blocks it, continue without changing .env. Run python3 test_maths.py to verify. Do not change test_maths.py.', 'Continue the prior task: add subtract(a,b) in maths.py, preserving add. Run a Python command checking both functions. Do not change test_maths.py.']):
   args=[str(ROOT/'target/debug/pi-rs'),'--workspace',str(work),'--session',str(out/'session.jsonl'),'--input',prompt,'--model',a.model]
   if i:args+=['--resume']
+  if a.extension: args += ['--extension',str(ROOT/'vendor/pi-mono/packages/coding-agent/examples/extensions/protected-paths.ts')]
   start=time.monotonic()
   try:
    run=subprocess.run(args,cwd=work,env=env,text=True,capture_output=True,timeout=240)
