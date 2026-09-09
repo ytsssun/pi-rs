@@ -1,23 +1,25 @@
-# Parity classification
+# Pi capability classification
 
-Reference upstream: Pi commit `9767ba275f3e9a5ee0f5c5342249b629ab1b2282`. The static inventory reports 43 public Runner methods and 15 event emitters (`experiments/parity-inventory.json`); it cannot establish runtime semantics. No overall percentage is reported.
+Reference: pinned Pi commit `9767ba275f3e9a5ee0f5c5342249b629ab1b2282`. This is a capability inventory, not a compatibility percentage.
 
-## Verified (bounded)
+## Verified or bounded
 
-- Core read/write/edit/bash behavior, truncation, and fresh-process coding/resume: E249–E252, E251, E255.
-- OpenAI-compatible provider HTTP transport (success, incomplete response, 429, redirect refusal): checkpoint provider verification.
-- Unchanged loader/ExtensionRunner deferred-tools and context chaining: `docs/real-plugin-host.md`; E243.
-- Extension entry persistence and explicit `triggerTurn:false` custom-message persistence across restart: E242–E243.
+- Rust core `read`, `write`, `edit`, and `bash`, including limits and failure recovery (Cargo suites; E239).
+- Formal `pi-rs` CLI with real OpenAI model calls, tool execution, and fresh-process continuation (E249–E251, E256).
+- Canonical session retention with bounded context projection (E226, E252).
+- Unchanged upstream extension loader, tool hooks, context chaining, custom entries, and deferred custom-message persistence (E230–E243).
+- OpenAI-compatible SSE parsing, bounded native queue, and live transport path (E248, E254).
 
 ## Partial
 
-- Host surface (`createHost`, `requestTools`, `execute`, actions, context actions, providers, `drainMessages`) exists, but semantics are not exhaustive.
-- Provider registration is retained; model resolution, OAuth/credentials, refresh, and scoped enumeration remain unverified.
-- Message delivery supports explicit non-trigger custom messages; other queued modes require a scheduling consumer and currently error explicitly (E243).
-- Context projection/truncation and policy persistence are tested (E226, E252, E158), while full schema conversion, chained mutation, cancellation, and live model-view coverage remain open.
-- Native snapshots support resume and recovery, but Pi SessionManager format, migration, branching, and compaction parity are absent/unverified (E250–E251).
-- Selected event-bus ordering/mutation is tested; complete lifecycle ordering, cancellation, steering, and error semantics remain open.
+- Extension messages: `triggerTurn:false` custom messages persist and re-enter context; steer, follow-up, and next-turn scheduling are not implemented.
+- Provider support: registration is retained; model resolution, scoped models, credentials refresh, OAuth, and provider breadth are incomplete.
+- Extension lifecycle: selected events and error propagation work; full 15-event ordering, cancellation, UI, and command context semantics remain unverified.
+- Session format: native snapshots and recovery are robust, but Pi SessionManager migration/import/export parity is incomplete.
+- Context editing: canonical retention and bounded projection work; full upstream mutation and event semantics remain partial.
 
 ## Missing or unverified
 
-Complete discovery/install/load compatibility; all registration surfaces (commands, shortcuts, renderers); full lifecycle and cancellation; TUI/UI modes; provider auth/live breadth; inter-plugin identity/collision/cleanup; JS export/environment compatibility; malformed session import/export and migration; and failure-race/performance behavior. These obligations are enumerated in `docs/plugin-seams.md`.
+Extension discovery/install, all renderers and shortcuts, TUI/UI modes, provider OAuth, inter-plugin cleanup and identity, malformed-session migration, crash-race coverage, and performance measurements.
+
+Do not report 70–80% parity until each capability has runtime evidence and a defined denominator. The next implementation priority is Rust-owned extension message scheduling, followed by provider model resolution.
