@@ -12,8 +12,33 @@ pub fn parse_sse_data(data: &str) -> Result<Option<Value>> {
     Ok(Some(serde_json::from_str(&payload).context("invalid SSE JSON payload")?))
 }
 
+/// Extract the incremental assistant delta from an OpenAI-compatible chunk.
+/// Empty keep-alive chunks are ignored; callers aggregate text/tool fragments.
+pub fn chat_delta(chunk: &Value) -> Option<&Value> {
+    chunk.get("choices")?.as_array()?.first()?.get("delta")
+}
+
 #[derive(Default)]
 pub struct SseDecoder { buffer: String, pending_bytes: Vec<u8>, after_cr: bool }
+
+/// Aggregates OpenAI Chat Completions streaming deltas into one Pi assistant message.
+#[derive(Default)]
+pub struct OpenAiDeltaAggregator { text: String, tool_calls: Vec<Value> }
+impl OpenAiDeltaAggregator {
+    pub fn push(&mut self, event: &Value) {
+        let Some(delta) = event.get("choices").and_then(|v| v.get(0)).and_then(|v| v.get("delta")) else { return };
+        if let Some(s) = delta.get("content").and_then(Value::as_str) { self.text.push_str(s); }
+        for call in delta.get("tool_calls").and_then(Value::as_array).into_iter().flatten() {
+            let i = call.get("index").and_then(Value::as_u64).unwrap_or(self.tool_calls.len() as u64) as usize;
+            while self.tool_calls.len() <= i { self.tool_calls.push(json!({"id":"","type":"function","function":{"name":"","arguments":""}})); }
+            let target = &mut self.tool_calls[i];
+            if let Some(v) = call.get("id").and_then(Value::as_str) { target["id"] = json!(v); }
+            if let Some(v) = call.get("function").and_then(|f| f.get("name")).and_then(Value::as_str) { target["function"]["name"] = json!(v); }
+            if let Some(v) = call.get("function").and_then(|f| f.get("arguments")).and_then(Value::as_str) { let old=target["function"]["arguments"].as_str().unwrap_or("").to_owned(); target["function"]["arguments"] = json!(old + v); }
+        }
+    }
+    pub fn finish(self) -> Value { let content = if self.text.is_empty() { Value::Null } else { json!(self.text) }; let mut out=json!({"role":"assistant","content":content}); if !self.tool_calls.is_empty(){out["tool_calls"]=json!(self.tool_calls);} out }
+}
 impl SseDecoder {
     pub fn push(&mut self, chunk: &str) -> Result<Vec<Option<Value>>> {
         for ch in chunk.chars() {
