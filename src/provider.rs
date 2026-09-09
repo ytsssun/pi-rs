@@ -157,7 +157,15 @@ pub fn openai_chat_stream_to_queue(client: &Client, base: &str, key: &str, model
 
 #[cfg(test)]
 mod tests {
-    use super::{parse_sse_data, SseDecoder};
+    use super::{parse_sse_data, SseDecoder, ChatDeltaAccumulator};
+    #[test]
+    fn accumulates_text_and_tool_fragments() {
+        let mut a = ChatDeltaAccumulator::default();
+        a.push(&serde_json::json!({"choices":[{"delta":{"content":"he"}}]}));
+        a.push(&serde_json::json!({"choices":[{"delta":{"content":"llo","tool_calls":[{"id":"x","function":{"name":"echo","arguments":"{\"a\":"}}]}}]}));
+        a.push(&serde_json::json!({"choices":[{"delta":{"tool_calls":[{"id":"x","function":{"arguments":"1}"}}]}}]}));
+        let m=a.message(); assert_eq!(m["content"][0]["text"],"hello"); assert_eq!(m["content"][1]["name"],"echo"); assert_eq!(m["content"][1]["arguments"],"{\"a\":1}");
+    }
     #[test]
     fn shared_request_encodes_pi_tool_continuation() {
         use serde_json::json;
