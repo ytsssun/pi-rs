@@ -5,13 +5,13 @@ import {basename, resolve} from 'node:path';
 const args=process.argv.slice(2), options={}, extensions=[];
 if(args.includes('--help')) {
   const invocationName = basename(process.argv[1] ?? 'pi-rs').replace(/\.mjs$/, '');
-  console.log(`${invocationName} --session FILE --workspace DIR --input TEXT (--model ID | --fixture FILE) [--resume] [--extension FILE] [--context-tool-chars N|none] [--trace-file FILE] [--command NAME] [--command-args JSON]`);
+  console.log(`${invocationName} --session FILE --workspace DIR --input TEXT (--model ID | --fixture FILE) [--resume] [--extension FILE] [--context-tool-chars N|none] [--trace-file FILE] [--command NAME] [--command-args JSON] [--branch ENTRY_ID|--reset-branch]`);
   process.exit(0);
 }
 for(let i=0;i<args.length;i++) {
   const key=args[i];
-  if(key==='--resume') {if(options[key]) throw Error('duplicate --resume'); options[key]=true; continue;}
-  if(!['--session','--workspace','--input','--model','--fixture','--extension','--context-tool-chars','--trace-file','--command','--command-args'].includes(key)) throw Error(`unknown option ${key}`);
+  if(key==='--resume' || key==='--reset-branch') {if(options[key]) throw Error(`duplicate ${key}`); options[key]=true; continue;}
+  if(!['--session','--workspace','--input','--model','--fixture','--extension','--context-tool-chars','--trace-file','--command','--command-args','--branch','--reset-branch'].includes(key)) throw Error(`unknown option ${key}`);
   const value=args[++i]; if(!value||value.startsWith('--')) throw Error(`missing value for ${key}`);
   if(key==='--extension') extensions.push(resolve(value));
   else {if(key in options) throw Error(`duplicate ${key}`); options[key]=value;}
@@ -21,6 +21,8 @@ if(!options['--input'] && !options['--command']) throw Error('one of --input or 
 if(options['--command-args']) { try { options['--commandArgsParsed']=JSON.parse(options['--command-args']); } catch { throw Error('--command-args must be JSON'); } }
 if (!options['--command'] && Boolean(options['--model'])===Boolean(options['--fixture'])) throw Error('choose exactly one of --model and --fixture');
 if (options['--command'] && (options['--model'] || options['--fixture'])) throw Error('--command cannot be combined with --model or --fixture');
+if (options['--branch'] && options['--reset-branch']) throw Error('--branch cannot be combined with --reset-branch');
+if ((options['--branch'] || options['--reset-branch']) && !options['--resume']) throw Error('branch selection requires --resume');
 const path=resolve(options['--session']), cwd=resolve(options['--workspace']);
 if(existsSync(path)!==Boolean(options['--resume'])) throw Error('session existence does not match --resume');
 let fixture;
@@ -32,6 +34,8 @@ const {nativeProviderStream}=await import('../prototype/architecture/native-prov
 const {createCodingTools}=await import('../vendor/pi-mono/packages/coding-agent/src/core/tools/index.ts');
 const tools=createCodingTools(cwd);
 const manager=await createBackend({path,cwd,mode:options['--resume']?'open':'create'});
+  if (options['--branch']) await manager.branch(options['--branch']);
+  if (options['--reset-branch']) await manager.resetLeaf();
 try {
   const host=await createHost(tsBackend(tools.map(t=>t.name)),{cwd,sessionManager:manager,extensionPaths:extensions,factories:[pi=>{for(const tool of tools) pi.registerTool(tool);} ]});
   if(options['--context-tool-chars']!==undefined) { const raw=options['--context-tool-chars']; manager.setContextPolicy(raw==='none'?null:Number(raw)); }
