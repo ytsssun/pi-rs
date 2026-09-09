@@ -36,9 +36,6 @@ const {nativeProviderStream}=await import('../prototype/architecture/native-prov
 const {createCodingTools}=await import('../vendor/pi-mono/packages/coding-agent/src/core/tools/index.ts');
 const tools=createCodingTools(cwd);
 const manager=await createBackend({path,cwd,mode:options['--resume']?'open':'create'});
-if (options['--branch']) await manager.branch(options['--branch']);
-if (options['--reset-branch']) await manager.resetLeaf();
-if (options['--compact-summary']) await manager.appendCompaction(options['--compact-summary'], options['--compact-first-kept'], Number(options['--compact-tokens-before']));
   if (options['--branch']) await manager.branch(options['--branch']);
   if (options['--reset-branch']) await manager.resetLeaf();
 if (options['--compact-summary']) await manager.appendCompaction(options['--compact-summary'], options['--compact-first-kept'], Number(options['--compact-tokens-before']));
@@ -54,11 +51,6 @@ try {
     let commandError = null;
     try { await command.handler(commandArgs, host.runner.createCommandContext()); } catch (error) { commandError = error instanceof Error ? error.message : String(error); }
     await manager.appendCustomEntry('pi-rs.command.v1', {name: options['--command'], args: commandArgs, ok: commandError === null, error: commandError});
-    if (!existsSync(path)) {
-      const header = {type:'session',version:3,id:`pi-rs-${Date.now()}`,cwd};
-      appendFileSync(path, JSON.stringify(header)+'\n');
-    }
-    appendFileSync(path, JSON.stringify({id:`cmd-${Date.now()}`,parentId:null,type:'custom',customType:'pi-rs.command.v1',data:{name: options['--command'],args: commandArgs,ok: commandError === null,error: commandError},timestamp:Date.now()})+'\n');
     if (commandError) throw Error(`command ${options['--command']} failed: ${commandError}`);
     commandResult = {name: options['--command'], args: commandArgs, dispatched: true};
   }

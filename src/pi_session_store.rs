@@ -118,7 +118,7 @@ impl PiSessionStore {
         // write therefore remains visible in this session instance.
         self.content = candidate;
         self.leaf = Value::String(id.clone());
-        let needs_initial_flush = has_assistant || (entry["type"] == "custom" && entry["customType"] == "pi-rs.in-flight.v1" || entry["type"] == "compaction");
+        let needs_initial_flush = has_assistant || (entry["type"] == "custom" && (entry["customType"] == "pi-rs.in-flight.v1" || entry["customType"] == "pi-rs.command.v1") || entry["type"] == "compaction");
         if self.flushed {
             OpenOptions::new()
                 .append(true)
