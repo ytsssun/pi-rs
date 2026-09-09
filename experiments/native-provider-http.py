@@ -46,7 +46,7 @@ try:
         result = subprocess.run(['node','--input-type=module','-e',script], check=True,
             capture_output=True, text=True, timeout=15, env={
                 'PATH':os.environ['PATH'], 'OPENAI_API_KEY':'fixture-only-key',
-                'OPENAI_BASE_URL':f'http://127.0.0.1:{server.server_port}/v1'})
+                'OPENAI_BASE_URL':f'http://127.0.0.1:{server.server_port}/v1', 'FIXTURE_BASE_URL':f'http://127.0.0.1:{server.server_port}/v1'})
         observed = json.loads(result.stdout)
         assert len(requests) == before + 1, 'redirect/retry unexpectedly performed'
         path, auth, payload = requests[-1]
