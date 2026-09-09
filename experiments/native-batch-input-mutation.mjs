@@ -26,8 +26,10 @@ try {
    const results=manager.snapshot().branch.filter(e=>e.message?.role==='toolResult').map(e=>e.message);
    assert.deepEqual(results.map(r=>r.toolCallId),['a','b']);
    assert.deepEqual(results.map(r=>r.isError),[invalid,false]);
-   assert.deepEqual(resultHooks,['a','b']);
-   assert.deepEqual(results.map(r=>r.content[0].text),['intercepted:a','intercepted:b']);
+   assert.deepEqual(resultHooks,invalid?['b']:['a','b']);
+   assert.equal(results[1].content[0].text,'intercepted:b');
+   if(!invalid) assert.equal(results[0].content[0].text,'intercepted:a');
+   else assert.notEqual(results[0].content[0].text,'intercepted:a');
 
   }finally{await manager.close();}
  }

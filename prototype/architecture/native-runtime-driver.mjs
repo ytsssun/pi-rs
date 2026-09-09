@@ -23,9 +23,8 @@ export async function drive({manager,host,prompt,stream,trace=[],onToolUpdate=()
       trace.push({type:'model_result',requestId});
     } else if(action.type==='tool') {
       trace.push({type:'tool_start',requestId,tool:action.call?.name});
-      const call=action.call;let result,isError=false,updateFailed=false,updateFailure,args=call.arguments??{};
+      const call=action.call;let result,isError=false,updateFailed=false,updateFailure,executed=false,args=call.arguments??{};
       try {
-        if(['write','edit','bash'].includes(call.name)) step({event:'mark_in_flight',requestId,toolCallId:call.id,toolName:call.name});
         if(call.skipError)throw Error(call.skipError); // Rust rejected truncated call.
         const registered=host.runner.getAllRegisteredTools().find(t=>t.definition.name===call.name);
         if(!registered)throw Error(`Tool ${call.name} not found`);
@@ -35,6 +34,8 @@ export async function drive({manager,host,prompt,stream,trace=[],onToolUpdate=()
         const hook=await host.runner.emitToolCall(hookEvent);
         args=hookEvent.input;
         if(hook?.block) throw Error(hook.reason||'Tool execution was blocked');
+        if(['write','edit','bash'].includes(call.name)) step({event:'mark_in_flight',requestId,toolCallId:call.id,toolName:call.name});
+        executed=true;
         result=await executeWithUpdates(tool,call.id,hookEvent.input,new AbortController().signal,async update=>{
           const accepted=step({event:'tool_update',requestId,update});
           if(accepted.type!=='accepted') throw Error('native runtime rejected tool update');
@@ -43,7 +44,7 @@ export async function drive({manager,host,prompt,stream,trace=[],onToolUpdate=()
           trace.push({type:'tool_update',tool:call.name});
         });
       } catch(error) { if(propagateUpdateErrors && updateFailed) throw updateFailure; isError=true;result={content:[{type:'text',text:error instanceof Error?error.message:String(error)}],details:{}};}
-      const hooked=await host.runner.emitToolResult({type:'tool_result',toolCallId:call.id,toolName:call.name,input:args,content:result.content??[],details:result.details,isError,usage:result.usage});
+      const hooked=executed && await host.runner.emitToolResult({type:'tool_result',toolCallId:call.id,toolName:call.name,input:args,content:result.content??[],details:result.details,isError,usage:result.usage});
       if(hooked){result.content=hooked.content??result.content;result.details=hooked.details??result.details;result.usage=hooked.usage??result.usage;isError=hooked.isError??isError;}
       action=step({event:'tool_result',requestId,result,isError});
       trace.push({type:'tool_result',requestId,tool:call.name,isError});
@@ -78,7 +79,7 @@ export async function drive({manager,host,prompt,stream,trace=[],onToolUpdate=()
           });
           }
         } catch(error) { isError=true; result={content:[{type:'text',text:error instanceof Error?error.message:String(error)}],details:{}}; }
-        const hooked=await host.runner.emitToolResult({type:'tool_result',toolCallId:call.id,toolName:call.name,input:args,content:result.content??[],details:result.details,isError,usage:result.usage});
+        const hooked=!immediate && await host.runner.emitToolResult({type:'tool_result',toolCallId:call.id,toolName:call.name,input:args,content:result.content??[],details:result.details,isError,usage:result.usage});
         if(hooked){ result.content=hooked.content??result.content; result.details=hooked.details??result.details; result.usage=hooked.usage??result.usage; isError=hooked.isError??isError; }
         trace.push({type:'tool_result',requestId:entry.requestId,tool:call.name,isError});
         return {requestId:entry.requestId,content:result.content,details:result.details,isError,usage:result.usage,terminate:result.terminate===true};
