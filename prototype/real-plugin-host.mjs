@@ -65,8 +65,9 @@ export async function createHost(backend, { factories = [], cwd = process.cwd(),
     },
   });
   let thinkingLevel = 'off';
+  for (const entry of restoredEntries) if (entry?.customType === 'thinking_level') thinkingLevel = String(entry.data?.level ?? 'off');
   let selectedModel;
-  Object.assign(actions, { setModel: model => { selectedModel = model; return true; }, getCommands: () => runner.getRegisteredCommands().map(command => ({name: command.invocationName, description: command.description, source: 'extension', sourceInfo: command.sourceInfo})), getThinkingLevel: () => thinkingLevel, setThinkingLevel: level => { thinkingLevel = level; }, refreshTools: () => undefined });
+  Object.assign(actions, { setModel: model => { selectedModel = model; return true; }, getCommands: () => runner.getRegisteredCommands().map(command => ({name: command.invocationName, description: command.description, source: 'extension', sourceInfo: command.sourceInfo})), getThinkingLevel: () => thinkingLevel, setThinkingLevel: async level => { thinkingLevel = String(level); if (typeof sessionManager.appendCustomEntry === 'function') await sessionManager.appendCustomEntry('thinking_level', {level: thinkingLevel}); }, refreshTools: () => undefined });
   Object.assign(actions, {
     getActiveTools: () => {
       const names = backend.getActiveTools();
