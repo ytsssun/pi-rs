@@ -75,7 +75,7 @@ impl Registry {
             match r["op"].as_str().unwrap_or("") {
                 "provider_chat" => {
                     let key = std::env::var("OPENAI_API_KEY").map_err(|_| "OPENAI_API_KEY missing".to_string())?;
-                    let base = std::env::var("OPENAI_BASE_URL").unwrap_or_else(|_| "https://api.openai.com/v1".into());
+                    let base = r["base_url"].as_str().map(str::to_string).or_else(|| std::env::var("OPENAI_BASE_URL").ok()).unwrap_or_else(|| "https://api.openai.com/v1".into());
                     let model = r["model"].as_str().ok_or("model required")?;
                     openai_chat(&pi_rs::provider::client().map_err(|e| e.to_string())?, &base, &key, model, r["messages"].as_array().ok_or("messages required")?, &r["tools"], r["reasoning_effort"].as_str()).map_err(|e| e.to_string())
                 }
@@ -119,7 +119,7 @@ impl Registry {
                 }
                 "provider_stream_start" => {
                     let key = std::env::var("OPENAI_API_KEY").map_err(|_| "OPENAI_API_KEY missing".to_string())?;
-                    let base = std::env::var("OPENAI_BASE_URL").unwrap_or_else(|_| "https://api.openai.com/v1".into());
+                    let base = r["base_url"].as_str().map(str::to_string).or_else(|| std::env::var("OPENAI_BASE_URL").ok()).unwrap_or_else(|| "https://api.openai.com/v1".into());
                     let model = r["model"].as_str().ok_or("model required")?.to_string();
                     let messages = r["messages"].as_array().ok_or("messages required")?.to_vec();
                     let tools = r["tools"].clone();
