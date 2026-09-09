@@ -65,7 +65,8 @@ export async function createHost(backend, { factories = [], cwd = process.cwd(),
     },
   });
   let thinkingLevel = 'off';
-  Object.assign(actions, { getCommands: () => runner.getRegisteredCommands().map(command => ({name: command.invocationName, description: command.description, source: 'extension', sourceInfo: command.sourceInfo})), getThinkingLevel: () => thinkingLevel, setThinkingLevel: level => { thinkingLevel = level; }, refreshTools: () => undefined });
+  let selectedModel;
+  Object.assign(actions, { setModel: model => { selectedModel = model; return true; }, getCommands: () => runner.getRegisteredCommands().map(command => ({name: command.invocationName, description: command.description, source: 'extension', sourceInfo: command.sourceInfo})), getThinkingLevel: () => thinkingLevel, setThinkingLevel: level => { thinkingLevel = level; }, refreshTools: () => undefined });
   Object.assign(actions, {
     getActiveTools: () => {
       const names = backend.getActiveTools();
@@ -81,7 +82,7 @@ export async function createHost(backend, { factories = [], cwd = process.cwd(),
   const contextActions = Object.fromEntries([
     'getScopedModels', 'getSignal', 'abort', 'shutdown', 'getSystemPrompt',
   ].map((name) => [name, unsupported(name)]));
-  Object.assign(contextActions, { getModel: () => undefined, isIdle: () => pendingMessages.length === 0, isProjectTrusted: () => true, hasPendingMessages: () => pendingMessages.length > 0 });
+  Object.assign(contextActions, { getModel: () => selectedModel, isIdle: () => pendingMessages.length === 0, isProjectTrusted: () => true, hasPendingMessages: () => pendingMessages.length > 0 });
   Object.assign(contextActions, { getContextUsage: () => { const entries = typeof sessionManager.getEntries === 'function' ? sessionManager.getEntries() : []; return estimateContextTokens(entries.flatMap(sessionEntryToContextMessages)); }, compact: async (options = {}) => { assert.ok(typeof sessionManager.appendCompaction === 'function', 'sessionManager.appendCompaction required'); return sessionManager.appendCompaction(String(options.summary ?? ''), options.firstKeptEntryId, Number(options.tokensBefore ?? 0)); } });
   runner.bindCore(actions, contextActions);
   const execute = async (name, params) => {
