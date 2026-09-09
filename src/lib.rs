@@ -378,3 +378,20 @@ where
 }
 
 pub mod sidecar;
+
+/// Conservative model-view size estimate used for bounded compaction experiments.
+/// This is deliberately an upper bound (four UTF-8 bytes per token), not a provider tokenizer.
+pub fn estimate_context_tokens(value: &Value) -> usize {
+    value.to_string().len().saturating_add(3) / 4
+}
+
+#[cfg(test)]
+mod context_size_tests {
+    use super::*;
+    #[test]
+    fn estimate_is_conservative_and_deterministic() {
+        let v = json!({"role":"tool","content":"abcdefgh"});
+        assert_eq!(estimate_context_tokens(&v), v.to_string().len().div_ceil(4));
+        assert!(estimate_context_tokens(&json!("🙂🙂🙂🙂")) >= 1);
+    }
+}
