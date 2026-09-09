@@ -3,6 +3,8 @@
 import {readFileSync, existsSync, writeFileSync, appendFileSync} from 'node:fs';
 import {basename, resolve} from 'node:path';
 const args=process.argv.slice(2), options={}, extensions=[];
+// Load project-local .env for provider subprocesses without printing secrets.
+try { for (const line of readFileSync(new URL('../.env', import.meta.url), 'utf8').split(/\r?\n/)) { const m=line.match(/^\s*([A-Za-z_][A-Za-z0-9_]*)\s*=\s*(.*)\s*$/); if (m && process.env[m[1]]===undefined) process.env[m[1]]=m[2].replace(/^(['\"])(.*)\1$/, '$2'); } } catch {}
 if(args.includes('--help')) {
   const invocationName = basename(process.argv[1] ?? 'pi-rs').replace(/\.mjs$/, '');
   console.log(`${invocationName} --session FILE --workspace DIR --input TEXT (--model ID | --fixture FILE) [--resume] [--extension FILE] [--context-tool-chars N|none] [--trace-file FILE] [--command NAME] [--command-args JSON] [--branch ENTRY_ID|--reset-branch]`);
