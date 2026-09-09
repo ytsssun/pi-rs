@@ -13,10 +13,14 @@ pub fn parse_sse_data(data: &str) -> Result<Option<Value>> {
 }
 
 #[derive(Default)]
-pub struct SseDecoder { buffer: String }
+pub struct SseDecoder { buffer: String, pending_bytes: Vec<u8>, after_cr: bool }
 impl SseDecoder {
     pub fn push(&mut self, chunk: &str) -> Result<Vec<Option<Value>>> {
-        self.buffer.push_str(&chunk.replace("\r\n", "\n"));
+        for ch in chunk.chars() {
+            if ch == '\n' && self.after_cr { self.after_cr = false; continue; }
+            self.after_cr = ch == '\r';
+            self.buffer.push(if self.after_cr { '\n' } else { ch });
+        }
         let mut out = Vec::new();
         while let Some(pos) = self.buffer.find("\n\n") {
             let event = self.buffer[..pos].to_string(); self.buffer.drain(..pos + 2);
@@ -24,7 +28,20 @@ impl SseDecoder {
         }
         Ok(out)
     }
-    pub fn finish(self) -> Result<()> { if self.buffer.trim().is_empty() { Ok(()) } else { bail!("SSE ended with incomplete event") } }
+    pub fn push_bytes(&mut self, chunk: &[u8]) -> Result<Vec<Option<Value>>> {
+        self.pending_bytes.extend_from_slice(chunk);
+        let length = match std::str::from_utf8(&self.pending_bytes) {
+            Ok(text) => text.len(),
+            Err(error) if error.error_len().is_none() => error.valid_up_to(),
+            Err(error) => return Err(error).context("stream was not UTF-8"),
+        };
+        let text = std::str::from_utf8(&self.pending_bytes[..length])?.to_owned();
+        self.pending_bytes.drain(..length);
+        self.push(&text)
+    }
+    pub fn finish(self) -> Result<()> {
+        if !self.pending_bytes.is_empty() { bail!("SSE ended with incomplete UTF-8"); }
+        if self.buffer.trim().is_empty() { Ok(()) } else { bail!("SSE ended with incomplete event") } }
 }
 
 pub fn client() -> Result<Client> {
@@ -79,7 +96,7 @@ pub fn openai_chat_stream<F: FnMut(Option<Value>) -> Result<()>>(client: &Client
     loop {
         let n = std::io::Read::read(&mut response, &mut buf)?;
         if n == 0 { break; }
-        for event in decoder.push(std::str::from_utf8(&buf[..n]).context("stream was not UTF-8")?)? {
+        for event in decoder.push_bytes(&buf[..n])? {
             let done = event.is_none(); on_event(event)?; if done { return Ok(()); }
         }
     }
