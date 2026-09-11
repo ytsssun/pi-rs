@@ -63,6 +63,14 @@ export async function createHost(backend, { factories = [], cwd = process.cwd(),
   // queue after extension dispatch. Keeping the queue explicit makes the
   // contract deterministic without pretending to run a provider here.
   const pendingMessages = [];
+  let activeDrive;
+  const beginDrive = () => {
+    if (activeDrive) throw new Error('Host already has an active drive');
+    let resolve;
+    const promise = new Promise(done => { resolve = done; });
+    activeDrive = promise;
+    return () => { activeDrive = undefined; resolve(); };
+  };
   const actions = Object.fromEntries(['setModel'].map((name) => [name, unsupported(name)]));
   Object.assign(actions, {
     sendMessage: (message, options) => { pendingMessages.push({ kind: 'agent', message, options }); },
@@ -100,9 +108,14 @@ export async function createHost(backend, { factories = [], cwd = process.cwd(),
   const contextActions = Object.fromEntries([
     'getSignal',
   ].map((name) => [name, unsupported(name)]));
-  Object.assign(contextActions, { getSignal: () => lifecycleAbort.signal, getScopedModels: () => [...providers.values()].flatMap(p => Array.isArray(p.models) ? p.models : []), getSystemPrompt: () => '', getSystemPromptOptions: () => ({cwd}), abort: () => { lifecycleAbort.abort(); runner.invalidate('aborted by extension'); }, shutdown: () => runner.invalidate('shutdown requested'), getModel: () => selectedModel, isIdle: () => pendingMessages.length === 0, isProjectTrusted: () => true, hasPendingMessages: () => pendingMessages.length > 0 });
+  Object.assign(contextActions, { getSignal: () => lifecycleAbort.signal, getScopedModels: () => [...providers.values()].flatMap(p => Array.isArray(p.models) ? p.models : []), getSystemPrompt: () => '', getSystemPromptOptions: () => ({cwd}), abort: () => { lifecycleAbort.abort(); runner.invalidate('aborted by extension'); }, shutdown: () => runner.invalidate('shutdown requested'), getModel: () => selectedModel, isIdle: () => activeDrive === undefined, isProjectTrusted: () => true, hasPendingMessages: () => pendingMessages.length > 0 });
   Object.assign(contextActions, { getContextUsage: () => { const entries = typeof sessionManager.getEntries === 'function' ? sessionManager.getEntries() : []; return estimateContextTokens(entries.flatMap(sessionEntryToContextMessages)); }, compact: async (options = {}) => { assert.ok(typeof sessionManager.appendCompaction === 'function', 'sessionManager.appendCompaction required'); return sessionManager.appendCompaction(String(options.summary ?? ''), options.firstKeptEntryId, Number(options.tokensBefore ?? 0)); } });
   runner.bindCore(actions, contextActions);
+  runner.bindCommandContext({
+    waitForIdle: () => activeDrive ?? Promise.resolve(),
+    ...Object.fromEntries(['newSession', 'fork', 'navigateTree', 'switchSession', 'reload']
+      .map(name => [name, unsupported(name)])),
+  });
   const execute = async (name, params) => {
     assert.ok(backend.getActiveTools().includes(name), `inactive tool: ${name}`);
     const definition = runner.getToolDefinition(name);
@@ -115,7 +128,7 @@ export async function createHost(backend, { factories = [], cwd = process.cwd(),
     assert.ok(definition, `unregistered tool: ${name}`);
     return { name, description: definition.description, parameters: definition.parameters };
   });
-  return { runner, eventBus, errors, providers, modelRegistry, contextActions, execute, requestTools, runtime: loaded.runtime, actions, pendingMessages, drainMessages: () => pendingMessages.splice(0) };
+  return { beginDrive, runner, eventBus, errors, providers, modelRegistry, contextActions, execute, requestTools, runtime: loaded.runtime, actions, pendingMessages, drainMessages: () => pendingMessages.splice(0) };
 }
 
 export async function exercise(backend = tsBackend()) {
