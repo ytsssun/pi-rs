@@ -1,6 +1,8 @@
 # Installation and development
 
-The installer builds from source and uses `cargo install --locked --path . --bin pi-rs` to install a release launcher. Rust, Node.js 22.18+, npm, Python 3, Git, and platform build tools are prerequisites. It installs pinned upstream Node dependencies and builds the Rust Node-API addon. The addon currently uses the development build profile; no performance claim is made.
+The installer builds from source and uses `cargo install --locked --path . --bin pi-rs` to install a release launcher. Rust, Node.js 22.19+, npm, Python 3, Git, and platform build tools are prerequisites. It installs pinned upstream Node dependencies and builds the Rust Node-API addon. The addon currently uses the development build profile; no performance claim is made.
+
+The source build downloads upstream model catalog data using `hydrate:model-data` before the offline compilation step. This requires network access; the Pi source commit is pinned, but these external catalog inputs are not pinned. A catalog outage fails installation rather than silently substituting stale data. No model API credentials are required.
 
 ## Locations
 

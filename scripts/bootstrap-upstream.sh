@@ -13,5 +13,7 @@ git -C vendor/pi-mono diff --exit-code
 if [ "${1:-}" = "--build" ]; then
   command -v npm >/dev/null 2>&1 || { echo 'npm is required for --build' >&2; exit 1; }
   npm --prefix vendor/pi-mono ci --ignore-scripts
+  # The pinned source omits generated provider data required by build:offline.
+  npm --prefix vendor/pi-mono run hydrate:model-data
   npm --prefix vendor/pi-mono run build:offline
 fi

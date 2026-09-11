@@ -8,7 +8,7 @@ This is an early, headless implementation. Basic coding and session continuation
 
 ## Install
 
-On macOS or Linux, install from source with Rust, Node.js 22.18+, npm, Python 3, and Git:
+On macOS or Linux, install from source with Rust, Node.js 22.19+, npm, Python 3, and Git:
 
 ```sh
 curl -fsSL https://raw.githubusercontent.com/ytsssun/pi-rs/main/scripts/install.sh | sh

@@ -21,7 +21,7 @@ export PATH="${CARGO_HOME:-$HOME/.cargo}/bin:$PATH"
 for tool in cargo rustc node npm python3 git; do
   command -v "$tool" >/dev/null 2>&1 || { echo "Missing prerequisite: $tool" >&2; exit 1; }
 done
-node -e 'const [major,minor]=process.versions.node.split(".").map(Number); if(major<22 || (major===22 && minor<18)) { console.error("Node.js 22.18+ required"); process.exit(1); }'
+node -e 'const [major,minor]=process.versions.node.split(".").map(Number); if(major<22 || (major===22 && minor<19)) { console.error("Node.js 22.19+ required"); process.exit(1); }'
 case "$(uname -s)" in Darwin|Linux) ;; *) echo 'Only macOS and Linux are supported' >&2; exit 1;; esac
 if [ -z "$source_dir" ]; then
   data_dir=${XDG_DATA_HOME:-"$HOME/.local/share"}/pi-rs
