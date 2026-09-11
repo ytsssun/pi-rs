@@ -5,7 +5,16 @@ import {request} from './native-store-backend.mjs';
 import {sessionEntryToContextMessages} from '../../vendor/pi-mono/packages/coding-agent/src/core/session-manager.ts';
 import {wrapRegisteredTool} from '../../vendor/pi-mono/packages/coding-agent/src/core/extensions/wrapper.ts';
 import {validateToolArguments} from '../../vendor/pi-mono/packages/ai/src/utils/validation.ts';
-export async function drive({manager,host,prompt,stream,trace=[],onToolUpdate=()=>{},onMessage,propagateUpdateErrors=false,parallel=false}) {
+export async function drive(options) {
+  const finish = options.host.beginDrive();
+  try {
+    return await driveActive(options);
+  } finally {
+    // Includes provider, tool, persistence, and queued-message delivery failures.
+    finish();
+  }
+}
+async function driveActive({manager,host,prompt,stream,trace=[],onToolUpdate=()=>{},onMessage,propagateUpdateErrors=false,parallel=false}) {
   const step=payload=>request({op:'runtime',handle:manager.handle,...payload});
   let action=step({event:'begin',prompt,parallel});
   trace.push({type:'turn_start'});

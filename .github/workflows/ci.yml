@@ -26,6 +26,8 @@ jobs:
         run: python3 scripts/build-native-session.py
       - name: Verify native CLI command acceptance
         run: node --experimental-strip-types experiments/command-invocation.mjs
+      - name: Verify native command idle lifecycle
+        run: node --experimental-strip-types experiments/command-idle.mjs
       - name: Verify native blocked tool hook acceptance
         run: |
           node experiments/native-batch-hook-abort.mjs
