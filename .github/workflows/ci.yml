@@ -35,3 +35,5 @@ jobs:
           node experiments/native-batch-hook-abort.mjs
           node experiments/native-preflight-results.mjs
           node experiments/native-batch-input-mutation.mjs
+      - name: Verify formal CLI lifecycle
+        run: node --experimental-strip-types experiments/cli-lifecycle.mjs
