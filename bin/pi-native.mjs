@@ -22,7 +22,7 @@ for(const key of ['--session','--workspace']) if(!options[key]) throw Error(`${k
 if(!options['--input'] && !options['--command']) throw Error('one of --input or --command required');
 if(options['--command-args']) { try { options['--commandArgsParsed']=JSON.parse(options['--command-args']); } catch { throw Error('--command-args must be JSON'); } }
 if (options['--model'] && options['--fixture']) throw Error('choose exactly one of --model and --fixture');
-if (!options['--command'] && !options['--resume'] && Boolean(options['--model'])===Boolean(options['--fixture'])) throw Error('choose exactly one of --model and --fixture');
+if (!options['--input']?.startsWith('/') && !options['--command'] && !options['--resume'] && Boolean(options['--model'])===Boolean(options['--fixture'])) throw Error('choose exactly one of --model and --fixture');
 if (options['--command'] && (options['--model'] || options['--fixture'])) throw Error('--command cannot be combined with --model or --fixture');
 if (options['--compact-summary'] && (!options['--compact-first-kept'] || !options['--compact-tokens-before'])) throw Error('--compact-summary requires --compact-first-kept and --compact-tokens-before');
 if (options['--compact-summary'] && !options['--resume']) throw Error('compaction requires --resume');
@@ -48,13 +48,12 @@ const savedModel = savedBranchModel(manager);
 const selectedModel = options['--model'] || savedModel;
 let resolvedModel;
 let transportModel;
-if (selectedModel && !options['--fixture'] && !options['--command']) { const slash=selectedModel.indexOf('/'); const provider=slash>0?selectedModel.slice(0,slash):'openai'; const modelId=slash>0?selectedModel.slice(slash+1):selectedModel; const runtime=await ModelRuntime.create({modelsPath:null,refreshOnCreate:false,allowModelNetwork:false}); resolvedModel=runtime.getModel(provider, modelId); if (!resolvedModel) throw Error(`model not found: provider=${provider} id=${modelId}`); }
-if (resolvedModel && !options['--fixture'] && !options['--command']) transportModel = openAITransportModel(resolvedModel);
-if (!options['--command'] && !options['--fixture'] && !selectedModel) throw Error('--model required for new sessions or when no saved model exists');
 if (options['--compact-summary']) await manager.appendCompaction(options['--compact-summary'], options['--compact-first-kept'], Number(options['--compact-tokens-before']));
   const host=await createHost(tsBackend(tools.map(t=>t.name)),{cwd,sessionManager:manager,extensionPaths:extensions,factories:[pi=>{for(const tool of tools) pi.registerTool(tool);} ]});
   if(options['--context-tool-chars']!==undefined) { const raw=options['--context-tool-chars']; manager.setContextPolicy(raw==='none'?null:Number(raw)); }
+  const {trySlashCommand}=await import('../prototype/architecture/command-invocation.mjs');
   let commandResult;
+  const slashHandled = !options['--command'] && await trySlashCommand(options['--input'], host.runner);
   if (options['--command']) {
     const command = host.runner.getCommand(options['--command']);
     if (!command) throw Error(`unknown command: ${options['--command']}`);
@@ -66,11 +65,15 @@ if (options['--compact-summary']) await manager.appendCompaction(options['--comp
     if (commandError) throw Error(`command ${options['--command']} failed: ${commandError}`);
     commandResult = {name: options['--command'], args: commandArgs, dispatched: true};
   }
+if (!slashHandled && selectedModel && !options['--fixture'] && !options['--command']) { const slash=selectedModel.indexOf('/'); const provider=slash>0?selectedModel.slice(0,slash):'openai'; const modelId=slash>0?selectedModel.slice(slash+1):selectedModel; const runtime=await ModelRuntime.create({modelsPath:null,refreshOnCreate:false,allowModelNetwork:false}); resolvedModel=runtime.getModel(provider, modelId); if (!resolvedModel) throw Error(`model not found: provider=${provider} id=${modelId}`); }
+if (!slashHandled && resolvedModel && !options['--fixture'] && !options['--command']) transportModel = openAITransportModel(resolvedModel);
+
+  if (!slashHandled && options['--input'] && !options['--command'] && !fixture && !selectedModel) throw Error('--model required for new sessions or when no saved model exists');
   let index=0;
   if (options['--model'] && !options['--command']) await manager.appendCustomEntry('pi-rs.model.v1', {model: options['--model']});
   const stream=fixture?async()=>{const message=fixture[index++]; if(!message)throw Error(`fixture exhausted after ${index} assistant responses; provide the next assistant message for the tool result`);return {async *[Symbol.asyncIterator](){},async result(){return message;}};}:nativeProviderStream({model:transportModel,streaming:true});
-  const result=options['--input'] ? await drive({manager,host,prompt:options['--input'],stream}) : null;
-  const report={result,command:commandResult,compaction:options['--compact-summary']?manager.snapshot().contextEntries.find(e=>e.type==='compaction')??null:null,session:path,fixture:Boolean(fixture),extensionErrors:host.errors};
+  const result=options['--input'] && !slashHandled ? await drive({manager,host,prompt:options['--input'],stream}) : null;
+  const report={result,command:commandResult,slashHandled,compaction:options['--compact-summary']?manager.snapshot().contextEntries.find(e=>e.type==='compaction')??null:null,session:path,fixture:Boolean(fixture),extensionErrors:host.errors};
   if(options['--trace-file']) writeFileSync(resolve(options['--trace-file']),JSON.stringify(report,null,2)+'\n');
   console.log(JSON.stringify(report));
 } finally {await manager.close();}
