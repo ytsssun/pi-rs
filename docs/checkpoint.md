@@ -1,5 +1,15 @@
 # Current checkpoint
 
+2026-09-11: PR #4 merged as `cc9367515c0416f27ea5955142293179fdaa30a3`. Registered slash commands dispatch before model turns, preserve raw arguments, and work without a model. Invalid-model ordinary/unknown requests no longer mutate resumed history through context policy or compaction. Independent external fixtures passed on repair f873552; exact post-conflict CI 34614396822 and main merge CI 34614579208 completed successfully. CI covers Rust tests/clippy and provider stream fixture; native CLI acceptance was local with shared built dependencies. No new live-model verification in this delivery.
+
+Installer repair at 6dae3cb passed fresh source installation and external installed-binary acceptance; issue #2 closed. Issue #3 remains open for active-turn and session-control semantics. Next: independently audit those remaining upstream behaviors and freeze the next bounded acceptance before implementation. Worker `/root/next_compat_audit` is performing that read-only audit; inspect its result before duplicating work.
+
+Recovery: fetch origin, inspect status, read docs/coordinator.md and recent board entries, then inspect issue #3 and active workers. Preserve uncommitted work. Worker completion now explicitly includes terminal exact-SHA CI and a recoverable pending handoff if interrupted.
+
+## Historical checkpoint (later corrections take precedence)
+
+# Current checkpoint
+
 2026-09-09 correction: installer completed successfully at `~/.cargo/bin/pi-rs` (previous chat report of interruption was incorrect). Installed executable passed external write/resume/extension rejection acceptance with `python3 experiments/formal-cli.py --binary "$HOME/.cargo/bin/pi-rs"`. Source assets remain required; remote curl bootstrap is not yet independently validated. Streaming already uses `nativeProviderStream → assembleNativeQueue → StreamAssembler`; previous claims that this bridge was missing were incorrect. Removed the unused ID-keyed ChatDeltaAccumulator rather than wiring an incompatible duplicate into the runtime. Next: independently validate remote installation and registered-provider selection through the formal CLI.
 
 Formal Cargo `pi-rs` now launches the existing Node host with Rust Node-API runtime and original Pi tools/extensions. Build: `python3 scripts/build-native-session.py` then `cargo build --locked --bin pi-rs`. Source checkout and Node dependencies remain required; this is not a standalone package.

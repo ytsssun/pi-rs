@@ -43,8 +43,14 @@ If a worker disappears, inspect its worktree and commit state before restarting 
 
 ## Active scheduling setup (2026-09-11)
 
-App thread heartbeat `pi-rs-coordinator` was accepted as ACTIVE at a 30-minute interval. Scheduled execution has not yet been observed. The old goal is blocked; this heartbeat is a separate wake-up mechanism. Maximum concurrency is one coordinator plus three child agents (four total). Workers use isolated worktrees and submit branches/PRs; they do not push main. The coordinator must inspect GitHub CI results, not infer success from workflow installation. First dispatched task: `/root/ci_failure_audit`, investigating failed runs 34560998771 and 34560892045.
+App thread heartbeat `pi-rs-coordinator` was accepted as ACTIVE at a 30-minute interval. Scheduled wake-ups have been observed; each wake-up must inspect current state before acting. The old goal is blocked; this heartbeat is a separate wake-up mechanism. Maximum concurrency is one coordinator plus three child agents (four total). Workers use isolated worktrees and submit branches/PRs; they do not push main. The coordinator must inspect GitHub CI results, not infer success from workflow installation. First dispatched task: `/root/ci_failure_audit`, investigating failed runs 34560998771 and 34560892045.
 
 ### Worker completion gate
 
 A worker is not complete when it has made a commit or when CI is merely queued. After every push, the coordinator must poll the exact GitHub run until `status=completed`, inspect failed logs if `conclusion=failure`, and only then record `verified` or a new remediation task. A fast failure is still a failure; never report “triggered” as validation. For local changes, run the relevant acceptance command from a clean checkout or explicitly record why that is impossible.
+
+### Worker handoff and CI ownership
+
+For implementation or CI repair, the assigned worker owns verification through terminal CI status for its exact pushed SHA. Its handoff includes SHA, PR, run URL, acceptance commands and results, failures and remaining limits. Queued, cancelled, missing, timed-out or failed checks mean pending or blocked, not complete. Inspect failure logs, repair the cause, rerun acceptance, and follow the new SHA after each push. After two failures with the same cause, reassess the approach and record evidence before another attempt.
+
+If execution ends before CI finishes, persist the run ID, SHA, failure evidence and exact next action; the coordinator explicitly assumes ownership. The coordinator independently verifies acceptance and exact-SHA checks before integration, then checks the main-branch merge run and updates checkpoint. Prior green runs do not validate conflict resolutions or later changes.
