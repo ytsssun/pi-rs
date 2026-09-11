@@ -40,3 +40,11 @@ tail -30 docs/board.jsonl
 ```
 
 If a worker disappears, inspect its worktree and commit state before restarting it. If the coordinator process exits, start a new task in this repository and follow the loop above. A heartbeat can wake a task, but all durable state must remain in these files and Git.
+
+## Active scheduling setup (2026-09-11)
+
+App thread heartbeat `pi-rs-coordinator` was accepted as ACTIVE at a 30-minute interval. Scheduled execution has not yet been observed. The old goal is blocked; this heartbeat is a separate wake-up mechanism. Maximum concurrency is one coordinator plus three child agents (four total). Workers use isolated worktrees and submit branches/PRs; they do not push main. The coordinator must inspect GitHub CI results, not infer success from workflow installation. First dispatched task: `/root/ci_failure_audit`, investigating failed runs 34560998771 and 34560892045.
+
+### Worker completion gate
+
+A worker is not complete when it has made a commit or when CI is merely queued. After every push, the coordinator must poll the exact GitHub run until `status=completed`, inspect failed logs if `conclusion=failure`, and only then record `verified` or a new remediation task. A fast failure is still a failure; never report “triggered” as validation. For local changes, run the relevant acceptance command from a clean checkout or explicitly record why that is impossible.
