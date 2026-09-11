@@ -47,7 +47,7 @@ if (mode) {
   const directory = mkdtempSync(join(tmpdir(), 'pi-session-identity-'));
   const run = (mode, path, scenario = 'direct') => {
     const start = Date.now();
-    const child = spawnSync(process.execPath, ['--experimental-strip-types', fileURLToPath(import.meta.url), mode, path, scenario], {encoding: 'utf8'});
+    const child = spawnSync(process.execPath, ['--experimental-strip-types', fileURLToPath(import.meta.url), mode, path, scenario], {encoding: 'utf8', timeout: 30000});
     const end = Date.now();
     assert.equal(child.status, 0, `${mode}: ${child.stderr} ${child.stdout}`);
     return {...JSON.parse(child.stdout), start, end};

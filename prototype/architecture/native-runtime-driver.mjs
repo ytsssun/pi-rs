@@ -15,7 +15,7 @@ export async function drive(options) {
   }
 }
 async function driveActive({manager,host,prompt,stream,trace=[],onToolUpdate=()=>{},onMessage,propagateUpdateErrors=false,parallel=false}) {
-  const step=payload=>request({op:'runtime',handle:manager.handle,...payload});
+  const step=payload=>{ const now=Date.now(); return request({op:'runtime',handle:manager.handle,timestamp:new Date(now).toISOString(),messageTimestamp:now,...payload}); };
   let action=step({event:'begin',prompt,parallel});
   trace.push({type:'turn_start'});
   for(let count=0;count<32;count++) {

@@ -5,6 +5,7 @@ use serde_json::{json, Value};
 use std::collections::{HashMap, HashSet};
 
 pub struct PiSessionIndex {
+    header: Value,
     entries: Vec<Value>,
     by_id: HashMap<String, usize>,
 }
@@ -30,7 +31,11 @@ impl PiSessionIndex {
                 .context("entry without string id is not supported")?;
             by_id.insert(id.to_owned(), i);
         }
-        Ok(Self { entries, by_id })
+        Ok(Self {
+            header,
+            entries,
+            by_id,
+        })
     }
     fn path(&self, leaf: Option<&Value>, fallback: bool) -> Result<Vec<Value>> {
         if leaf.is_some_and(Value::is_null) {
@@ -129,7 +134,7 @@ impl PiSessionIndex {
             path
         };
         Ok(
-            json!({"entries":self.entries,"branch":branch,"contextEntries":context,"thinkingLevel":thinking,"model":model}),
+            json!({"header":self.header,"entries":self.entries,"branch":branch,"contextEntries":context,"thinkingLevel":thinking,"model":model}),
         )
     }
 }
