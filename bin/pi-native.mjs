@@ -48,9 +48,7 @@ const savedModel = savedBranchModel(manager);
 const selectedModel = options['--model'] || savedModel;
 let resolvedModel;
 let transportModel;
-if (options['--compact-summary']) await manager.appendCompaction(options['--compact-summary'], options['--compact-first-kept'], Number(options['--compact-tokens-before']));
   const host=await createHost(tsBackend(tools.map(t=>t.name)),{cwd,sessionManager:manager,extensionPaths:extensions,factories:[pi=>{for(const tool of tools) pi.registerTool(tool);} ]});
-  if(options['--context-tool-chars']!==undefined) { const raw=options['--context-tool-chars']; manager.setContextPolicy(raw==='none'?null:Number(raw)); }
   const {trySlashCommand}=await import('../prototype/architecture/command-invocation.mjs');
   let commandResult;
   const slashHandled = !options['--command'] && await trySlashCommand(options['--input'], host.runner);
@@ -69,8 +67,10 @@ if (!slashHandled && selectedModel && !options['--fixture'] && !options['--comma
 if (!slashHandled && resolvedModel && !options['--fixture'] && !options['--command']) transportModel = openAITransportModel(resolvedModel);
 
   if (!slashHandled && options['--input'] && !options['--command'] && !fixture && !selectedModel) throw Error('--model required for new sessions or when no saved model exists');
+if (options['--compact-summary']) await manager.appendCompaction(options['--compact-summary'], options['--compact-first-kept'], Number(options['--compact-tokens-before']));
+  if(options['--context-tool-chars']!==undefined) { const raw=options['--context-tool-chars']; manager.setContextPolicy(raw==='none'?null:Number(raw)); }
   let index=0;
-  if (options['--model'] && !options['--command']) await manager.appendCustomEntry('pi-rs.model.v1', {model: options['--model']});
+  if (!slashHandled && options['--model'] && !options['--command']) await manager.appendCustomEntry('pi-rs.model.v1', {model: options['--model']});
   const stream=fixture?async()=>{const message=fixture[index++]; if(!message)throw Error(`fixture exhausted after ${index} assistant responses; provide the next assistant message for the tool result`);return {async *[Symbol.asyncIterator](){},async result(){return message;}};}:nativeProviderStream({model:transportModel,streaming:true});
   const result=options['--input'] && !slashHandled ? await drive({manager,host,prompt:options['--input'],stream}) : null;
   const report={result,command:commandResult,slashHandled,compaction:options['--compact-summary']?manager.snapshot().contextEntries.find(e=>e.type==='compaction')??null:null,session:path,fixture:Boolean(fixture),extensionErrors:host.errors};
