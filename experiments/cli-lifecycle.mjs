@@ -9,6 +9,7 @@ const log = join(dir, 'events.jsonl'), extension = join(dir, 'probe.ts');
 writeFileSync(extension, `import {appendFileSync} from 'node:fs';
 export default function(pi) {
  const record = value => appendFileSync(${JSON.stringify(log)}, JSON.stringify(value)+'\\n');
+ record({type:'extension_loaded'});
  let captured;
  pi.on('session_start', (event, ctx) => {captured=ctx; record(event); pi.appendEntry('lifecycle.start', event);});
  pi.on('before_agent_start', () => record({type:'model_work'}));
@@ -32,7 +33,8 @@ const run = (session, args=[], env={}) => {
 const pair = result => {
  assert.deepEqual(result.events.filter(e=>e.type==='session_start'),[{type:'session_start',reason:'startup'}]);
  assert.deepEqual(result.events.filter(e=>e.type==='session_shutdown'),[{type:'session_shutdown',reason:'quit'}]);
- assert.equal(result.events[0].type,'session_start');
+ assert.equal(result.events.filter(e=>e.type==='extension_loaded').length,1);
+ assert.equal(result.events[1].type,'session_start');
 
  assert.equal(result.events.filter(e=>e.type==='shutdown_peer').length,1);
  const shutdown=result.events.findIndex(e=>e.type==='session_shutdown');
@@ -59,11 +61,11 @@ try {
  assert.notEqual(result.status,0); assert.match(result.stderr,/fixture exhausted/); pair(result);
  assert.ok(readFileSync(failedSession,'utf8').includes('lifecycle.shutdown'));
  result=run(failedSession,['--resume','--input','/probe']); assert.equal(result.status,0,result.stderr); pair(result);
- const unknown=join(dir,'unknown.jsonl'); result=run(unknown,['--command','missing']); assert.notEqual(result.status,0); assert.deepEqual(result.events,[]); assert.equal(existsSync(unknown),false);
+ const unknown=join(dir,'unknown.jsonl'); result=run(unknown,['--command','missing']); assert.notEqual(result.status,0); assert.deepEqual(result.events.filter(e=>e.type!=='extension_loaded'),[]); assert.equal(existsSync(unknown),false);
  for (const args of [['--input','x','--fixture',fixture,'--unknown','x'],['--input','x','--model','nonexistent-model']]) {
- const path=join(dir,'invalid.jsonl'); result=run(path,args); assert.notEqual(result.status,0); assert.deepEqual(result.events,[]); assert.equal(existsSync(path),false);
+ const path=join(dir,'invalid.jsonl'); result=run(path,args); assert.notEqual(result.status,0); assert.deepEqual(result.events.filter(e=>e.type!=='extension_loaded'),[]); assert.equal(existsSync(path),false);
  }
  const before=readFileSync(session); result=run(session,['--resume','--input','invalid','--model','nonexistent-model','--context-tool-chars','20']);
- assert.notEqual(result.status,0); assert.deepEqual(result.events,[]); assert.deepEqual(readFileSync(session),before);
- console.log('PASS: formal CLI startup/quit once, model/tool/command ordering, success/failure cleanup, throwing shutdown peers/report, stale context, fresh resume prefix, invalid arguments/model preservation');
+ assert.notEqual(result.status,0); assert.deepEqual(result.events.filter(e=>e.type!=='extension_loaded'),[]); assert.deepEqual(readFileSync(session),before);
+ console.log('PASS: formal CLI startup/quit once, model/tool/command ordering, success/failure cleanup, throwing shutdown peers/report, fresh resume prefix, invalid arguments/model preservation');
 } finally {rmSync(dir,{recursive:true,force:true});}
