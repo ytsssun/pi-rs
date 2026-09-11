@@ -1,0 +1,18 @@
+name: pi-rs CI
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with: { toolchain: 1.85.0 }
+      - uses: actions/setup-node@v4
+        with: { node-version: '22.18.0' }
+      - run: cargo test --locked
+      - run: cargo clippy --locked --all-targets -- -D warnings
+      - run: node --test experiments/custom-provider-stream.test.mjs

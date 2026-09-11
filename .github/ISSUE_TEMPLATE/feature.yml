@@ -1,0 +1,12 @@
+name: Roadmap capability
+description: Propose a Pi-compatible capability with measurable acceptance
+labels: [enhancement, roadmap]
+body:
+  - type: textarea
+    id: behavior
+    attributes: {label: Behavior, description: User-visible behavior and upstream reference}
+    validations: {required: true}
+  - type: textarea
+    id: acceptance
+    attributes: {label: Acceptance, description: Deterministic or live test that proves it}
+    validations: {required: true}

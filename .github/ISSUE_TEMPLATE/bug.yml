@@ -1,0 +1,16 @@
+name: Compatibility bug
+description: Report a reproducible difference from pinned Pi
+labels: [bug, compatibility]
+body:
+  - type: input
+    id: upstream
+    attributes: {label: Upstream reference, description: Commit or behavior compared}
+    validations: {required: true}
+  - type: textarea
+    id: reproduce
+    attributes: {label: Reproduction, description: Commands, inputs and expected/actual results}
+    validations: {required: true}
+  - type: textarea
+    id: evidence
+    attributes: {label: Evidence, description: Logs or fixture path; do not include credentials}
+    validations: {required: true}
