@@ -40,6 +40,7 @@ const {createCodingTools}=await import('../vendor/pi-mono/packages/coding-agent/
 const {openAITransportModel,savedBranchModel}=await import('../prototype/architecture/model-transport.mjs');
 const {ModelRuntime}=await import('../vendor/pi-mono/packages/coding-agent/src/core/model-runtime.ts');
 const tools=createCodingTools(cwd);
+if (options['--command']) { const probe = await createHost({getActiveTools:()=>[], setActiveTools:()=>{}}, {cwd, extensionPaths: extensions}); if (!probe.runner.getCommand(options['--command'])) throw Error(`unknown command: ${options['--command']}`); }
 const manager=await createBackend({path,cwd,mode:options['--resume']?'open':'create'});
 let host;
 let started = false;

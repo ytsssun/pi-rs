@@ -59,6 +59,7 @@ try {
  assert.notEqual(result.status,0); assert.match(result.stderr,/fixture exhausted/); pair(result);
  assert.ok(readFileSync(failedSession,'utf8').includes('lifecycle.shutdown'));
  result=run(failedSession,['--resume','--input','/probe']); assert.equal(result.status,0,result.stderr); pair(result);
+ const unknown=join(dir,'unknown.jsonl'); result=run(unknown,['--command','missing']); assert.notEqual(result.status,0); assert.deepEqual(result.events,[]); assert.equal(existsSync(unknown),false);
  for (const args of [['--input','x','--fixture',fixture,'--unknown','x'],['--input','x','--model','nonexistent-model']]) {
  const path=join(dir,'invalid.jsonl'); result=run(path,args); assert.notEqual(result.status,0); assert.deepEqual(result.events,[]); assert.equal(existsSync(path),false);
  }
