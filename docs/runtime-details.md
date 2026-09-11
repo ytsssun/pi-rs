@@ -25,3 +25,7 @@ The following limits apply to `pi-rs-legacy`, not the original tools used by the
 - Native v1 JSON snapshots use fsync/rename and an appended `.lock` file with Unix flock. Old v1 sessions load with default new fields. Leave the permanent lock file in place; ownership releases on process death. A leftover `.tmp` from interrupted save requires inspection before removal; no automatic promotion of incomplete snapshots.
 - Before a write/edit/bash effect, an `in_flight` marker is saved. If the process dies before the result is saved, resume refuses automatic replay. Inspect files and surviving processes, then use `--resume --resolve-in-flight 'observed outcome'` with the normal model/fixture arguments. This records an operator-supplied result and continues; it does not re-run that call or prove exactly-once effects. Do not resolve while the original process is still changing files.
 
+
+## Headless extension commands
+
+`--input '/name raw arguments'` dispatches a registered extension command before a model request. Parsing uses upstream's first literal space and preserves the remainder unchanged; unknown names (including case differences and tab-separated names) fall through to model input. Handler failures are reported in `extensionErrors` and do not turn into model requests. Explicit `--command` retains its existing interface. Verify with `node --experimental-strip-types experiments/command-invocation.mjs`. Interactive active-turn queue/steer semantics and command session-control methods are not established by this headless fixture.
