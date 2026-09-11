@@ -1,5 +1,7 @@
 # Current checkpoint
 
+2026-09-09 correction: installer completed successfully at `~/.cargo/bin/pi-rs` (previous chat report of interruption was incorrect). Installed executable passed external write/resume/extension rejection acceptance with `python3 experiments/formal-cli.py --binary "$HOME/.cargo/bin/pi-rs"`. Source assets remain required; remote curl bootstrap is not yet independently validated. Streaming already uses `nativeProviderStream → assembleNativeQueue → StreamAssembler`; previous claims that this bridge was missing were incorrect. Removed the unused ID-keyed ChatDeltaAccumulator rather than wiring an incompatible duplicate into the runtime. Next: independently validate remote installation and registered-provider selection through the formal CLI.
+
 Formal Cargo `pi-rs` now launches the existing Node host with Rust Node-API runtime and original Pi tools/extensions. Build: `python3 scripts/build-native-session.py` then `cargo build --locked --bin pi-rs`. Source checkout and Node dependencies remain required; this is not a standalone package.
 
 Deterministic external acceptance: `python3 experiments/formal-cli.py` passes original write → new-process resume/edit, exact filesystem assertions, canonical prefix retention, and unchanged protected-path extension rejection. No live call was performed for this launcher migration. Legacy Rust snapshot CLI is preserved as `pi-rs-legacy`; historical harnesses explicitly target it.

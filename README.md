@@ -54,6 +54,8 @@ The current usable slice is headless coding with the original Pi tools, OpenAI-c
 
 ## Project
 
+- [Architecture and feature map](docs/architecture.md)
+
 - [Checkpoint and evidence](docs/checkpoint.md)
 - [Runtime details](docs/runtime-details.md)
 - [Pinned upstream reference](docs/upstream.md)

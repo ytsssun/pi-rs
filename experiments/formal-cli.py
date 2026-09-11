@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 """External deterministic acceptance of the formal Cargo launcher and Rust/JS runtime."""
-import json, pathlib, subprocess, tempfile
+import argparse, json, pathlib, subprocess, tempfile
 ROOT = pathlib.Path(__file__).resolve().parents[1]
-BIN = ROOT / 'target/debug/pi-rs'
+parser = argparse.ArgumentParser(description=__doc__)
+parser.add_argument('--binary', type=pathlib.Path, default=ROOT / 'target/debug/pi-rs')
+BIN = parser.parse_args().binary.expanduser().resolve()
 def assistant(content, stop='stop'):
     return dict(role='assistant',content=content,api='openai-completions',provider='fixture',model='fixture',stopReason=stop,timestamp=1,usage=dict(input=0,output=0,cacheRead=0,cacheWrite=0,totalTokens=0,cost=dict(input=0,output=0,cacheRead=0,cacheWrite=0,total=0)))
 def call(name, args):

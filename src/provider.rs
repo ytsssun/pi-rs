@@ -12,28 +12,6 @@ pub fn parse_sse_data(data: &str) -> Result<Option<Value>> {
     Ok(Some(serde_json::from_str(&payload).context("invalid SSE JSON payload")?))
 }
 
-/// Extract the incremental assistant delta from an OpenAI-compatible chunk.
-/// Empty keep-alive chunks are ignored; callers aggregate text/tool fragments.
-pub fn chat_delta(chunk: &Value) -> Option<&Value> {
-    chunk.get("choices")?.as_array()?.first()?.get("delta")
-}
-
-/// Accumulates streamed text and tool-call argument fragments.
-#[derive(Default, Debug)]
-pub struct ChatDeltaAccumulator { pub text: String, pub tool_arguments: std::collections::BTreeMap<String, (String, String)> }
-impl ChatDeltaAccumulator {
-    pub fn push(&mut self, chunk: &Value) {
-        let Some(delta) = chat_delta(chunk) else { return };
-        if let Some(s) = delta.get("content").and_then(Value::as_str) { self.text.push_str(s); }
-        if let Some(calls) = delta.get("tool_calls").and_then(Value::as_array) { for c in calls { let key=c.get("id").and_then(Value::as_str).unwrap_or("").to_string(); let name=c.pointer("/function/name").and_then(Value::as_str).unwrap_or("").to_string(); if let Some(s)=c.pointer("/function/arguments").and_then(Value::as_str) { let e=self.tool_arguments.entry(key).or_insert((name, String::new())); e.1.push_str(s); } } }
-    }
-    pub fn message(&self) -> Value {
-        let mut content = Vec::new(); if !self.text.is_empty() { content.push(json!({"type":"text","text":self.text})); }
-        for (id,(name,args)) in &self.tool_arguments { content.push(json!({"type":"toolCall","id":id,"name":name,"arguments":args})); }
-        json!({"role":"assistant","content":content})
-    }
-}
-
 #[derive(Default)]
 pub struct SseDecoder { buffer: String, pending_bytes: Vec<u8>, after_cr: bool }
 
@@ -157,15 +135,7 @@ pub fn openai_chat_stream_to_queue(client: &Client, base: &str, key: &str, model
 
 #[cfg(test)]
 mod tests {
-    use super::{parse_sse_data, SseDecoder, ChatDeltaAccumulator};
-    #[test]
-    fn accumulates_text_and_tool_fragments() {
-        let mut a = ChatDeltaAccumulator::default();
-        a.push(&serde_json::json!({"choices":[{"delta":{"content":"he"}}]}));
-        a.push(&serde_json::json!({"choices":[{"delta":{"content":"llo","tool_calls":[{"id":"x","function":{"name":"echo","arguments":"{\"a\":"}}]}}]}));
-        a.push(&serde_json::json!({"choices":[{"delta":{"tool_calls":[{"id":"x","function":{"arguments":"1}"}}]}}]}));
-        let m=a.message(); assert_eq!(m["content"][0]["text"],"hello"); assert_eq!(m["content"][1]["name"],"echo"); assert_eq!(m["content"][1]["arguments"],"{\"a\":1}");
-    }
+    use super::{parse_sse_data, SseDecoder};
     #[test]
     fn shared_request_encodes_pi_tool_continuation() {
         use serde_json::json;
