@@ -18,7 +18,11 @@ jobs:
       - uses: actions/setup-node@v4
         with: { node-version: '22.19.0' }
       - name: Bootstrap pinned upstream compatibility checkout
-        run: sh scripts/bootstrap-upstream.sh
+        run: sh scripts/bootstrap-upstream.sh --build
       - run: cargo test --locked
       - run: cargo clippy --locked --all-targets -- -D warnings
       - run: node --test experiments/custom-provider-stream.test.mjs
+      - name: Build native Node-API addon
+        run: python3 scripts/build-native-session.py
+      - name: Verify native CLI command acceptance
+        run: node --experimental-strip-types experiments/command-invocation.mjs
