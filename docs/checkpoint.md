@@ -1,10 +1,12 @@
 # Current checkpoint
 
-2026-09-11: PR #4 merged as `cc9367515c0416f27ea5955142293179fdaa30a3`. Registered slash commands dispatch before model turns, preserve raw arguments, and work without a model. Invalid-model ordinary/unknown requests no longer mutate resumed history through context policy or compaction. Independent external fixtures passed on repair f873552; exact post-conflict CI 34614396822 and main merge CI 34614579208 completed successfully. CI covers Rust tests/clippy and provider stream fixture; native CLI acceptance was local with shared built dependencies. No new live-model verification in this delivery.
+Main `f7fe60e` includes PR #5 native Linux CI, PR #6 truthful drive idle/wait/error handling, and PR #7 corrected blocked-tool fixture expectations. Main CI 34638952099 completed success. Deterministic native acceptance covers command dispatch, successful/failed drive cleanup, preflight and input mutation; no new live-model validation in these deliveries. Reproduce with `node --experimental-strip-types experiments/command-idle.mjs`, `node --experimental-strip-types experiments/command-invocation.mjs`, and `node experiments/native-batch-hook-abort.mjs`.
 
-Installer repair at 6dae3cb passed fresh source installation and external installed-binary acceptance; issue #2 closed. Issue #3 remains open for active-turn and session-control semantics. Next: independently audit those remaining upstream behaviors and freeze the next bounded acceptance before implementation. Worker `/root/next_compat_audit` is performing that read-only audit; inspect its result before duplicating work.
+Current task: session identity and timestamp correctness, prerequisite to session replacement. Worker `/root/session_identity` must work only in `/tmp/pi-rs-session-identity`, branch `codex/session-identity-verified`, initial commit `cc7ebf7`. Earlier worker commit e2b05d2 was made on shared local main without acceptance; it was removed from local main and recovered in this isolated worktree, never published on main. It remains unverified until fresh-process identity/timestamp/history tests and exact-SHA CI pass. Coordinator created the worktree to enforce ownership concretely.
 
-Recovery: fetch origin, inspect status, read docs/coordinator.md and recent board entries, then inspect issue #3 and active workers. Preserve uncommitted work. Worker completion now explicitly includes terminal exact-SHA CI and a recoverable pending handoff if interrupted.
+Remaining: actual session replacement, cancellation and compaction compatibility are incomplete. Unsupported command session operations fail explicitly. Issue #3 stays open. Next: independently verify identity fixture, then integrate only after terminal CI; investigate session replacement ownership next. Preserve all failed/superseded evidence.
+
+Recovery: inspect git status, PRs/CI and worker status before duplicating work; consult docs/coordinator.md and latest board entries. Pending records from the previous failed patch were recovered from /tmp/root-docs.patch and appended without overwriting board history.
 
 ## Historical checkpoint (later corrections take precedence)
 
