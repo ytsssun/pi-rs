@@ -132,10 +132,16 @@ mod tests {
     #[test]
     fn producer_close_cancels_without_error() {
         let q = Arc::new(StreamQueue::new(1));
-        let handle = spawn_producer(Arc::clone(&q), vec![e(1, false), e(2, false)]);
-        // First event may be queued before close; closure must stop production
-        // and must never turn cancellation into a producer failure.
+        let (release, resume) = std::sync::mpsc::channel();
+        let events = vec![e(1, false), e(2, false)].into_iter().enumerate().map(move |(index, event)| {
+            if index == 1 { resume.recv().unwrap(); }
+            event
+        });
+        let handle = spawn_producer(Arc::clone(&q), events);
+        // Confirm production started, then close before allowing the next push.
+        assert_eq!(q.wait_poll(), Some(e(1, false)));
         q.close();
+        release.send(()).unwrap();
         assert_eq!(handle.join().unwrap(), Ok(()));
     }
 }
