@@ -13,6 +13,7 @@ const deferred = () => {
 };
 const bytes = path => existsSync(path) ? readFileSync(path) : null;
 const tick = () => new Promise(resolve => setImmediate(resolve));
+const watchdog = setTimeout(() => { console.error('command idle acceptance timed out'); process.exit(1); }, 15000);
 const dir = mkdtempSync(join(tmpdir(),'pi-command-idle-'));
 try {
   for (const outcome of ['success','provider failure','delivery failure']) {
@@ -22,6 +23,7 @@ try {
       const entered = deferred(), release = deferred(), delivery = deferred(), finishDelivery = deferred();
       let calls = 0, commandEntered = false, commandFinished = false, waiting;
       const host = await createHost(tsBackend(),{cwd:dir,sessionManager:manager,extensionPaths:[],factories:[pi => {
+        pi.registerCommand('unsupported',{description:'unsupported operations',handler:async (name,ctx) => ctx[name]('unused')});
         pi.registerCommand('probe',{description:'idle probe',handler:async (args,ctx) => {
           assert.equal(args,'raw args');
           assert.equal(ctx.isIdle(),false);
@@ -89,6 +91,14 @@ try {
       assert.equal(ctx.isIdle(),true);
       assert.equal(calls,1,'command cannot initiate another provider call');
       assert.deepEqual(host.errors,[]);
+      for (const name of ['newSession','fork','navigateTree','switchSession','reload']) {
+        const snapshot = manager.snapshot(), saved = bytes(path), count = host.errors.length;
+        assert.equal(await trySlashCommand('/unsupported '+name,host.runner),true);
+        assert.equal(host.errors.length,count+1);
+        assert.match(host.errors.at(-1).error,new RegExp('Unexercised host binding: '+name));
+        assert.deepEqual(manager.snapshot(),snapshot);
+        assert.deepEqual(bytes(path),saved);
+      }
       const users = manager.snapshot().entries.filter(e => e.type === 'message' && e.message.role === 'user');
       assert.equal(users.length,1,'command cannot append a user entry');
       assert.equal(users[0].message.content,'only user input');
@@ -105,4 +115,4 @@ try {
       console.log('PASS native drive command lifecycle:',outcome);
     } finally { await manager.close(); }
   }
-} finally { rmSync(dir,{recursive:true,force:true}); }
+} finally { clearTimeout(watchdog); rmSync(dir,{recursive:true,force:true}); }
