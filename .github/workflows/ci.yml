@@ -24,6 +24,8 @@ jobs:
       - run: node --test experiments/custom-provider-stream.test.mjs
       - name: Build native Node-API addon
         run: python3 scripts/build-native-session.py
+      - name: Verify native session identity and timestamps
+        run: node experiments/session-identity.mjs
       - name: Verify native CLI command acceptance
         run: node --experimental-strip-types experiments/command-invocation.mjs
       - name: Verify native command idle lifecycle
