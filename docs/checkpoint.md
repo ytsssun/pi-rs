@@ -1,5 +1,19 @@
 # Current checkpoint
 
+Main `ee668e9` CI passed. PR #11 merged as `63de743` after exact-head CI runs 34703881056 and 34703879455 and independent review. Native owner replacement and terminal-failure fixtures are now CI gates. Compaction report snapshot-after-close regression is fixed and externally tested.
+
+Local real gpt-5.4-mini coding regression: 2/2 turns passed (bug fix then separate-process continuation), 0 failures/steering, protected tests unchanged. Summary: `docs/owner-live-resume-summary.json`; full local evidence: `/tmp/pi-rs-owner-live-63de743`. This is live resume evidence, not live newSession replacement.
+
+Reproduce owner acceptance after the documented build: `node --experimental-strip-types experiments/cli-new-session.mjs` and `node --experimental-strip-types experiments/session-owner-failures.mjs`. Idle-only replacement is a deliberate limitation relative to upstream abort-and-switch. parentSession/withSession remain unsupported; no full parity claim.
+
+Current critical path: real-model coding after extension-command replacement, followed by a fresh-process CLI resume with external filesystem and history assertions. Active implementation: `/tmp/pi-rs-live-replacement`, branch `codex/live-replacement`, worker `live_replacement_harness`. Check that worktree before duplicating it. The switch is harness-driven; model independently chooses coding tools. Native owner harness evidence must be distinguished from formal CLI evidence.
+
+Roadmap order: finish this replacement evidence; make unseeded replacement usable through the formal CLI while preserving lazy persistence; implement missing session command options; then tackle cancellation/message scheduling needed for self-hosted harness work. Do not broaden provider/TUI scope to avoid these gaps. Reassess order on concrete failures. Source inventory currently counts 43 method candidates/15 emitter names, not verified public API parity.
+
+## Historical checkpoint (later corrections take precedence)
+
+# Previous checkpoint
+
 PR #11 merged as `63de743` after exact-head f645aa1 CI runs 34703881056 and 34703879455 succeeded and independent review passed. Compaction reporting now reads its snapshot before owner close; all owner fixtures are CI gates. Fresh live gpt-5.4-mini regression completed 2/2 turns: bug fix then fresh-process continuation, external assertions passed, tests unchanged, no manual steering. Artifacts: `/tmp/pi-rs-owner-live-63de743`; this validates the existing resume path after owner integration, NOT live newSession replacement. Next: make a live replacement harness that distinguishes extension-driven switching from model-driven coding; preserve current idle-only and unsupported-option limits.
 
 Main `543f577` contains idle-only native session replacement wired into the formal CLI. CI run 34699278838 completed successfully for that exact SHA, but did not run the two new owner fixtures. Those fixtures passed locally; this branch adds them to CI. Do not conflate existing CI success with new owner coverage.
@@ -10,7 +24,6 @@ Next: complete exact-SHA CI for the added gates, then validate live coding after
 
 Coordination correction: worker commit e8f0685 depended on 6a687fb; the worker did not omit CLI files. Coordinator cherry-picked only the dependent fix, causing missing files/wiring, then repaired integration. Previous chat attribution to worker omission was incorrect. Coordinator also pushed main before exact-SHA CI, contrary to the agreed gate; subsequent runtime changes must use a reviewed branch with completed CI before integration.
 
-## Historical checkpoint (later corrections take precedence)
 
 # Previous checkpoint
 
