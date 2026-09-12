@@ -40,15 +40,10 @@ const {createCodingTools}=await import('../vendor/pi-mono/packages/coding-agent/
 const {openAITransportModel,savedBranchModel}=await import('../prototype/architecture/model-transport.mjs');
 const {ModelRuntime}=await import('../vendor/pi-mono/packages/coding-agent/src/core/model-runtime.ts');
 const tools=createCodingTools(cwd);
-const manager=await createBackend({path,cwd,mode:options['--resume']?'open':'create'});
-let host;
-let started = false;
-const shutdown = async () => {
-  if (!started) return;
-  started = false;
-  try { await host.runner.emit({type: 'session_shutdown', reason: 'quit'}); }
-  finally { host.runner.invalidate('This extension ctx is stale after session shutdown.'); }
-};
+const {createSessionOwner}=await import('../prototype/architecture/session-owner.mjs');
+const owner=await createSessionOwner({path,cwd,mode:options['--resume']?'open':'create',
+  makeHost:manager=>createHost(tsBackend(tools.map(t=>t.name)),{cwd,sessionManager:manager,extensionPaths:extensions,factories:[pi=>{for(const tool of tools) pi.registerTool(tool);}]})});
+let {manager,host}=owner.current;
 try {
 if (options['--branch']) await manager.branch(options['--branch']);
 if (options['--reset-branch']) await manager.resetLeaf();
@@ -56,7 +51,7 @@ const savedModel = savedBranchModel(manager);
 const selectedModel = options['--model'] || savedModel;
 let resolvedModel;
 let transportModel;
-  host=await createHost(tsBackend(tools.map(t=>t.name)),{cwd,sessionManager:manager,extensionPaths:extensions,factories:[pi=>{for(const tool of tools) pi.registerTool(tool);} ]});
+
   if (options['--command'] && !host.runner.getCommand(options['--command'])) throw Error(`unknown command: ${options['--command']}`);
   const {trySlashCommand}=await import('../prototype/architecture/command-invocation.mjs');
   let commandResult;
@@ -69,8 +64,7 @@ if (!slashHandled && resolvedModel && !options['--fixture'] && !options['--comma
   if (!slashHandled && options['--input'] && !options['--command'] && !fixture && !selectedModel) throw Error('--model required for new sessions or when no saved model exists');
 // Initial process startup also covers --resume; replacement reasons belong to
 // in-process session switching. Validate model selection before startup hooks.
-  started = true;
-  await host.runner.emit({type: 'session_start', reason: 'startup'});
+  await owner.start();
   if (slashHandled) await trySlashCommand(input, host.runner);
   if (options['--command']) {
     const command = host.runner.getCommand(options['--command']);
@@ -79,24 +73,23 @@ if (!slashHandled && resolvedModel && !options['--fixture'] && !options['--comma
     const commandArgs = typeof rawArgs === 'string' ? rawArgs : (rawArgs === undefined ? '' : JSON.stringify(rawArgs));
     let commandError = null;
     try { await command.handler(commandArgs, host.runner.createCommandContext()); } catch (error) { commandError = error instanceof Error ? error.message : String(error); }
+    ({manager,host}=owner.current);
     await manager.appendCustomEntry('pi-rs.command.v1', {name: options['--command'], args: commandArgs, ok: commandError === null, error: commandError});
     if (commandError) throw Error(`command ${options['--command']} failed: ${commandError}`);
     commandResult = {name: options['--command'], args: commandArgs, dispatched: true};
   }
+({manager,host}=owner.current);
 if (options['--compact-summary']) await manager.appendCompaction(options['--compact-summary'], options['--compact-first-kept'], Number(options['--compact-tokens-before']));
   if(options['--context-tool-chars']!==undefined) { const raw=options['--context-tool-chars']; manager.setContextPolicy(raw==='none'?null:Number(raw)); }
   let index=0;
   if (!slashHandled && options['--model'] && !options['--command']) await manager.appendCustomEntry('pi-rs.model.v1', {model: options['--model']});
   const stream=fixture?async()=>{const message=fixture[index++]; if(!message)throw Error(`fixture exhausted after ${index} assistant responses; provide the next assistant message for the tool result`);return {async *[Symbol.asyncIterator](){},async result(){return message;}};}:nativeProviderStream({model:transportModel,streaming:true});
   const result=options['--input'] && !slashHandled ? await drive({manager,host,prompt:options['--input'],stream}) : null;
-  await shutdown();
-  const report={result,command:commandResult,slashHandled,compaction:options['--compact-summary']?manager.snapshot().contextEntries.find(e=>e.type==='compaction')??null:null,session:path,fixture:Boolean(fixture),extensionErrors:host.errors};
+  const activePath=owner.current.path;
+  await owner.close();
+  const report={result,command:commandResult,slashHandled,compaction:options['--compact-summary']?manager.snapshot().contextEntries.find(e=>e.type==='compaction')??null:null,session:activePath,fixture:Boolean(fixture),extensionErrors:owner.errors};
   if(options['--trace-file']) writeFileSync(resolve(options['--trace-file']),JSON.stringify(report,null,2)+'\n');
   console.log(JSON.stringify(report));
 } finally {
-  try { await shutdown(); }
-  finally {
-    try { host?.runner.invalidate('This extension ctx is stale after session shutdown.'); }
-    finally { await manager.close(); }
-  }
+  await owner.close();
 }
