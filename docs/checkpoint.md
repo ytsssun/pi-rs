@@ -1,5 +1,7 @@
 # Current checkpoint
 
+PR #11 merged as `63de743` after exact-head f645aa1 CI runs 34703881056 and 34703879455 succeeded and independent review passed. Compaction reporting now reads its snapshot before owner close; all owner fixtures are CI gates. Fresh live gpt-5.4-mini regression completed 2/2 turns: bug fix then fresh-process continuation, external assertions passed, tests unchanged, no manual steering. Artifacts: `/tmp/pi-rs-owner-live-63de743`; this validates the existing resume path after owner integration, NOT live newSession replacement. Next: make a live replacement harness that distinguishes extension-driven switching from model-driven coding; preserve current idle-only and unsupported-option limits.
+
 Main `543f577` contains idle-only native session replacement wired into the formal CLI. CI run 34699278838 completed successfully for that exact SHA, but did not run the two new owner fixtures. Those fixtures passed locally; this branch adds them to CI. Do not conflate existing CI success with new owner coverage.
 
 Reproduce after the documented native build: `node --experimental-strip-types experiments/cli-new-session.mjs` and `node --experimental-strip-types experiments/session-owner-failures.mjs`. Coverage: veto, distinct persisted identity/history, fresh-process continuation, stale contexts, idle waiter, busy rejection and terminal setup/host-creation failures. This is deterministic fixture evidence, not live-model validation. `parentSession`/`withSession` remain unsupported; busy rejection differs from upstream abort-and-switch.
