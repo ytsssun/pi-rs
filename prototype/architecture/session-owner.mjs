@@ -12,14 +12,16 @@ export async function createSessionOwner({path, cwd, mode, makeHost}) {
     newSession,
     ...Object.fromEntries(['fork','navigateTree','switchSession','reload'].map(name => [name, () => {throw Error(`Unexercised host binding: ${name}`);}]))
   });
-  const prepare = async path => {
-    const manager = await createBackend({path,cwd,mode:'create'});
+  const prepare = async (path, parentSession) => {
+    const manager = await createBackend({path,cwd,mode:'create',parentSession});
     return {path,manager};
   };
   async function newSession(options = {}) {
     if (terminal) throw Error('session owner is terminal');
-    if (options.parentSession !== undefined || options.withSession !== undefined)
-      throw Error('newSession parentSession/withSession unsupported by native owner');
+    if (options === null || typeof options !== 'object' || Array.isArray(options)) throw Error('newSession options must be an object');
+    if (options.parentSession !== undefined && typeof options.parentSession !== 'string')
+      throw Error('newSession parentSession must be a string');
+    if (options.withSession !== undefined) throw Error('newSession withSession unsupported by native owner');
     if (options.setup !== undefined && typeof options.setup !== 'function') throw Error('newSession setup must be a function');
     if (replacing || !current.host.contextActions.isIdle()) throw Error('newSession requires an idle owner');
     replacing = true;
@@ -27,7 +29,7 @@ export async function createSessionOwner({path, cwd, mode, makeHost}) {
     try {
       const before = await current.host.runner.emit({type:'session_before_switch',reason:'new'});
       if (before?.cancel === true) return {cancelled:true};
-      next = await prepare(join(dirname(current.path), `${randomUUID()}.jsonl`));
+      next = await prepare(join(dirname(current.path), `${randomUUID()}.jsonl`), options.parentSession);
       const previousSessionFile = current.path;
       const old = current;
       terminal = true; // After teardown starts, failure cannot roll back old contexts.
