@@ -45,3 +45,5 @@ jobs:
         run: |
           node --experimental-strip-types experiments/cli-new-session.mjs
           node --experimental-strip-types experiments/session-owner-failures.mjs
+      - name: Verify parent session metadata compatibility
+        run: node --experimental-strip-types experiments/session-parent-option.mjs
