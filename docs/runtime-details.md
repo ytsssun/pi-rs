@@ -43,3 +43,7 @@ New native sessions generate UUID v4 IDs accepted by pinned Pi's session ID vali
 ## Formal CLI session replacement
 
 The CLI owner binds idle-only `newSession({setup})` using the real native store. The bare test host still rejects unbound session controls. Veto precedes allocation; old context invalidation precedes the new startup event; setup runs afterward. New files retain lazy persistence. `parentSession` and `withSession` reject explicitly. Unlike pinned upstream, active turns are rejected rather than aborted. Deterministic fixtures: `experiments/cli-new-session.mjs`, `experiments/session-owner-failures.mjs`. Live replacement and full session-control compatibility remain unverified.
+
+## Formal CLI command then input
+
+The native CLI supports `--command NAME --input TEXT` as a pi-rs extension: it dispatches the registered command, then drives the input on the command's current session owner. Explicit `--model` or `--fixture` is required for the input; command-only invocations reject transport options. This ordering is pi-rs-specific and is covered by the command-input fixture when enabled in CI.

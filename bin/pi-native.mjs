@@ -23,7 +23,7 @@ if(!options['--input'] && !options['--command']) throw Error('one of --input or 
 if(options['--command-args']) { try { options['--commandArgsParsed']=JSON.parse(options['--command-args']); } catch { throw Error('--command-args must be JSON'); } }
 if (options['--model'] && options['--fixture']) throw Error('choose exactly one of --model and --fixture');
 if (!options['--input']?.startsWith('/') && !options['--command'] && !options['--resume'] && Boolean(options['--model'])===Boolean(options['--fixture'])) throw Error('choose exactly one of --model and --fixture');
-if (options['--command'] && (options['--model'] || options['--fixture'])) throw Error('--command cannot be combined with --model or --fixture');
+if (options['--command'] && !options['--input'] && (options['--model'] || options['--fixture'])) throw Error('--command cannot be combined with --model or --fixture');
 if (options['--compact-summary'] && (!options['--compact-first-kept'] || !options['--compact-tokens-before'])) throw Error('--compact-summary requires --compact-first-kept and --compact-tokens-before');
 if (options['--compact-summary'] && !options['--resume']) throw Error('compaction requires --resume');
 if (options['--branch'] && options['--reset-branch']) throw Error('--branch cannot be combined with --reset-branch');
@@ -48,7 +48,8 @@ try {
 if (options['--branch']) await manager.branch(options['--branch']);
 if (options['--reset-branch']) await manager.resetLeaf();
 const savedModel = savedBranchModel(manager);
-const selectedModel = options['--model'] || savedModel;
+// Combined commands must declare their transport: replacement may discard saved metadata.
+const selectedModel = options['--model'] || (options['--command'] ? undefined : savedModel);
 let resolvedModel;
 let transportModel;
 
@@ -58,10 +59,10 @@ let transportModel;
   const input = options['--input'];
   const space = input?.indexOf(' ') ?? -1;
   const slashHandled = !options['--command'] && Boolean(input?.startsWith('/') && host.runner.getCommand(space === -1 ? input.slice(1) : input.slice(1, space)));
-if (!slashHandled && selectedModel && !options['--fixture'] && !options['--command']) { const slash=selectedModel.indexOf('/'); const provider=slash>0?selectedModel.slice(0,slash):'openai'; const modelId=slash>0?selectedModel.slice(slash+1):selectedModel; const runtime=await ModelRuntime.create({modelsPath:null,refreshOnCreate:false,allowModelNetwork:false}); resolvedModel=runtime.getModel(provider, modelId); if (!resolvedModel) throw Error(`model not found: provider=${provider} id=${modelId}`); }
-if (!slashHandled && resolvedModel && !options['--fixture'] && !options['--command']) transportModel = openAITransportModel(resolvedModel);
+if (!slashHandled && selectedModel && !options['--fixture'] && options['--input']) { const slash=selectedModel.indexOf('/'); const provider=slash>0?selectedModel.slice(0,slash):'openai'; const modelId=slash>0?selectedModel.slice(slash+1):selectedModel; const runtime=await ModelRuntime.create({modelsPath:null,refreshOnCreate:false,allowModelNetwork:false}); resolvedModel=runtime.getModel(provider, modelId); if (!resolvedModel) throw Error(`model not found: provider=${provider} id=${modelId}`); }
+if (!slashHandled && resolvedModel && !options['--fixture'] && options['--input']) transportModel = openAITransportModel(resolvedModel);
 
-  if (!slashHandled && options['--input'] && !options['--command'] && !fixture && !selectedModel) throw Error('--model required for new sessions or when no saved model exists');
+  if (!slashHandled && options['--input'] && !fixture && !selectedModel) throw Error('--model required for new sessions or when no saved model exists');
 // Initial process startup also covers --resume; replacement reasons belong to
 // in-process session switching. Validate model selection before startup hooks.
   await owner.start();
@@ -82,7 +83,7 @@ if (!slashHandled && resolvedModel && !options['--fixture'] && !options['--comma
 if (options['--compact-summary']) await manager.appendCompaction(options['--compact-summary'], options['--compact-first-kept'], Number(options['--compact-tokens-before']));
   if(options['--context-tool-chars']!==undefined) { const raw=options['--context-tool-chars']; manager.setContextPolicy(raw==='none'?null:Number(raw)); }
   let index=0;
-  if (!slashHandled && options['--model'] && !options['--command']) await manager.appendCustomEntry('pi-rs.model.v1', {model: options['--model']});
+  if (!slashHandled && options['--model'] && options['--input']) await manager.appendCustomEntry('pi-rs.model.v1', {model: options['--model']});
   const stream=fixture?async()=>{const message=fixture[index++]; if(!message)throw Error(`fixture exhausted after ${index} assistant responses; provide the next assistant message for the tool result`);return {async *[Symbol.asyncIterator](){},async result(){return message;}};}:nativeProviderStream({model:transportModel,streaming:true});
   const result=options['--input'] && !slashHandled ? await drive({manager,host,prompt:options['--input'],stream}) : null;
   const activePath=owner.current.path;
