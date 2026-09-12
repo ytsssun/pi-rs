@@ -1,5 +1,7 @@
 # Current checkpoint
 
+Latest bounded result: repaired live replacement harness passed a three-stage workflow (old coding → harness-command replacement → new coding → formal fresh-process resume), 15 model calls and 14530 canonical tokens. Prior live attempt failed from accidentally loaded demo extension. See `docs/live-replacement-run2-summary.json` for dirty-code/binary provenance and missing isolated first-stage assertion. Harness is not integrated; worker is repairing those evidence gaps before a clean rerun.
+
 Main `ee668e9` CI passed. PR #11 merged as `63de743` after exact-head CI runs 34703881056 and 34703879455 and independent review. Native owner replacement and terminal-failure fixtures are now CI gates. Compaction report snapshot-after-close regression is fixed and externally tested.
 
 Local real gpt-5.4-mini coding regression: 2/2 turns passed (bug fix then separate-process continuation), 0 failures/steering, protected tests unchanged. Summary: `docs/owner-live-resume-summary.json`; full local evidence: `/tmp/pi-rs-owner-live-63de743`. This is live resume evidence, not live newSession replacement.

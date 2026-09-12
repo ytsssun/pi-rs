@@ -1,0 +1,42 @@
+{
+  "commit": "9a553f9be43ad41b3d9ef784d85b2c6adc6f70cc",
+  "model": "gpt-5.4-mini",
+  "provider": "openai",
+  "fixture": false,
+  "contextEditing": false,
+  "switch": "harness-driven registered extension command",
+  "manualSteering": 0,
+  "scope": "internal native owner two turns + formal CLI new-process resume",
+  "status": "tested",
+  "processes": [
+    {
+      "label": "owner",
+      "exit": 0,
+      "elapsed": 10.937030833
+    },
+    {
+      "label": "resume",
+      "exit": 0,
+      "elapsed": 4.842500041999999
+    }
+  ],
+  "codingTurnsPassed": 3,
+  "externalAcceptance": true,
+  "oldBytesFrozen": true,
+  "distinctIds": true,
+  "newHistoryIsolated": true,
+  "resumePrefixPreserved": true,
+  "testsUnchanged": true,
+  "evidenceStatus": "tested",
+  "sourceCorrection": "9a553f9 plus uncommitted extensionPaths:[] harness fix; resume binary built from root checkout, not isolated worktree",
+  "requests": 15,
+  "canonicalAssistantMessages": 15,
+  "canonicalTotalTokens": 14530,
+  "priorFailedRuns": 1,
+  "limitations": [
+    "Harness drives registered command switch; model chooses coding tools.",
+    "First-turn filesystem acceptance was not isolated before second turn; three-stage workflow passed, individual first-task independence not fully established.",
+    "Raw artifacts local; relay SSE usage is null, usage taken from canonical assistant entries."
+  ],
+  "harnessSha256": "0f6aada61181f82c17f3304818b73298ecf9893dfb05b729efafea7573956af7"
+}
