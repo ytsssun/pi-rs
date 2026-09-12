@@ -1,5 +1,17 @@
 # Current checkpoint
 
+Main `543f577` contains idle-only native session replacement wired into the formal CLI. CI run 34699278838 completed successfully for that exact SHA, but did not run the two new owner fixtures. Those fixtures passed locally; this branch adds them to CI. Do not conflate existing CI success with new owner coverage.
+
+Reproduce after the documented native build: `node --experimental-strip-types experiments/cli-new-session.mjs` and `node --experimental-strip-types experiments/session-owner-failures.mjs`. Coverage: veto, distinct persisted identity/history, fresh-process continuation, stale contexts, idle waiter, busy rejection and terminal setup/host-creation failures. This is deterministic fixture evidence, not live-model validation. `parentSession`/`withSession` remain unsupported; busy rejection differs from upstream abort-and-switch.
+
+Next: complete exact-SHA CI for the added gates, then validate live coding after session replacement. Review snapshot access after owner close in compaction reporting before expanding scope. Historical live coding evidence below does not validate this replacement implementation.
+
+Coordination correction: worker commit e8f0685 depended on 6a687fb; the worker did not omit CLI files. Coordinator cherry-picked only the dependent fix, causing missing files/wiring, then repaired integration. Previous chat attribution to worker omission was incorrect. Coordinator also pushed main before exact-SHA CI, contrary to the agreed gate; subsequent runtime changes must use a reviewed branch with completed CI before integration.
+
+## Historical checkpoint (later corrections take precedence)
+
+# Previous checkpoint
+
 Main `9094e77` integrates PR #10: actual prebuilt CLI `--help` process measurement. Exact PR head `29fbf3b6246a863cf0846ed45291cff617aef6bb` passed CI runs 34687711563 and 34687702949; merge CI also completed successfully. Independent review exercised both the real binary and an exit-zero non-CLI rejection. Local debug warm-filesystem median was 89.63 ms (10 samples, 2 warmups); this is not full runtime startup, a release benchmark, or an upstream speed comparison.
 
 Reproduce: `python3 scripts/measure-startup.py --binary "$HOME/.cargo/bin/pi-rs" --samples 10 --json-out /tmp/pi-startup.json`. Results identify the supplied binary by SHA256; the committed historical baseline describes its own debug binary, not this installed executable.

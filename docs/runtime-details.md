@@ -39,3 +39,7 @@ Deterministic reproduction: `node --experimental-strip-types experiments/command
 ## Native session identity and clocks
 
 New native sessions generate UUID v4 IDs accepted by pinned Pi's session ID validator (upstream itself generates UUID v7). Rust snapshots retain the parsed header so getSessionId works before persistence and after reopen. Existing headers and canonical entries are preserved on resume. The Node driver supplies wall-clock ISO entry timestamps and millisecond user/tool message timestamps to Rust actions; explicit request timestamps remain possible for deterministic runtime tests. Model-provided assistant timestamps remain provider-owned. No UUID-generation-version or performance parity is claimed.
+
+## Formal CLI session replacement
+
+The CLI owner binds idle-only `newSession({setup})` using the real native store. The bare test host still rejects unbound session controls. Veto precedes allocation; old context invalidation precedes the new startup event; setup runs afterward. New files retain lazy persistence. `parentSession` and `withSession` reject explicitly. Unlike pinned upstream, active turns are rejected rather than aborted. Deterministic fixtures: `experiments/cli-new-session.mjs`, `experiments/session-owner-failures.mjs`. Live replacement and full session-control compatibility remain unverified.

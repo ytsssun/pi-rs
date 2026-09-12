@@ -62,6 +62,11 @@ try {
  assert.notEqual(result.status,0); assert.match(result.stderr,/fixture exhausted/); pair(result);
  assert.ok(readFileSync(failedSession,'utf8').includes('lifecycle.shutdown'));
  result=run(failedSession,['--resume','--input','/probe']); assert.equal(result.status,0,result.stderr); pair(result);
+ const firstKept=readFileSync(session,'utf8').trim().split('\n').map(JSON.parse).find(e=>e.type==='message').id;
+ result=run(session,['--resume','--input','compact then continue','--fixture',fixture,'--compact-summary','retained summary','--compact-first-kept',firstKept,'--compact-tokens-before','10']);
+ assert.equal(result.status,0,result.stderr); pair(result);
+ assert.equal(JSON.parse(result.stdout).compaction.summary,'retained summary');
+ assert.ok(readFileSync(session,'utf8').includes('retained summary'));
  const unknown=join(dir,'unknown.jsonl'); result=run(unknown,['--command','missing']); assert.notEqual(result.status,0); assert.deepEqual(result.events.filter(e=>e.type!=='extension_loaded'),[]); assert.equal(existsSync(unknown),false);
  for (const args of [['--input','x','--fixture',fixture,'--unknown','x'],['--input','x','--model','nonexistent-model']]) {
  const path=join(dir,'invalid.jsonl'); result=run(path,args); assert.notEqual(result.status,0); assert.deepEqual(result.events.filter(e=>e.type!=='extension_loaded'),[]); assert.equal(existsSync(path),false);
