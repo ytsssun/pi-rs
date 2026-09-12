@@ -24,7 +24,7 @@ export function tsBackend(initial = []) {
   };
 }
 
-export async function createHost(backend, { factories = [], cwd = process.cwd(), extensionPaths = [pluginPath], sessionManager = guardedObject('sessionManager') } = {}) {
+export async function createHost(backend, { factories = [], cwd = process.cwd(), extensionPaths = [pluginPath], sessionManager = guardedObject('sessionManager'), commandActions = {} } = {}) {
   const eventBus = createEventBus();
   const loaded = await loadExtensions(extensionPaths, cwd, eventBus);
   assert.deepEqual(loaded.errors, [], 'unchanged upstream extension must load');
@@ -114,7 +114,7 @@ export async function createHost(backend, { factories = [], cwd = process.cwd(),
   runner.bindCommandContext({
     waitForIdle: () => activeDrive ?? Promise.resolve(),
     ...Object.fromEntries(['newSession', 'fork', 'navigateTree', 'switchSession', 'reload']
-      .map(name => [name, unsupported(name)])),
+      .map(name => [name, commandActions[name] ?? unsupported(name)])),
   });
   const execute = async (name, params) => {
     assert.ok(backend.getActiveTools().includes(name), `inactive tool: ${name}`);
