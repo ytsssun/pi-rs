@@ -17,7 +17,7 @@ export default function(pi) {
  pi.registerCommand('probe', {description:'probe', handler:async () => record({type:'command_work'})});
  pi.on('session_shutdown', (event, ctx) => {
    record(event); pi.appendEntry('lifecycle.shutdown', event);
-   setImmediate(() => {try {captured.cwd; record({type:'stale', rejected:false});} catch {record({type:'stale', rejected:true});}});
+   process.once('exit', () => {try {captured.cwd; record({type:'stale', rejected:false});} catch {record({type:'stale', rejected:true});}});
    if (process.env.LIFECYCLE_THROW) throw Error('shutdown fixture failure');
  });
  pi.on('session_shutdown', () => record({type:'shutdown_peer'}));
@@ -37,6 +37,7 @@ const pair = result => {
  assert.equal(result.events[1].type,'session_start');
 
  assert.equal(result.events.filter(e=>e.type==='shutdown_peer').length,1);
+ assert.deepEqual(result.events.filter(e=>e.type==='stale'), [{type:'stale', rejected:true}], 'captured context must reject access after automatic CLI shutdown');
  const shutdown=result.events.findIndex(e=>e.type==='session_shutdown');
  for (const [i,event] of result.events.entries()) if (['model_work','tool_work','command_work'].includes(event.type)) assert.ok(i>0&&i<shutdown);
 };
