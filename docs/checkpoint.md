@@ -1,5 +1,7 @@
 # Current checkpoint
 
+Strengthened live replacement harness is integrated at `9247b7a` (worker 7c63acc), with syntax/compile checks passing. Run3 passed in `/tmp/pi-rs-live-replacement-run3`: native owner coding, extension-command replacement, new-owner coding, and formal fresh-process resume; 3 stages, owner 13.34s, resume 11.62s, 0 steering. Per-stage external checks, active tool assertions, frozen old bytes, isolated IDs/history, unchanged tests, usage and provenance are recorded. This is one harness-driven live run, not full upstream session-control parity.
+
 Latest bounded result: repaired live replacement harness passed a three-stage workflow (old coding → harness-command replacement → new coding → formal fresh-process resume), 15 model calls and 14530 canonical tokens. Prior live attempt failed from accidentally loaded demo extension. See `docs/live-replacement-run2-summary.json` for dirty-code/binary provenance and missing isolated first-stage assertion. Harness is not integrated; worker is repairing those evidence gaps before a clean rerun.
 
 Main `ee668e9` CI passed. PR #11 merged as `63de743` after exact-head CI runs 34703881056 and 34703879455 and independent review. Native owner replacement and terminal-failure fixtures are now CI gates. Compaction report snapshot-after-close regression is fixed and externally tested.
