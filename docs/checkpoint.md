@@ -1,5 +1,7 @@
 # Current checkpoint
 
+PR #12 merged as `c9b9129` after exact-head CI runs 34723992787 and 34723991380 plus independent review. Formal CLI now accepts `--command NAME --input TEXT --fixture FILE|--model ID`; the verified fixture performs command-triggered newSession, real write/bash on the new owner, fresh-process edit, parent header/history isolation, invalid command/model failure and veto. Deterministic only; live combined command path remains next.
+
 Main `fd583d4` records parentSession acceptance: exact behavioral head `267f581` passed CI 34718169806, including header-only metadata, no history copying, veto/invalid options and fresh-process roundtrip. withSession and active-turn abort-and-switch remain unsupported.
 
 Clean-source live replacement workflow at a633523 passed three coding stages with gpt-5.4-mini, 0 steering, 13443 canonical tokens. Independently checked artifact hashes and per-stage external assertions; evidence in `docs/live-replacement-clean-summary.json`. Switch is harness-driven, not model-selected or a complete formal CLI replacement flow.
