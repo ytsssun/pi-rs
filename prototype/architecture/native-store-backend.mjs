@@ -10,7 +10,7 @@ export async function createBackend({path,cwd=process.cwd(),mode='create',parent
   let next=1;
   function append(payload) {
     const ids=new Set(snapshot().entries.map(e=>e.id));while(ids.has('e'+next))next++;
-    return call({op:'append',entry:{...payload,id:'e'+next++,timestamp:new Date().toISOString(),...(parentSession === undefined ? {} : {parentSession})}});
+    return call({op:'append',entry:{...payload,id:'e'+next++,timestamp:new Date().toISOString()}});
   }
   return {handle,snapshot,appendRaw:append,
     // Synchronous compatibility methods required by unchanged Pi tool context.
