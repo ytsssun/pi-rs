@@ -51,6 +51,7 @@ try {
     assert.notEqual(fresh[0].id, entries(original)[0].id);
     assert.equal(fresh[0].parentSession, options.parentSession);
     assert.equal(Object.hasOwn(fresh[0], 'parentSession'), Object.hasOwn(options, 'parentSession'));
+    assert.ok(fresh.slice(1).every(entry => !Object.hasOwn(entry, 'parentSession')));
     assert.ok(!JSON.stringify(fresh).includes('original-private-history'));
     const prefix = readFileSync(report.session);
     run(report.session, ['--resume','--input','continuation','--fixture',fixture]);
