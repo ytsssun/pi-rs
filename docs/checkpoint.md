@@ -1,12 +1,25 @@
 # Current checkpoint
 
+Main `9094e77` integrates PR #10: actual prebuilt CLI `--help` process measurement. Exact PR head `29fbf3b6246a863cf0846ed45291cff617aef6bb` passed CI runs 34687711563 and 34687702949; merge CI also completed successfully. Independent review exercised both the real binary and an exit-zero non-CLI rejection. Local debug warm-filesystem median was 89.63 ms (10 samples, 2 warmups); this is not full runtime startup, a release benchmark, or an upstream speed comparison.
+
+Reproduce: `python3 scripts/measure-startup.py --binary "$HOME/.cargo/bin/pi-rs" --samples 10 --json-out /tmp/pi-startup.json`. Results identify the supplied binary by SHA256; the committed historical baseline describes its own debug binary, not this installed executable.
+
+Existing formal CLI coding/recovery evidence remains historical below. In-process `newSession` is still explicitly unsupported. Current work: source-audit the proposed owner contract against pinned upstream and implement a real native-store owner through the formal CLI in isolated branch `codex/owner-next`. Acceptance remains veto before allocation, idle/busy guard, shutdown/startup ordering, distinct persisted histories/IDs, stale-context rejection, setup isolation and fresh continuation. Fixture results must not be labelled live-model validation.
+
+Recovery: inspect git status, open PRs/exact CI and worker state; inspect `/tmp/pi-rs-owner-next` before duplicating work. Prior prototypes remain quarantined. Coordinator owns integration; do not merge worker claims without reproducing the external fixture. Two earlier wakeups repeated summaries instead of executing: this was an execution failure, not a credential or product-decision blocker.
+
+## Historical checkpoint (later corrections take precedence)
+
+# Previous checkpoint
+
 Main `0ef20e4` includes PR #9 formal CLI lifecycle events and quarantine records for two rejected newSession worker attempts. Exact SHA `03d5557` CI `34657605731` passed all Rust, native session, command, idle, blocked-tool, and lifecycle checks; independent review and local fixture also passed. CLI now emits one `session_start(reason: startup)` after validation and one `session_shutdown(reason: quit)` with cleanup. Unknown explicit commands are rejected before session creation; invalid model/arguments remain side-effect free. No live-model validation in this slice.
 
 Reproduce: `node --experimental-strip-types experiments/cli-lifecycle.mjs`. Coverage limits: signal-driven shutdown, valid explicit `--command` lifecycle, active-provider abort ordering, runtime rebind and newSession remain unverified. Issue #3 remains open. Next critical path is a mutable runtime owner for idle-only same-workspace newSession. Source-backed design is verified in board record `new-session-design-verified`; three implementation attempts were rejected for fake/incomplete acceptance or shared-tree edits. Do not implement resetLeaf as a substitute.
 
 Recovery: inspect current main CI/PRs, read coordinator and newest board records, then inspect active workers before starting work. Worker lifecycle handoff failed to push initially; coordinator took ownership, caught duplicate host loading and missing CI invocation, corrected both, and only then merged after exact SHA CI. Session identity remains UUIDv4 versus upstream UUIDv7; timestamps are current on native driver actions.
 
-## Historical checkpoint (later corrections take precedence)
+
+
 
 # Current checkpoint
 
