@@ -37,3 +37,7 @@ jobs:
           node experiments/native-batch-input-mutation.mjs
       - name: Verify formal CLI lifecycle
         run: node --experimental-strip-types experiments/cli-lifecycle.mjs
+      - name: Verify startup measurement executes actual CLI
+        run: |
+          cargo build --locked --bin pi-rs
+          python3 scripts/measure-startup.py --binary "$PWD/target/debug/pi-rs" --samples 2 --warmups 0
