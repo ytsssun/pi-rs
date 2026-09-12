@@ -41,3 +41,7 @@ jobs:
         run: |
           cargo build --locked --bin pi-rs
           python3 scripts/measure-startup.py --binary "$PWD/target/debug/pi-rs" --samples 2 --warmups 0
+      - name: Verify persisted session replacement and failure cleanup
+        run: |
+          node --experimental-strip-types experiments/cli-new-session.mjs
+          node --experimental-strip-types experiments/session-owner-failures.mjs
