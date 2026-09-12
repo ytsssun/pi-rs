@@ -1,5 +1,17 @@
 # Current checkpoint
 
+Main `fd583d4` records parentSession acceptance: exact behavioral head `267f581` passed CI 34718169806, including header-only metadata, no history copying, veto/invalid options and fresh-process roundtrip. withSession and active-turn abort-and-switch remain unsupported.
+
+Clean-source live replacement workflow at a633523 passed three coding stages with gpt-5.4-mini, 0 steering, 13443 canonical tokens. Independently checked artifact hashes and per-stage external assertions; evidence in `docs/live-replacement-clean-summary.json`. Switch is harness-driven, not model-selected or a complete formal CLI replacement flow.
+
+Current critical path: formal CLI `--command fresh --input ... --model ID|--fixture FILE`, allowing a registered command to replace the session and run the coding request on the new owner without synthetic setup messages. Active isolated worktree `/tmp/pi-rs-command-input`, branch `codex/command-input`. Frozen acceptance is board record `formal-command-input-cycle`. Check this worktree before duplicating work. Existing CLI has inconsistent command+input validation; implementation must eliminate implicit model fallback and retain side-effect-free invalid-model/command rejection.
+
+Reproduce established gates: `node --experimental-strip-types experiments/session-parent-option.mjs`, `node --experimental-strip-types experiments/cli-new-session.mjs`, `node --experimental-strip-types experiments/session-owner-failures.mjs`. After command/input usability, prioritize withSession and cancellation/message scheduling. No provider/TUI expansion is on this critical path.
+
+## Historical checkpoint (later corrections take precedence)
+
+# Previous checkpoint
+
 Latest verified bounded result: clean main a633523 completed all three live replacement/continuation stages with gpt-5.4-mini and no steering; sourceDirty=false and all artifact hashes independently checked. See `docs/live-replacement-clean-summary.json`. Run3 remains successful but was dirty, correcting the prior clean-run claim. Current implementation: `parentSession` header-only compatibility is integrated on main (`267f581`) and its fixture passes locally and exact main CI 34718169806 succeeded. Formal CLI empty replacement usability and withSession/cancellation remain open.
 
 Strengthened live replacement harness is integrated at `9247b7a` (worker 7c63acc), with syntax/compile checks passing. Run3 passed in `/tmp/pi-rs-live-replacement-run3`: native owner coding, extension-command replacement, new-owner coding, and formal fresh-process resume; 3 stages, owner 13.34s, resume 11.62s, 0 steering. Per-stage external checks, active tool assertions, frozen old bytes, isolated IDs/history, unchanged tests, usage and provenance are recorded. This is one harness-driven live run, not full upstream session-control parity.
@@ -16,7 +28,6 @@ Current critical path: repair the owner harness tool registration, then rerun re
 
 Roadmap order: finish this replacement evidence; make unseeded replacement usable through the formal CLI while preserving lazy persistence; implement missing session command options; then tackle cancellation/message scheduling needed for self-hosted harness work. Do not broaden provider/TUI scope to avoid these gaps. Reassess order on concrete failures. Source inventory currently counts 43 method candidates/15 emitter names, not verified public API parity.
 
-## Historical checkpoint (later corrections take precedence)
 
 # Previous checkpoint
 
