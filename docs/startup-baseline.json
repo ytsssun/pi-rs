@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "status": "measured",
+  "metric": "prebuilt_cli_help_process_wall_ms",
+  "binary": "/Users/stevensun/repos/pi-rs/target/debug/pi-rs",
+  "binary_sha256": "6c631c4f1bf8aee9c84a5607a3a4dd9a479edbac8c15ba21f113f4d9ae1012b6",
+  "platform": "macOS-15.6.1-arm64-arm-64bit",
+  "python": "3.9.6",
+  "node": "v22.18.0",
+  "samples": 10,
+  "warmups": 2,
+  "samples_ms": [
+    85.649334,
+    90.622375,
+    86.511958,
+    90.107917,
+    92.788292,
+    89.393125,
+    86.108084,
+    89.631708,
+    89.628959,
+    90.257958
+  ],
+  "median_ms": 89.6303335,
+  "min_ms": 85.649334,
+  "max_ms": 92.788292,
+  "scope": "fresh processes, warm filesystem cache; includes launcher and Node help path",
+  "excludes": [
+    "compilation",
+    "full runtime initialization",
+    "model calls",
+    "tool execution",
+    "RSS",
+    "upstream comparison"
+  ],
+  "source_commit": "7d3d38eb46991666804d02ab51bdc796f4a05488",
+  "build_profile": "debug"
+}
