@@ -1,5 +1,7 @@
 # Current checkpoint
 
+Formal CLI live command replacement is now verified once: gpt-5.4-mini completed old-session bug fix, `--resume --command fresh --input` replacement coding, then fresh-process continuation. All 3 stages and external checks passed, tests unchanged, steering 0; tools read/edit/write/bash were observed and old/new session isolation held. Artifact `/tmp/pi-live-command-37a8b4f`; relay usage was unavailable, not counted as zero. One run only; active-turn abort, withSession, cancellation and reliability across repetitions remain open.
+
 Active live formal command validation: worker `live_cli_command` resumed after resolving PATH-only Cargo failure. `/Users/stevensun/.cargo/bin/cargo build --locked --bin pi-rs` succeeds on main 37a8b4f. If `cargo` is absent from PATH, check `$HOME/.cargo/bin/cargo` before reporting an installation/access blocker. Live combined-command outcome still pending; prior deterministic gates remain valid.
 
 PR #12 merged as `c9b9129` after exact-head CI runs 34723992787 and 34723991380 plus independent review. Formal CLI now accepts `--command NAME --input TEXT --fixture FILE|--model ID`; the verified fixture performs command-triggered newSession, real write/bash on the new owner, fresh-process edit, parent header/history isolation, invalid command/model failure and veto. Deterministic only; live combined command path remains next.
