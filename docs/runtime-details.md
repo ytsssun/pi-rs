@@ -47,3 +47,7 @@ The CLI owner binds idle-only `newSession({setup})` using the real native store.
 ## Formal CLI command then input
 
 The native CLI supports `--command NAME --input TEXT` as a pi-rs extension: it dispatches the registered command, then drives the input on the command's current session owner. Explicit `--model` or `--fixture` is required for the input; command-only invocations reject transport options. This ordering is pi-rs-specific and is covered by the command-input fixture when enabled in CI.
+
+## Deferred message verification scope
+
+`experiments/deferred-custom-message.mjs` independently tests `triggerTurn:false` without `deliverAs`: append after the current assistant and include in fresh-process context. The older nextTurn fixture documents pi-rs behavior, not upstream equivalence: pinned `agent-session.ts` queues nextTurn messages until the next user prompt. Class-priority sorting at turn end does not prove steering/follow-up semantics. Message start/end event ordering and tool-pair interleaving still require dedicated tests.

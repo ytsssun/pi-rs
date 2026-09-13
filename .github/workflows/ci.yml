@@ -49,3 +49,5 @@ jobs:
           node --experimental-strip-types experiments/session-owner-failures.mjs
       - name: Verify parent session metadata compatibility
         run: node --experimental-strip-types experiments/session-parent-option.mjs
+      - name: Verify deferred non-trigger custom message persistence
+        run: node --experimental-strip-types experiments/deferred-custom-message.mjs
