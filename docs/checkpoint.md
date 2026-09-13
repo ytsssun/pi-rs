@@ -1,5 +1,17 @@
 # Current checkpoint
 
+PR #14 merged as 9545e68 after exact-head CI 34753745675 / 34753743902 passed. Coordinator reran cooperative-tool-cancel, deferred-message-events, next-turn-queue and cancel-settlement-probe: all passed. Scope is deterministic sequential cooperative tools and persisted settlement, not in-flight provider interruption or full cancellation parity.
+
+A new independent continuation counterexample found extension abort permanently poisoned the host signal: next drive made zero provider calls. Branch codex/cancel-next-turn refreshes the signal only at idle-to-active admission and adds same-host continuation checks for caller and extension cancellation. Local cooperative-tool-cancel and command-idle pass; CI pending.
+
+Next: independently review and integrate continuation fix after exact CI. Then wire and verify in-flight provider cancellation: controlled blocked provider, real signal propagation, cleanup before idle, one persisted terminal outcome, no subsequent tools/provider calls, same-host continuation and fresh-process recovery. Freeze these criteria before implementation; live-model cancellation remains unverified.
+
+Coordinator execution incident: heartbeat wakeups from 11:40 through 16:46 returned assurances without tool-backed progress. Those assurances are unsupported; scheduling worked but execution did not. Each actionable wake must inspect state and produce evidence or an explicit blocker; acknowledgements are not progress.
+
+## Historical checkpoint (superseded status preserved for traceability)
+
+# Current checkpoint
+
 Cancellation implementation is blocked by a real protocol gap, not credentials: audit `docs/cancellation-seam-audit.md` (main `2128777`) shows synchronous Rust `step` with private waiting and no cancel handle/token or settlement event. No unsafe cancel stub was added. Active next task is API/state-machine design in `/tmp/pi-rs-cancel-api`; implementation follows only after a bounded design and deterministic blocking fixture plan.
 
 Active next milestone: one Rust-owned cancellation seam. Worker `cancellation_seam` is assigned `/tmp/pi-rs-cancellation`, branch `codex/cancellation`, acceptance in board `cancellation-seam-task`. Current Rust runtime has no cancel op; only JS-side AbortController exists. Implementation must prove exactly-once settle and persisted aborted recovery or return a concrete blocker.
