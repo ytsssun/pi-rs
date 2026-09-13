@@ -1,5 +1,7 @@
 # Current checkpoint
 
+Deferred custom event observation is integrated at `ad1738d` after fresh native rebuild. `deferred-message-events.mjs`, `deferred-custom-message.mjs` and `next-turn-queue.mjs` pass. Admission snapshot now drives both canonical persistence and message_start/end observer payload; mutation and observer-failure paths are covered. Scope is triggerTurn:false/no deliverAs only; full AgentSession.subscribe, normal messages, steer/followUp and cancellation remain open. Exact main CI is pending.
+
 Main `23f03ed` passed exact CI 34741172995. nextTurn now enters native begin after the user message in FIFO order; deterministic true-subprocess fixture distinguishes lost unconsumed in-memory queues from retained consumed entries. Rejected admission preserves queue/history. Deferred triggerTurn:false gate remains passing. No live scheduling, steer/followUp, cancellation or crash-atomic multiappend claim.
 
 Correction: the previous fixture failure came from stale native addon. The original second-item invalid-admission test was valid; changing index was not a necessary bug fix. Rebuild with `python3 scripts/build-native-session.py` before evaluating Rust changes.
