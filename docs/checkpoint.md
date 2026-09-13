@@ -1,5 +1,7 @@
 # Current checkpoint
 
+Next task: upstream-accurate `nextTurn` queue semantics. Worker `next_turn_semantics` is active in `/tmp/pi-rs-next-turn`, branch `codex/next-turn-semantics`; current driver drains and persists all queued classes at turn end, which differs from pinned upstream. Acceptance is board record `next-turn-semantics`; no steer/followUp claim until separately evidenced.
+
 PR #13 merged as `856becd` after exact CI runs 34730735438 and 34730733447. The new deterministic gate verifies triggerTurn:false custom messages persist at safe turn end and enter fresh-process context. Upstream nextTurn remains a known semantic mismatch: it queues until the next user prompt; steer/followUp and event ordering are unverified.
 
 Next milestone: Rust-owned extension message scheduling seam. Worker `message_scheduler_seam` is active in `/tmp/pi-rs-message-scheduler`, branch `codex/message-scheduler`; acceptance is board record `message-scheduler-milestone`. It must either implement one upstream-backed deferred ordering behavior with real host/native persistence and CI, or provide a reproduced blocker. Steer/followUp/in-flight cancellation remain unclaimed until evidence exists.
