@@ -22,6 +22,7 @@ async function driveActive({manager,host,prompt,stream,trace=[],onToolUpdate=()=
     return queued.message;
   });
   let action=step({event:'begin',prompt,parallel,nextTurnMessages});
+  // Acknowledge only after Rust accepts and appends the user plus queued messages.
   host.acknowledgeNextTurnMessages?.(pending);
   trace.push({type:'turn_start'});
   for(let count=0;count<32;count++) {
