@@ -49,7 +49,7 @@ export async function createHost(backend, { factories = [], cwd = process.cwd(),
   };
   const runner = new ExtensionRunner(loaded.extensions, loaded.runtime, cwd, sessionManager, modelRegistry);
   const errors = [];
-  const lifecycleAbort = new AbortController();
+  let lifecycleAbort = new AbortController();
   runner.onError(({ event, error }) => errors.push({ event, error }));
   let sessionName;
   const labels = new Map();
@@ -66,6 +66,7 @@ export async function createHost(backend, { factories = [], cwd = process.cwd(),
   let activeDrive;
   const beginDrive = () => {
     if (activeDrive) throw new Error('Host already has an active drive');
+    if (lifecycleAbort.signal.aborted) lifecycleAbort = new AbortController();
     let resolve;
     const promise = new Promise(done => { resolve = done; });
     activeDrive = promise;

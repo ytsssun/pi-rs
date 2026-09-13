@@ -65,9 +65,16 @@ if(mode==='reopen') {
       assert.equal(executions,1);
       assert.equal(trace.filter(e=>e.type==='tool_result').length,1);
       assert.equal(trace.filter(e=>e.type==='cancel_settled').length,1);
-      manager.close();
       const child=spawnSync(process.execPath,['--experimental-strip-types',fileURLToPath(import.meta.url),'reopen',file],{encoding:'utf8'});
       assert.equal(child.status,0,child.stderr);
+      let continuedCalls=0;
+      await drive({manager,host,prompt:'continue after cancellation',stream:async()=>{
+        continuedCalls++;
+        return {async *[Symbol.asyncIterator](){},async result(){return {role:'assistant',content:[{type:'text',text:'continued'}],stopReason:'stop'};}};
+      }});
+      assert.equal(continuedCalls,1,source+' cancellation must allow next turn');
+      assert.equal(manager.getEntries().filter(e=>e.message).at(-1).message.stopReason,'stop');
+      manager.close();
     }
     console.log(JSON.stringify({passed:true,scope:'cooperative sequential registered tool; caller and extension abort; cleanup before idle; persisted pairing; child reopen; fixture provider only'}));
   } finally {rmSync(dir,{recursive:true,force:true});}
