@@ -1,5 +1,15 @@
 # Current checkpoint
 
+Main c6f871c CI and rerun of 72677e3 both succeeded. nextTurn implementation remains reverted; main retains known early-persistence mismatch. Previous rejection misread consumed-versus-pending restart behavior; board `next-turn-rejection-audit-correction` is authoritative.
+
+Active worktree `/tmp/pi-rs-next-order` (worker next_turn_order): draft 15f7284 moves injection to Rust begin after user append. Coordinator ran fixture and found invalid payload (missing display); fixture also lacks FIFO, relative order and genuine subprocess assertions. Worker is repairing those exact gaps. No integration or nextTurn compatibility claim yet. Preserve non-trigger custom-message gate independently.
+
+Verified product baseline: formal CLI command-triggered replacement, real model coding, fresh-process continuation; parentSession header-only metadata; deterministic deferred triggerTurn:false gate. Bounded live evidence remains below. NextTurn acceptance: user then two custom messages in FIFO, no current-turn persistence or duplicates; pending queue lost on process exit, consumed entries survive real subprocess reopen; rejected begin leaves queue intact. After this slice: message event ordering and steer/followUp/cancellation, not provider/TUI expansion.
+
+## Historical checkpoint (later corrections take precedence)
+
+# Previous checkpoint
+
 Next task: upstream-accurate `nextTurn` queue semantics. Worker `next_turn_semantics` is active in `/tmp/pi-rs-next-turn`, branch `codex/next-turn-semantics`; current driver drains and persists all queued classes at turn end, which differs from pinned upstream. Acceptance is board record `next-turn-semantics`; no steer/followUp claim until separately evidenced.
 
 PR #13 merged as `856becd` after exact CI runs 34730735438 and 34730733447. The new deterministic gate verifies triggerTurn:false custom messages persist at safe turn end and enter fresh-process context. Upstream nextTurn remains a known semantic mismatch: it queues until the next user prompt; steer/followUp and event ordering are unverified.
@@ -20,7 +30,6 @@ Current critical path: formal CLI `--command fresh --input ... --model ID|--fixt
 
 Reproduce established gates: `node --experimental-strip-types experiments/session-parent-option.mjs`, `node --experimental-strip-types experiments/cli-new-session.mjs`, `node --experimental-strip-types experiments/session-owner-failures.mjs`. After command/input usability, prioritize withSession and cancellation/message scheduling. No provider/TUI expansion is on this critical path.
 
-## Historical checkpoint (later corrections take precedence)
 
 # Previous checkpoint
 
