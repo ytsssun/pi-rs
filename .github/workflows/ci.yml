@@ -51,3 +51,6 @@ jobs:
         run: node --experimental-strip-types experiments/session-parent-option.mjs
       - name: Verify deferred non-trigger custom message persistence
         run: node --experimental-strip-types experiments/deferred-custom-message.mjs
+
+      - name: Verify nextTurn queue
+        run: node --experimental-strip-types experiments/next-turn-queue.mjs
