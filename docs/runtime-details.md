@@ -51,6 +51,3 @@ The native CLI supports `--command NAME --input TEXT` as a pi-rs extension: it d
 ## Deferred message verification scope
 
 `experiments/deferred-custom-message.mjs` independently tests `triggerTurn:false` without `deliverAs`: append after the current assistant and include in fresh-process context. The older nextTurn fixture documents pi-rs behavior, not upstream equivalence: pinned `agent-session.ts` queues nextTurn messages until the next user prompt. Class-priority sorting at turn end does not prove steering/follow-up semantics. Message start/end event ordering and tool-pair interleaving still require dedicated tests.
-
-### nextTurn queue (tested)
-`deliverAs: "nextTurn"` messages remain in memory through the current drive and are persisted immediately before the next drive. The fixture `experiments/next-turn-queue.mjs` verifies first-history absence, second-drive single delivery, no duplicate on a third drive, and fresh-process recovery. This does not claim steer/followUp parity.
