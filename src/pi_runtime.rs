@@ -121,6 +121,16 @@ impl PiRuntime {
             if self.waiting.is_some() {
                 bail!("runtime already awaiting completion");
             }
+            let queued = request.get("nextTurnMessages").cloned().unwrap_or(json!([]));
+            let queued = queued.as_array().context("nextTurnMessages must be an array")?;
+            for message in queued {
+                if !message["customType"].is_string()
+                    || !(message["content"].is_string() || message["content"].is_array())
+                    || !message["display"].is_boolean()
+                {
+                    bail!("invalid nextTurn custom message");
+                }
+            }
             // Do not silently replay an unfinished persisted tool on reopen.
             let mut unresolved = vec![];
             let resolved: std::collections::HashSet<Value> = store.snapshot()?["branch"].as_array().unwrap().iter().filter(|e| e["customType"]=="pi-rs.in-flight.v1" && e["data"]["state"]=="resolved").map(|e|e["data"]["toolCallId"].clone()).collect();
@@ -156,6 +166,9 @@ impl PiRuntime {
                 json!({"type":"message","message":{"role":"user","content":request["prompt"],"timestamp":request["messageTimestamp"].as_u64().unwrap_or(0)}}),
                 timestamp,
             )?;
+            for message in queued {
+                Self::append(store, json!({"type":"custom_message","customType":message["customType"],"content":message["content"],"display":message["display"],"details":message["details"]}), timestamp)?;
+            }
             self.parallel = request["parallel"].as_bool().unwrap_or(false);
             return self.next(store);
         }

@@ -16,14 +16,18 @@ export async function drive(options) {
 }
 async function driveActive({manager,host,prompt,stream,trace=[],onToolUpdate=()=>{},onMessage,propagateUpdateErrors=false,parallel=false}) {
   const step=payload=>{ const now=Date.now(); return request({op:'runtime',handle:manager.handle,timestamp:new Date(now).toISOString(),messageTimestamp:now,...payload}); };
-  let action=step({event:'begin',prompt,parallel});
+  const pending = host.peekNextTurnMessages?.() ?? [];
+  const nextTurnMessages = pending.map(queued => {
+    if (queued.kind !== 'agent') throw Error('nextTurn requires a custom message');
+    return queued.message;
+  });
+  let action=step({event:'begin',prompt,parallel,nextTurnMessages});
+  host.acknowledgeNextTurnMessages?.(pending);
   trace.push({type:'turn_start'});
   for(let count=0;count<32;count++) {
     if(action.type==='done') {
       const drainedMessages = typeof host.drainMessages === 'function' ? host.drainMessages() : [];
-      // Rust-owned turn-boundary scheduler: preserve FIFO within a class while
-      // giving steer/follow-up work precedence over deferred next-turn work.
-      // This is deterministic and keeps the Node plugin API unchanged.
+      // Legacy non-nextTurn delivery; steer/followUp compatibility is not claimed.
       const rank = queued => queued?.options?.deliverAs === 'steer' ? 0
         : queued?.options?.deliverAs === 'followUp' ? 1 : 2;
       const messages = drainedMessages.map((message, index) => ({message, index}))
