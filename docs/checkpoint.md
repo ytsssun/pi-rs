@@ -1,5 +1,13 @@
 # Current checkpoint
 
+Independent HTTP cancellation recheck: corrected fixture waits for actual request arrival, observes unfinished producer 100ms after queue_close, then disconnects the server and verifies producer completion within 2s. Reproduction: node --experimental-strip-types experiments/provider-http-cancel-blocker.mjs. Local fixture only, no live model. Previous process-hang interpretation was confounded by the test server leaving sockets open; superseded below. Branch codex/http-cancel-evidence adds bounded cleanup; CI pending.
+
+Next implementation: cancellable Rust streaming transport with yielding JS queue consumption. Keep the existing non-streaming provider behavior unchanged. Require stalled-header and stalled-body cancellation, producer completion before idle, persisted aborted result once, and continuation/reopen. Existing synchronous HTTP read cannot observe queue closure while waiting for bytes.
+
+## Historical checkpoint
+
+# Current checkpoint
+
 Main 14d3bcf includes PR15; implementation head 5ac6b74 passed CI 34771190001 and 34771185716, and main CI succeeded. Same-host continuation after extension abort is fixed; deterministic scope only.
 
 Provider cancellation audit corrected the worker claim: Rust already starts provider work on a thread and exposes stream handles, nonblocking queue_poll and queue_close. JS assembleNativeQueue chooses blocking wait:true. Existing primitives permit cooperative polling without a new request protocol, demonstrated by experiments/provider-queue-cancel-probe.mjs. Closing a queue does NOT prove interruption of a blocked HTTP read or producer cleanup. Provider cancellation remains unimplemented.
