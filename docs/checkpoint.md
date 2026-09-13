@@ -1,5 +1,15 @@
 # Current checkpoint
 
+Main 14d3bcf includes PR15; implementation head 5ac6b74 passed CI 34771190001 and 34771185716, and main CI succeeded. Same-host continuation after extension abort is fixed; deterministic scope only.
+
+Provider cancellation audit corrected the worker claim: Rust already starts provider work on a thread and exposes stream handles, nonblocking queue_poll and queue_close. JS assembleNativeQueue chooses blocking wait:true. Existing primitives permit cooperative polling without a new request protocol, demonstrated by experiments/provider-queue-cancel-probe.mjs. Closing a queue does NOT prove interruption of a blocked HTTP read or producer cleanup. Provider cancellation remains unimplemented.
+
+Next bounded milestone: replace blocking queue consumption with yielding consumption for streaming mode, retaining existing assembly behavior and propagating AbortSignal. Acceptance: local HTTP fixture with controlled stalled response, event-loop responsiveness, transport cleanup before idle, once-only persisted abort, same-host continuation, fresh-process recovery. Investigate blocking HTTP read cancellation before promising cleanup; non-streaming mode remains separately unsupported. No live cancellation or performance claim.
+
+## Historical checkpoint (superseded status preserved)
+
+# Current checkpoint
+
 PR #14 merged as 9545e68 after exact-head CI 34753745675 / 34753743902 passed. Coordinator reran cooperative-tool-cancel, deferred-message-events, next-turn-queue and cancel-settlement-probe: all passed. Scope is deterministic sequential cooperative tools and persisted settlement, not in-flight provider interruption or full cancellation parity.
 
 A new independent continuation counterexample found extension abort permanently poisoned the host signal: next drive made zero provider calls. Branch codex/cancel-next-turn refreshes the signal only at idle-to-active admission and adds same-host continuation checks for caller and extension cancellation. Local cooperative-tool-cancel and command-idle pass; CI pending.
