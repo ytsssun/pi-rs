@@ -1,5 +1,7 @@
 # Current checkpoint
 
+Active live formal command validation: worker `live_cli_command` resumed after resolving PATH-only Cargo failure. `/Users/stevensun/.cargo/bin/cargo build --locked --bin pi-rs` succeeds on main 37a8b4f. If `cargo` is absent from PATH, check `$HOME/.cargo/bin/cargo` before reporting an installation/access blocker. Live combined-command outcome still pending; prior deterministic gates remain valid.
+
 PR #12 merged as `c9b9129` after exact-head CI runs 34723992787 and 34723991380 plus independent review. Formal CLI now accepts `--command NAME --input TEXT --fixture FILE|--model ID`; the verified fixture performs command-triggered newSession, real write/bash on the new owner, fresh-process edit, parent header/history isolation, invalid command/model failure and veto. Deterministic only; live combined command path remains next.
 
 Main `fd583d4` records parentSession acceptance: exact behavioral head `267f581` passed CI 34718169806, including header-only metadata, no history copying, veto/invalid options and fresh-process roundtrip. withSession and active-turn abort-and-switch remain unsupported.
