@@ -10,7 +10,7 @@ Extensions can register named provider configurations through the unchanged `pi.
 
 ## Extension message delivery
 
-Custom messages sent during execution with explicit `triggerTurn: false` or deferred delivery options are appended as upstream-compatible `custom_message` entries after the current execution completes. They enter subsequent model context and survive process restart. Delivery options are retained. Headless `steer`, `followUp`, and `nextTurn` are currently persisted at turn end as deferred fallbacks; they do not interrupt an in-flight provider request or start a nested turn. Message lifecycle events and pending-queue crash recovery remain open. Deterministic reproduction: `node --experimental-strip-types experiments/extension-message-recovery.mjs`.
+Custom messages with `triggerTurn:false` and no `deliverAs` are appended after execution and survive restart. `deliverAs:nextTurn` instead stays in the host's in-memory queue until the next drive: Rust validates all custom inputs before appending the user followed by queued messages in FIFO order, and the host removes them only after successful begin. Unconsumed pending messages are lost on process exit, matching pinned upstream; consumed messages persist once. Deterministic reproduction: `node --experimental-strip-types experiments/next-turn-queue.mjs`. This proves native ordering and real subprocess recovery with fixture responses, not live-model scheduling, steering, cancellation, or lifecycle-event parity.
 
 ## Legacy CLI behavior and recovery
 
@@ -50,4 +50,4 @@ The native CLI supports `--command NAME --input TEXT` as a pi-rs extension: it d
 
 ## Deferred message verification scope
 
-`experiments/deferred-custom-message.mjs` independently tests `triggerTurn:false` without `deliverAs`: append after the current assistant and include in fresh-process context. The older nextTurn fixture documents pi-rs behavior, not upstream equivalence: pinned `agent-session.ts` queues nextTurn messages until the next user prompt. Class-priority sorting at turn end does not prove steering/follow-up semantics. Message start/end event ordering and tool-pair interleaving still require dedicated tests.
+`experiments/deferred-custom-message.mjs` independently tests `triggerTurn:false` without `deliverAs`: append after the current assistant and include in fresh-process context. The older `extension-message-recovery.mjs` turn-end nextTurn expectation is superseded and now aliases the corrected gate. Pinned `agent-session.ts:1258-1275` appends the user before pending custom messages; the nextTurn queue is in-memory. Class-priority sorting at turn end does not prove steering/follow-up semantics. Message start/end event ordering and tool-pair interleaving still require dedicated tests.
