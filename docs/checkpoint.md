@@ -1,5 +1,7 @@
 # Current checkpoint
 
+Deferred event observation is CI-verified at 86f0e4b. New source audit confirms steer/followUp/cancellation remain a structural gap: pinned AgentSession requires explicit streamingBehavior, queue admission and abort/dispose ordering; native Rust currently has none and abort is JS-triggered. Do not add success-shaped stubs. Next task is a single cancellation admission seam with a real provider/tool fixture and explicit failure behavior.
+
 Deferred custom event observation is integrated at `ad1738d` after fresh native rebuild. `deferred-message-events.mjs`, `deferred-custom-message.mjs` and `next-turn-queue.mjs` pass. Admission snapshot now drives both canonical persistence and message_start/end observer payload; mutation and observer-failure paths are covered. Scope is triggerTurn:false/no deliverAs only; full AgentSession.subscribe, normal messages, steer/followUp and cancellation remain open. Exact main CI is pending.
 
 Main `23f03ed` passed exact CI 34741172995. nextTurn now enters native begin after the user message in FIFO order; deterministic true-subprocess fixture distinguishes lost unconsumed in-memory queues from retained consumed entries. Rejected admission preserves queue/history. Deferred triggerTurn:false gate remains passing. No live scheduling, steer/followUp, cancellation or crash-atomic multiappend claim.
