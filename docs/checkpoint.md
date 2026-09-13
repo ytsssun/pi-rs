@@ -4,6 +4,8 @@ Main 14d3bcf includes PR15; implementation head 5ac6b74 passed CI 34771190001 an
 
 Provider cancellation audit corrected the worker claim: Rust already starts provider work on a thread and exposes stream handles, nonblocking queue_poll and queue_close. JS assembleNativeQueue chooses blocking wait:true. Existing primitives permit cooperative polling without a new request protocol, demonstrated by experiments/provider-queue-cancel-probe.mjs. Closing a queue does NOT prove interruption of a blocked HTTP read or producer cleanup. Provider cancellation remains unimplemented.
 
+New blocker evidence (main 4aa77e5): `provider-http-cancel-blocker.mjs` against a local stalled HTTP endpoint shows `queue_close` returns while `stream_status` remains unfinished and the process hangs in the producer read. This proves transport cleanup is missing.
+
 Next bounded milestone: replace blocking queue consumption with yielding consumption for streaming mode, retaining existing assembly behavior and propagating AbortSignal. Acceptance: local HTTP fixture with controlled stalled response, event-loop responsiveness, transport cleanup before idle, once-only persisted abort, same-host continuation, fresh-process recovery. Investigate blocking HTTP read cancellation before promising cleanup; non-streaming mode remains separately unsupported. No live cancellation or performance claim.
 
 ## Historical checkpoint (superseded status preserved)
