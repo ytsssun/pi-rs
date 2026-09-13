@@ -36,7 +36,7 @@ async function driveActive({manager,host,prompt,stream,trace=[],onToolUpdate=()=
         .map(({message}) => message);
       for (const queued of messages) {
         if (queued.kind === 'agent' && (queued.options?.triggerTurn === false || queued.options?.deliverAs === undefined || queued.options?.deliverAs === 'nextTurn' || queued.options?.deliverAs === 'steer')) {
-          const message = queued.message;
+          const message = queued.sessionMessage ?? queued.message;
           manager.appendCustomMessageEntry(message.customType, message.content ?? [], message.display, message.details);
           trace.push({type:'message_persisted', kind:queued.kind, customType:message.customType});
           // Scoped synchronous AgentSession subscriber seam, never ExtensionRunner.

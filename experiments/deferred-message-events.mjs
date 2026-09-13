@@ -18,7 +18,10 @@ try {
         pi.registerTool({name:'notify', label:'Notify', description:'queues custom note', parameters:{type:'object', properties:{}}, execute:async () => {
           executed++;
           admissionBefore = Date.now();
-          pi.sendMessage({customType:'note', content:'tool note', display:false, details:{origin:'tool'}}, {triggerTurn:false});
+          const input = {customType:'note', content:'tool note', display:false, details:{origin:'tool'}};
+          pi.sendMessage(input, {triggerTurn:false});
+          input.content = 'mutated after admission';
+          input.details.extra = 'shared nested object';
           admissionAfter = Date.now();
           assert.equal(manager.getEntries().filter(e => e.type === 'custom_message').length, 0);
           assert.equal(events.length, 0, 'must not emit inside tool execution');
@@ -40,8 +43,10 @@ try {
         assert.ok(resultIndex > disk.findIndex(e => Array.isArray(e.message?.content) && e.message.content.some(c => c.type === 'toolCall')));
         assert.ok(resultIndex < disk.indexOf(notes[0]), 'custom message must not split tool pair');
         assert.equal(event.message.role, 'custom');
+        assert.equal(notes[0].content, 'tool note', 'persist admission snapshot, not reassigned caller field');
         assert.equal(event.message.content, notes[0].content);
-        assert.deepEqual(event.message.details, {origin:'tool'});
+        assert.deepEqual(event.message.details, {origin:'tool', extra:'shared nested object'}, 'retain upstream shallow snapshot semantics');
+        assert.deepEqual(notes[0].details, event.message.details);
         assert.ok(event.message.timestamp >= admissionBefore && event.message.timestamp <= admissionAfter);
         events.push(event);
         if (event.type === failAt) throw observerError;
