@@ -63,7 +63,6 @@ export async function createHost(backend, { factories = [], cwd = process.cwd(),
   // queue after extension dispatch. Keeping the queue explicit makes the
   // contract deterministic without pretending to run a provider here.
   const pendingMessages = [];
-  const nextTurnMessages = [];
   let activeDrive;
   const beginDrive = () => {
     if (activeDrive) throw new Error('Host already has an active drive');
@@ -74,10 +73,7 @@ export async function createHost(backend, { factories = [], cwd = process.cwd(),
   };
   const actions = Object.fromEntries(['setModel'].map((name) => [name, unsupported(name)]));
   Object.assign(actions, {
-    sendMessage: (message, options) => {
-      const queued = { kind: 'agent', message, options };
-      if (options?.deliverAs === 'nextTurn') nextTurnMessages.push(queued); else pendingMessages.push(queued);
-    },
+    sendMessage: (message, options) => { pendingMessages.push({ kind: 'agent', message, options }); },
     sendUserMessage: (message, options) => { pendingMessages.push({ kind: 'user', message, options }); },
     appendEntry: (customType, data) => {
       assert.ok(sessionManager && typeof sessionManager.appendCustomEntry === 'function', 'sessionManager.appendCustomEntry required');
@@ -133,7 +129,7 @@ export async function createHost(backend, { factories = [], cwd = process.cwd(),
     assert.ok(definition, `unregistered tool: ${name}`);
     return { name, description: definition.description, parameters: definition.parameters };
   });
-  return { beginDrive, waitForIdle, runner, eventBus, errors, providers, modelRegistry, contextActions, execute, requestTools, runtime: loaded.runtime, actions, pendingMessages, drainMessages: () => pendingMessages.splice(0), takeNextTurnMessages: () => nextTurnMessages.splice(0) };
+  return { beginDrive, waitForIdle, runner, eventBus, errors, providers, modelRegistry, contextActions, execute, requestTools, runtime: loaded.runtime, actions, pendingMessages, drainMessages: () => pendingMessages.splice(0) };
 }
 
 export async function exercise(backend = tsBackend()) {

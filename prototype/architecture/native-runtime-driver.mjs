@@ -15,14 +15,6 @@ export async function drive(options) {
   }
 }
 async function driveActive({manager,host,prompt,stream,trace=[],onToolUpdate=()=>{},onMessage,propagateUpdateErrors=false,parallel=false}) {
-  // Upstream nextTurn messages are held in memory until the next user turn.
-  // Persist them immediately before that turn begins, never at prior turn end.
-  const deferred = typeof host.takeNextTurnMessages === 'function' ? host.takeNextTurnMessages() : [];
-  for (const queued of deferred) {
-    const message = queued.message;
-    manager.appendCustomMessageEntry(message.customType, message.content ?? [], message.display, message.details);
-    trace.push({type: 'next_turn_message_persisted', customType: message.customType});
-  }
   const step=payload=>{ const now=Date.now(); return request({op:'runtime',handle:manager.handle,timestamp:new Date(now).toISOString(),messageTimestamp:now,...payload}); };
   let action=step({event:'begin',prompt,parallel});
   trace.push({type:'turn_start'});
@@ -38,7 +30,7 @@ async function driveActive({manager,host,prompt,stream,trace=[],onToolUpdate=()=
         .sort((a, b) => rank(a.message) - rank(b.message) || a.index - b.index)
         .map(({message}) => message);
       for (const queued of messages) {
-        if (queued.kind === 'agent' && (queued.options?.triggerTurn === false || queued.options?.deliverAs === undefined || queued.options?.deliverAs === 'steer')) {
+        if (queued.kind === 'agent' && (queued.options?.triggerTurn === false || queued.options?.deliverAs === undefined || queued.options?.deliverAs === 'nextTurn' || queued.options?.deliverAs === 'steer')) {
           const message = queued.message;
           manager.appendCustomMessageEntry(message.customType, message.content ?? [], message.display, message.details);
           trace.push({type:'message_persisted', kind:queued.kind, customType:message.customType});
