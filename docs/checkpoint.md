@@ -1,12 +1,23 @@
 # Current checkpoint
 
+Main `23f03ed` passed exact CI 34741172995. nextTurn now enters native begin after the user message in FIFO order; deterministic true-subprocess fixture distinguishes lost unconsumed in-memory queues from retained consumed entries. Rejected admission preserves queue/history. Deferred triggerTurn:false gate remains passing. No live scheduling, steer/followUp, cancellation or crash-atomic multiappend claim.
+
+Correction: the previous fixture failure came from stale native addon. The original second-item invalid-admission test was valid; changing index was not a necessary bug fix. Rebuild with `python3 scripts/build-native-session.py` before evaluating Rust changes.
+
+Active work: `/tmp/pi-rs-deferred-events`, worker deferred_event_contract. Implement minimal deferred-custom onSessionEvent observer after persisted append, with tool-result ordering and explicit observer-exception tests. AgentSession subscriber events differ from generic extension eventBus; ordinary message forwarding also differs from deferred custom path. Source evidence is board `deferred-event-boundary-audit`. This scope does not promise full AgentSession.subscribe compatibility.
+
+Established live baseline: formal command-triggered replacement, coding and fresh-process resume passed once; source/artifact evidence remains in history. Next critical path after deferred events is safe message/cancellation control needed by self-hosted harnesses; no provider/TUI expansion.
+
+## Historical checkpoint (later corrections take precedence)
+
+# Previous checkpoint
+
 Main c6f871c CI and rerun of 72677e3 both succeeded. nextTurn implementation remains reverted; main retains known early-persistence mismatch. Previous rejection misread consumed-versus-pending restart behavior; board `next-turn-rejection-audit-correction` is authoritative.
 
 Active worktree `/tmp/pi-rs-next-order` (worker next_turn_order): draft 15f7284 moves injection to Rust begin after user append. Coordinator ran fixture and found invalid payload (missing display); fixture also lacks FIFO, relative order and genuine subprocess assertions. Worker is repairing those exact gaps. No integration or nextTurn compatibility claim yet. Preserve non-trigger custom-message gate independently.
 
 Verified product baseline: formal CLI command-triggered replacement, real model coding, fresh-process continuation; parentSession header-only metadata; deterministic deferred triggerTurn:false gate. Bounded live evidence remains below. NextTurn acceptance: user then two custom messages in FIFO, no current-turn persistence or duplicates; pending queue lost on process exit, consumed entries survive real subprocess reopen; rejected begin leaves queue intact. After this slice: message event ordering and steer/followUp/cancellation, not provider/TUI expansion.
 
-## Historical checkpoint (later corrections take precedence)
 
 # Previous checkpoint
 
