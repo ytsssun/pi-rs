@@ -1,5 +1,7 @@
 # Current checkpoint
 
+Cancellation implementation is blocked by a real protocol gap, not credentials: audit `docs/cancellation-seam-audit.md` (main `2128777`) shows synchronous Rust `step` with private waiting and no cancel handle/token or settlement event. No unsafe cancel stub was added. Active next task is API/state-machine design in `/tmp/pi-rs-cancel-api`; implementation follows only after a bounded design and deterministic blocking fixture plan.
+
 Active next milestone: one Rust-owned cancellation seam. Worker `cancellation_seam` is assigned `/tmp/pi-rs-cancellation`, branch `codex/cancellation`, acceptance in board `cancellation-seam-task`. Current Rust runtime has no cancel op; only JS-side AbortController exists. Implementation must prove exactly-once settle and persisted aborted recovery or return a concrete blocker.
 
 Deferred event observation is CI-verified at 86f0e4b. New source audit confirms steer/followUp/cancellation remain a structural gap: pinned AgentSession requires explicit streamingBehavior, queue admission and abort/dispose ordering; native Rust currently has none and abort is JS-triggered. Do not add success-shaped stubs. Next task is a single cancellation admission seam with a real provider/tool fixture and explicit failure behavior.
