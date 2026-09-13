@@ -1,0 +1,16 @@
+import http from 'node:http';
+import assert from 'node:assert/strict';
+import {request} from '../prototype/architecture/native-store-backend.mjs';
+const server=http.createServer((req,res)=>{if(req.url?.endsWith('/chat/completions')){req.on('data',()=>{}); /* deliberately never respond */}});
+await new Promise(r=>server.listen(0,'127.0.0.1',r));
+const port=server.address().port;
+const handle=request({op:'provider_stream_start',model:'fixture',messages:[{role:'user',content:'stall'}],tools:[],base_url:`http://127.0.0.1:${port}/v1`,capacity:4});
+await new Promise(r=>setTimeout(r,100));
+const before=request({op:'stream_status',handle});
+request({op:'queue_close',handle});
+await new Promise(r=>setTimeout(r,100));
+const after=request({op:'stream_status',handle});
+server.close();
+assert.equal(before.finished,false);
+assert.equal(after.finished,false);
+console.log(JSON.stringify({passed:true,scope:'blocked HTTP provider stream',before,after,limitation:'queue_close does not interrupt or join producer blocked in HTTP read; cleanup cannot be proven'}));
