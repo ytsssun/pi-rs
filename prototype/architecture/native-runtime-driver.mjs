@@ -6,15 +6,16 @@ import {sessionEntryToContextMessages} from '../../vendor/pi-mono/packages/codin
 import {wrapRegisteredTool} from '../../vendor/pi-mono/packages/coding-agent/src/core/extensions/wrapper.ts';
 import {validateToolArguments} from '../../vendor/pi-mono/packages/ai/src/utils/validation.ts';
 export async function drive(options) {
+  if (options.parallel && options.signal) throw Error("Cooperative cancellation does not support parallel drive");
   const finish = options.host.beginDrive();
   try {
-    return await driveActive(options);
+    return await driveActive({...options, signal: AbortSignal.any([options.host.contextActions.getSignal(), ...(options.signal ? [options.signal] : [])])});
   } finally {
     // Includes provider, tool, persistence, and queued-message delivery failures.
     finish();
   }
 }
-async function driveActive({manager,host,prompt,stream,trace=[],onToolUpdate=()=>{},onMessage,onSessionEvent,propagateUpdateErrors=false,parallel=false}) {
+async function driveActive({manager,host,prompt,stream,trace=[],onToolUpdate=()=>{},onMessage,onSessionEvent,propagateUpdateErrors=false,parallel=false,signal}) {
   const step=payload=>{ const now=Date.now(); return request({op:'runtime',handle:manager.handle,timestamp:new Date(now).toISOString(),messageTimestamp:now,...payload}); };
   const pending = host.peekNextTurnMessages?.() ?? [];
   const nextTurnMessages = pending.map(queued => {
@@ -61,6 +62,11 @@ async function driveActive({manager,host,prompt,stream,trace=[],onToolUpdate=()=
     }
     const requestId=action.requestId;
     if(action.type==='model') {
+      if(signal.aborted) {
+        action=step({event:'model_result',requestId,message:{role:'assistant',content:[],stopReason:'aborted',errorMessage:'Drive cancelled',timestamp:Date.now()}});
+        trace.push({type:'cancel_settled',requestId});
+        continue;
+      }
       trace.push({type:'model_start',requestId});
       const canonicalMessages=action.contextEntries.flatMap(sessionEntryToContextMessages);
       const projected=step({event:'project',messages:canonicalMessages});
@@ -75,6 +81,7 @@ async function driveActive({manager,host,prompt,stream,trace=[],onToolUpdate=()=
       trace.push({type:'tool_start',requestId,tool:action.call?.name});
       const call=action.call;let result,isError=false,updateFailed=false,updateFailure,executed=false,args=call.arguments??{};
       try {
+        signal.throwIfAborted();
         if(call.skipError)throw Error(call.skipError); // Rust rejected truncated call.
         const registered=host.runner.getAllRegisteredTools().find(t=>t.definition.name===call.name);
         if(!registered)throw Error(`Tool ${call.name} not found`);
@@ -86,7 +93,7 @@ async function driveActive({manager,host,prompt,stream,trace=[],onToolUpdate=()=
         if(hook?.block) throw Error(hook.reason||'Tool execution was blocked');
         if(['write','edit','bash'].includes(call.name)) step({event:'mark_in_flight',requestId,toolCallId:call.id,toolName:call.name});
         executed=true;
-        result=await executeWithUpdates(tool,call.id,hookEvent.input,new AbortController().signal,async update=>{
+        result=await executeWithUpdates(tool,call.id,hookEvent.input,signal,async update=>{
           const accepted=step({event:'tool_update',requestId,update});
           if(accepted.type!=='accepted') throw Error('native runtime rejected tool update');
           try { await onToolUpdate({toolCallId:call.id,toolName:call.name,partialResult:update,requestId}); }
