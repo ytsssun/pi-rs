@@ -14,7 +14,7 @@ export async function drive(options) {
     finish();
   }
 }
-async function driveActive({manager,host,prompt,stream,trace=[],onToolUpdate=()=>{},onMessage,propagateUpdateErrors=false,parallel=false}) {
+async function driveActive({manager,host,prompt,stream,trace=[],onToolUpdate=()=>{},onMessage,onSessionEvent,propagateUpdateErrors=false,parallel=false}) {
   const step=payload=>{ const now=Date.now(); return request({op:'runtime',handle:manager.handle,timestamp:new Date(now).toISOString(),messageTimestamp:now,...payload}); };
   const pending = host.peekNextTurnMessages?.() ?? [];
   const nextTurnMessages = pending.map(queued => {
@@ -39,6 +39,12 @@ async function driveActive({manager,host,prompt,stream,trace=[],onToolUpdate=()=
           const message = queued.message;
           manager.appendCustomMessageEntry(message.customType, message.content ?? [], message.display, message.details);
           trace.push({type:'message_persisted', kind:queued.kind, customType:message.customType});
+          // Scoped synchronous AgentSession subscriber seam, never ExtensionRunner.
+          // A thrown observer error propagates after persistence; no retry or rollback.
+          if (queued.sessionMessage && onSessionEvent) {
+            onSessionEvent({type:'message_start', message:queued.sessionMessage});
+            onSessionEvent({type:'message_end', message:queued.sessionMessage});
+          }
         } else if (queued.kind === 'user' && queued.options?.deliverAs === 'followUp') {
           const content = typeof queued.message === 'string' ? queued.message : queued.message?.content;
           manager.appendMessage({role:'user', content: typeof content === 'string' ? content : (content ?? []), timestamp: Date.now()});

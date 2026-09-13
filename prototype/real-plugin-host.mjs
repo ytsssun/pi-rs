@@ -73,7 +73,13 @@ export async function createHost(backend, { factories = [], cwd = process.cwd(),
   };
   const actions = Object.fromEntries(['setModel'].map((name) => [name, unsupported(name)]));
   Object.assign(actions, {
-    sendMessage: (message, options) => { pendingMessages.push({ kind: 'agent', message, options }); },
+    sendMessage: (message, options) => {
+      // Capture the custom event payload at admission, as AgentSession does.
+      const sessionMessage = options?.triggerTurn === false && options?.deliverAs === undefined
+        ? {role:'custom', customType:message.customType, content:message.content ?? [], display:message.display, details:message.details, timestamp:Date.now()}
+        : undefined;
+      pendingMessages.push({ kind: 'agent', message, options, ...(sessionMessage ? {sessionMessage} : {}) });
+    },
     sendUserMessage: (message, options) => { pendingMessages.push({ kind: 'user', message, options }); },
     appendEntry: (customType, data) => {
       assert.ok(sessionManager && typeof sessionManager.appendCustomEntry === 'function', 'sessionManager.appendCustomEntry required');

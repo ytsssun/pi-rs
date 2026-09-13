@@ -51,3 +51,9 @@ The native CLI supports `--command NAME --input TEXT` as a pi-rs extension: it d
 ## Deferred message verification scope
 
 `experiments/deferred-custom-message.mjs` independently tests `triggerTurn:false` without `deliverAs`: append after the current assistant and include in fresh-process context. The older `extension-message-recovery.mjs` turn-end nextTurn expectation is superseded and now aliases the corrected gate. Pinned `agent-session.ts:1258-1275` appends the user before pending custom messages; the nextTurn queue is in-memory. Class-priority sorting at turn end does not prove steering/follow-up semantics. Message start/end event ordering and tool-pair interleaving still require dedicated tests.
+
+### Scoped custom-message observation
+
+`drive({onSessionEvent})` accepts a synchronous observer for non-`deliverAs`, explicit `triggerTurn:false` custom messages only. The host captures the custom message timestamp at admission; after canonical append the driver calls `message_start` then `message_end` with the same message object. These are direct session subscriber observations, not generic event-bus messages or ExtensionRunner dispatch. This follows pinned `agent-session.ts:590` and `1516-1525`; ordinary agent message forwarding to extensions at `791` is a separate path.
+
+Synchronous observer exceptions propagate: history remains committed, `message_end` is not called if `message_start` throws, consumed messages are not retried, and drive still becomes idle. This small seam does not await observer promises (use synchronous callbacks), does not implement `AgentSession.subscribe`, and makes no normal-message, nextTurn-event, steer/followUp or cancellation claim. Run `node --experimental-strip-types experiments/deferred-message-events.mjs`: actual native tool execution verifies persistence before callbacks, no split toolCall/toolResult, one event pair, timestamp/object identity, and both observer-failure points.
