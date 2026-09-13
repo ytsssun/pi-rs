@@ -1,5 +1,7 @@
 # Current checkpoint
 
+PR #13 merged as `856becd` after exact CI runs 34730735438 and 34730733447. The new deterministic gate verifies triggerTurn:false custom messages persist at safe turn end and enter fresh-process context. Upstream nextTurn remains a known semantic mismatch: it queues until the next user prompt; steer/followUp and event ordering are unverified.
+
 Next milestone: Rust-owned extension message scheduling seam. Worker `message_scheduler_seam` is active in `/tmp/pi-rs-message-scheduler`, branch `codex/message-scheduler`; acceptance is board record `message-scheduler-milestone`. It must either implement one upstream-backed deferred ordering behavior with real host/native persistence and CI, or provide a reproduced blocker. Steer/followUp/in-flight cancellation remain unclaimed until evidence exists.
 
 Formal CLI live command replacement is now verified once: gpt-5.4-mini completed old-session bug fix, `--resume --command fresh --input` replacement coding, then fresh-process continuation. All 3 stages and external checks passed, tests unchanged, steering 0; tools read/edit/write/bash were observed and old/new session isolation held. Artifact `/tmp/pi-live-command-37a8b4f`; relay usage was unavailable, not counted as zero. One run only; active-turn abort, withSession, cancellation and reliability across repetitions remain open.
