@@ -1,4 +1,4 @@
-// Diagnostic counterexample: intentionally records a compatibility gap, not a gate.
+// Executable upstream comparison: inactive Calculator is rejected through formal CLI.
 import assert from 'node:assert/strict';
 import {Agent} from '../vendor/pi-mono/packages/agent/src/agent.ts';
 import {mkdtempSync,writeFileSync,readFileSync,rmSync} from 'node:fs';
@@ -20,5 +20,6 @@ try{
  const run=spawnSync(process.execPath,['--experimental-strip-types',resolve('bin/pi-native.mjs'),'--session',session,'--workspace',dir,'--extension',resolve('vendor/pi-mono/packages/coding-agent/examples/extensions/kimi-deferred-tools.ts'),'--extension',ext,'--model','disabled-test/tiny','--input','invoke disabled calculator'],{encoding:'utf8',timeout:30000,env:{PATH:process.env.PATH,HOME:dir}});
  assert.equal(run.status,0,run.stderr);
  const native=readFileSync(session,'utf8').trim().split('\n').map(JSON.parse).find(e=>e.message?.role==='toolResult').message;
+ assert.equal(native.isError,true);assert.deepEqual(native.content,upstream.content);
  console.log(JSON.stringify({upstream:{isError:upstream.isError,content:upstream.content},native:{isError:native.isError,content:native.content},parity:upstream.isError===native.isError}));
 }finally{rmSync(dir,{recursive:true,force:true})}
