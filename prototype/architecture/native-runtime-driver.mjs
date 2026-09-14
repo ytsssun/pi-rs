@@ -26,9 +26,25 @@ async function driveActive({manager,host,prompt,stream,trace=[],onToolUpdate=()=
   // Acknowledge only after Rust accepts and appends the user plus queued messages.
   host.acknowledgeNextTurnMessages?.(pending);
   const consumedMessages = [];
+  let terminalFailure = false;
   trace.push({type:'turn_start'});
   for(let count=0;count<32;count++) {
     if(action.type==='done') {
+      // Upstream ends error/aborted turns without draining steering/follow-up.
+      if (terminalFailure) {
+        trace.push({type:'turn_end',consumedMessages:0});
+        return {action,trace,consumedMessages};
+      }
+      const steer = host.pendingMessages.find(q => q.kind === 'user' && q.options?.deliverAs === 'steer');
+      if (steer && !signal.aborted) {
+        const content = typeof steer.message === 'string' ? steer.message : steer.message?.content;
+        if (typeof content !== 'string' && !Array.isArray(content)) throw Error('Invalid steer content');
+        action = step({event:'begin',prompt:content,parallel});
+        host.pendingMessages.splice(host.pendingMessages.indexOf(steer),1);
+        trace.push({type:'steer_admitted'});
+        consumedMessages.push(steer);
+        continue;
+      }
       // Match upstream's default one-at-a-time follow-up drain. Begin through
       // Rust before acknowledging admission; queued messages are not delivery.
       const followUp = host.pendingMessages.find(q => q.kind === 'user' && q.options?.deliverAs === 'followUp');
@@ -77,6 +93,7 @@ async function driveActive({manager,host,prompt,stream,trace=[],onToolUpdate=()=
     if(action.type==='model') {
       if(signal.aborted) {
         action=step({event:'model_result',requestId,message:{role:'assistant',content:[],stopReason:'aborted',errorMessage:'Drive cancelled',timestamp:Date.now()}});
+        terminalFailure=true;
         trace.push({type:'cancel_settled',requestId});
         continue;
       }
@@ -88,7 +105,9 @@ async function driveActive({manager,host,prompt,stream,trace=[],onToolUpdate=()=
       trace.push({type:"context_usage", ...estimateContextTokens(messages), serializedBytes:Buffer.byteLength(JSON.stringify(messages), "utf8"), estimator:"pinned-pi"});
       const output=await stream({provider:'fixture'}, {systemPrompt:'native architecture experiment',messages,tools:host.requestTools()});
       for await(const _event of output){} // Stream transport consumption, no turn decisions.
-      action=step({event:'model_result',requestId,message:await output.result()});
+      const message=await output.result();
+      terminalFailure=['error','aborted'].includes(message.stopReason);
+      action=step({event:'model_result',requestId,message});
       trace.push({type:'model_result',requestId});
     } else if(action.type==='tool') {
       trace.push({type:'tool_start',requestId,tool:action.call?.name});
