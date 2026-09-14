@@ -24,7 +24,7 @@ export function tsBackend(initial = []) {
   };
 }
 
-export async function createHost(backend, { factories = [], cwd = process.cwd(), extensionPaths = [pluginPath], sessionManager = guardedObject('sessionManager') } = {}) {
+export async function createHost(backend, { factories = [], cwd = process.cwd(), extensionPaths = [pluginPath], sessionManager = guardedObject('sessionManager'), modelRuntime }  = {}) {
   const eventBus = createEventBus();
   const loaded = await loadExtensions(extensionPaths, cwd, eventBus);
   assert.deepEqual(loaded.errors, [], 'unchanged upstream extension must load');
@@ -36,11 +36,13 @@ export async function createHost(backend, { factories = [], cwd = process.cwd(),
     registerProvider: (nameOrProvider, config) => {
       const name = typeof nameOrProvider === 'string' ? nameOrProvider : nameOrProvider?.name;
       if (!name) throw new Error('provider name required');
+      modelRuntime?.registerProvider(name, typeof nameOrProvider === 'string' ? config : nameOrProvider);
       providers.set(name, typeof nameOrProvider === 'string' ? {name, ...config} : nameOrProvider);
     },
-    unregisterProvider: name => providers.delete(name),
+    unregisterProvider: name => { modelRuntime?.unregisterProvider(name); return providers.delete(name); },
     getProviders: () => new Map(providers),
     find: (provider, modelId) => {
+      if (modelRuntime) return modelRuntime.getModel(String(provider), String(modelId));
       const entry = providers.get(String(provider));
       const models = entry?.models;
       if (!Array.isArray(models)) return undefined;
@@ -136,7 +138,7 @@ export async function createHost(backend, { factories = [], cwd = process.cwd(),
     assert.ok(definition, `unregistered tool: ${name}`);
     return { name, description: definition.description, parameters: definition.parameters };
   });
-  return { beginDrive, waitForIdle, runner, eventBus, errors, providers, modelRegistry, contextActions, execute, requestTools, runtime: loaded.runtime, actions, pendingMessages, peekNextTurnMessages: () => pendingMessages.filter(q => q.options?.deliverAs === 'nextTurn'),
+  return { modelRuntime, beginDrive, waitForIdle, runner, eventBus, errors, providers, modelRegistry, contextActions, execute, requestTools, runtime: loaded.runtime, actions, pendingMessages, peekNextTurnMessages: () => pendingMessages.filter(q => q.options?.deliverAs === 'nextTurn'),
     acknowledgeNextTurnMessages: messages => { for (const message of messages) { const index = pendingMessages.indexOf(message); if (index >= 0) pendingMessages.splice(index, 1); } },
     drainMessages: () => { const ready = pendingMessages.filter(q => q.options?.deliverAs !== 'nextTurn'); for (const message of ready) pendingMessages.splice(pendingMessages.indexOf(message), 1); return ready; } };
 }

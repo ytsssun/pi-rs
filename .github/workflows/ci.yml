@@ -58,6 +58,10 @@ jobs:
         run: node --experimental-strip-types experiments/user-followup-execution.mjs
       - name: Native user steer boundary
         run: node --experimental-strip-types experiments/user-steer-execution.mjs
+      - name: Registered provider CLI
+        run: node --experimental-strip-types experiments/cli-registered-provider.mjs
+      - name: Core inventory report consistency
+        run: python3 scripts/report-core-parity.py --check
       - name: Verify deferred custom session event ordering
         run: node --experimental-strip-types experiments/deferred-message-events.mjs
       - name: Verify cooperative sequential tool cancellation
