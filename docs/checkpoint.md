@@ -1,10 +1,10 @@
 # Current checkpoint
 
-Main 8f278db includes PR21 bounded final-boundary user steer. Exact implementation 8523dda passed CI 34819378579 and 34819373980; coordinator reproduced native steer, upstream oracle and followUp. Tool-boundary/custom steer and live scheduling remain unverified.
+Main 87d51cd includes PR22 registered provider dispatch. Exact head 2459734 passed CI 34828568829/34828563927; merge SHA CI succeeded. Independent registered-provider CLI fixture and adjacent command/model tests passed. Synthetic provider only: real tool effect, result continuation, saved-model process resume, missing-provider rejection and persisted error. No unchanged third-party/live/OAuth claim.
 
-Current highest-level priority: quantify core replacement obligations and close the provider-plugin execution gap. Worker core_parity_denominator owns an upstream-backed requirement matrix and arithmetic; worker provider_plugin_dispatch owns isolated formal-CLI registered-stream routing through the unchanged JS provider boundary, retaining Rust loop/store. CLI currently rejects non-OpenAI providers despite retaining registration, a concrete ecosystem blocker. No new provider or OAuth implementation is requested.
+Active critical path: prompt construction and before_agent_start compatibility. Native driver still sends the literal system prompt "native architecture experiment" and omits the hook. Worker prompt_hook_compat is implementing against pinned upstream with an unchanged example extension, formal CLI and deterministic provider assertions; acceptance includes chained prompt effects, custom-message persistence/order, real tool roundtrip and process resume. Add CI before integration. Unimplemented hooks remain explicitly unclaimed.
 
-Correction: chat estimate of 45–50% coverage is withdrawn. It used subjective half-credit and inconsistent category counts; no complete verified denominator exists yet. Coverage of sampled cases, public contracts and full replacement readiness must be reported separately. Preserving upstream UI in Node is part of ecosystem compatibility, not an obligation to rewrite TUI in Rust.
+Quantification: scripts/report-core-parity.py --check verifies report consistency for 37 SELECTED groups, not exhaustive feature coverage. Current labels 33 partial / 3 unknown / 1 missing reflect broad incomplete groups, not absence of working slices or a compatibility percentage. Full parity percentage remains unavailable.
 
 ## Historical checkpoint
 
