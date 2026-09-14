@@ -1,8 +1,8 @@
 # Current checkpoint
 
-Main 9b59458 passed merge CI. PR27 active-tool fix passed exact head 5df056a CI 34884994967/34884990555. Inactive calls now have deterministic sequential/parallel no-side-effect error tests and unchanged dynamic activation gates. Prior unreviewed push 476dc659 was reverted before corrected integration; history retained in board.
+PR28 merged as 4eb30d1 after exact-head CI 34894576230/34894569948 passed. Coordinator reproduced formal context hook chain/replacement, canonical isolation, tools and process recovery. This was coverage of existing behavior, not a new runtime feature.
 
-Active task context_hook_mutation in /tmp/pi-context-hook (base 9b59458). Formal context mutation fixture has provider-registration setup failure (ctx/tiny not found); worker is repairing it using working registered-provider fixture. This is ordinary unfinished implementation, not an architectural blocker. Acceptance remains formal CLI chained context mutation/replacement, provider visibility, canonical-history isolation, tool roundtrip and fresh-process recovery; add CI. Existing driver already invokes emitContext, so do not introduce redundant runtime changes if only coverage is missing.
+Active highest-value missing operation: idle switchSession, currently unsupported in native owner. Worker session_switch_core owns isolated implementation. Acceptance: formal command selects existing same-workspace session, preserved identities/history, old file unchanged, veto and invalid target preserve old owner, fresh guarded callback, actual tool continuation and subprocess recovery. Different workspace must be handled correctly or explicitly rejected before teardown; no active cancellation/fork/reload scope expansion.
 
 ## Historical checkpoint
 
