@@ -25,9 +25,23 @@ async function driveActive({manager,host,prompt,stream,trace=[],onToolUpdate=()=
   let action=step({event:'begin',prompt,parallel,nextTurnMessages});
   // Acknowledge only after Rust accepts and appends the user plus queued messages.
   host.acknowledgeNextTurnMessages?.(pending);
+  const consumedMessages = [];
   trace.push({type:'turn_start'});
   for(let count=0;count<32;count++) {
     if(action.type==='done') {
+      // Match upstream's default one-at-a-time follow-up drain. Begin through
+      // Rust before acknowledging admission; queued messages are not delivery.
+      const followUp = host.pendingMessages.find(q => q.kind === 'user' && q.options?.deliverAs === 'followUp');
+      if (followUp && !signal.aborted) {
+        const content = typeof followUp.message === 'string' ? followUp.message : followUp.message?.content;
+        if (typeof content !== 'string' && !Array.isArray(content)) throw Error('Invalid followUp content');
+        action = step({event:'begin', prompt:content, parallel});
+        host.pendingMessages.splice(host.pendingMessages.indexOf(followUp), 1);
+        trace.push({type:'followup_admitted'});
+        consumedMessages.push(followUp);
+        // Continue under the same active-drive lease and global action budget.
+        continue;
+      }
       const drainedMessages = typeof host.drainMessages === 'function' ? host.drainMessages() : [];
       // Legacy non-nextTurn delivery; steer/followUp compatibility is not claimed.
       const rank = queued => queued?.options?.deliverAs === 'steer' ? 0
@@ -47,9 +61,8 @@ async function driveActive({manager,host,prompt,stream,trace=[],onToolUpdate=()=
             onSessionEvent({type:'message_end', message:queued.sessionMessage});
           }
         } else if (queued.kind === 'user' && queued.options?.deliverAs === 'followUp') {
-          const content = typeof queued.message === 'string' ? queued.message : queued.message?.content;
-          manager.appendMessage({role:'user', content: typeof content === 'string' ? content : (content ?? []), timestamp: Date.now()});
-          trace.push({type:'message_persisted', kind:queued.kind, deliverAs:'followUp'});
+          host.pendingMessages.unshift(...messages.slice(messages.indexOf(queued)));
+          throw Error('Cancelled drive retains pending followUp messages');
         } else if (!onMessage) {
           // Do not report delivery when the runtime has no scheduling consumer.
           host.pendingMessages.unshift(...messages.slice(messages.indexOf(queued)));
@@ -58,7 +71,7 @@ async function driveActive({manager,host,prompt,stream,trace=[],onToolUpdate=()=
         if (onMessage) await onMessage(queued);
         trace.push({type:'message_consumed', kind:queued.kind});
       }
-      trace.push({type:'turn_end',consumedMessages:messages.length}); return {action,trace,consumedMessages:messages};
+      trace.push({type:'turn_end',consumedMessages:messages.length}); return {action,trace,consumedMessages:[...consumedMessages,...messages]};
     }
     const requestId=action.requestId;
     if(action.type==='model') {
