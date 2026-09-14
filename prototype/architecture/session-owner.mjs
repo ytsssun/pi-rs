@@ -16,12 +16,31 @@ export async function createSessionOwner({path, cwd, mode, makeHost}) {
     const manager = await createBackend({path,cwd,mode:'create',parentSession});
     return {path,manager};
   };
+  function replacedContext(session) {
+    // Preserve upstream runner's lazy stale guards; spreading captures old values.
+    const context = Object.defineProperties({}, Object.getOwnPropertyDescriptors(session.host.runner.createCommandContext()));
+    context.sendMessage = async (message, options) => {
+      context.isIdle(); // Also validates this context's lifetime before mutation.
+      if (options?.deliverAs === 'nextTurn') {
+        session.host.actions.sendMessage(message, options);
+        return;
+      }
+      if (options?.triggerTurn || !context.isIdle())
+        throw Error('replacement sendMessage requires an idle non-triggering message; scheduling unsupported');
+      session.manager.appendCustomMessageEntry(message.customType, message.content ?? [], message.display, message.details);
+    };
+    context.sendUserMessage = async () => {
+      context.isIdle();
+      throw Error('replacement sendUserMessage requires a scheduling consumer; unsupported');
+    };
+    return context;
+  }
   async function newSession(options = {}) {
     if (terminal) throw Error('session owner is terminal');
     if (options === null || typeof options !== 'object' || Array.isArray(options)) throw Error('newSession options must be an object');
     if (options.parentSession !== undefined && typeof options.parentSession !== 'string')
       throw Error('newSession parentSession must be a string');
-    if (options.withSession !== undefined) throw Error('newSession withSession unsupported by native owner');
+    if (options.withSession !== undefined && typeof options.withSession !== 'function') throw Error('newSession withSession must be a function');
     if (options.setup !== undefined && typeof options.setup !== 'function') throw Error('newSession setup must be a function');
     if (replacing || !current.host.contextActions.isIdle()) throw Error('newSession requires an idle owner');
     replacing = true;
@@ -45,6 +64,10 @@ export async function createSessionOwner({path, cwd, mode, makeHost}) {
       await next.host.runner.emit({type:'session_start',reason:'new',previousSessionFile});
       if (options.setup) await options.setup(next.manager);
       terminal = false;
+      // Replacement is committed before user callback execution, as upstream's
+      // finishSessionReplacement. Callback failure must not poison the new owner.
+      replacing = false;
+      if (options.withSession) await options.withSession(replacedContext(next));
       return {cancelled:false};
     } finally {
       if (next && current !== next) await next.manager.close();
