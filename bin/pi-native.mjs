@@ -80,7 +80,7 @@ if (!slashHandled && resolvedModel && !options['--fixture'] && options['--input'
     ({manager,host}=owner.current);
     // Replacement recreates ModelRuntime and extension registrations; resolve the
     // selected model against the new host before any post-command drive.
-    if (selectedModel && !fixture) {
+    if (!commandError && selectedModel && !fixture) {
       const slash=selectedModel.indexOf('/');
       const provider=slash>0?selectedModel.slice(0,slash):'openai';
       const modelId=slash>0?selectedModel.slice(slash+1):selectedModel;
