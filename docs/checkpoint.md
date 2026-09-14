@@ -1,5 +1,13 @@
 # Current checkpoint
 
+PR17 merged as c975fee after exact-head CI 34799759878 and 34799756011 succeeded. Coordinator independently reran with-session-contract, session-owner-failures, session-parent-option, cli-new-session and cli-command-input. Bounded idle withSession callback, stale-context rejection and true native subprocess reopen work; trigger/user scheduling remains unsupported in replacement context.
+
+Active next milestone: queued user followUp execution through the existing Rust driver. Current done path appends user followUp and returns success without asking the model to act. Worker user_followup_execution will verify pinned upstream behavior and implement the bounded execution path in isolation. Acceptance: real host/store, actual tool queues message, follow-up model/tool execution before idle, FIFO semantics, bounded loops, failure/no false delivery, subprocess history. Deferred/nextTurn behavior must remain intact. No steer or provider-cancellation claim.
+
+## Historical checkpoint
+
+# Current checkpoint
+
 Active milestone: idle newSession withSession support. Native owner currently rejects the option; pinned upstream defines a fresh command-capable ReplacedSessionContext with message methods. Worker with_session_contract owns isolated implementation, acceptance in board with-session-idle-milestone. Coordinator independently checks upstream ordering/error semantics and actual owner fixture before integration. Provider transport cancellation remains open; no additional audit loop is needed to rediscover blocking reads.
 
 Main fb482b9 CI passed. PR16 correction merged as a17a528. Latest tested transport evidence is bounded local HTTP only, not live cancellation. No new parity claim.
