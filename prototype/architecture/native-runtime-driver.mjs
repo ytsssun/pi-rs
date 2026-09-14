@@ -22,6 +22,8 @@ async function driveActive({manager,host,prompt,stream,trace=[],onToolUpdate=()=
     if (queued.kind !== 'agent') throw Error('nextTurn requires a custom message');
     return queued.message;
   });
+  const preparedPrompt = await host.preparePrompt(prompt);
+  nextTurnMessages.push(...preparedPrompt.messages.map(message => ({...message, content: message.content ?? []})));
   let action=step({event:'begin',prompt,parallel,nextTurnMessages});
   // Acknowledge only after Rust accepts and appends the user plus queued messages.
   host.acknowledgeNextTurnMessages?.(pending);
@@ -103,7 +105,7 @@ async function driveActive({manager,host,prompt,stream,trace=[],onToolUpdate=()=
       trace.push({type:"context_projection",canonicalMessages:canonicalMessages.length,projectedMessages:projected.length,projectedTextBytes:JSON.stringify(projected).length,projected:projected});
       const messages=await host.runner.emitContext(projected);
       trace.push({type:"context_usage", ...estimateContextTokens(messages), serializedBytes:Buffer.byteLength(JSON.stringify(messages), "utf8"), estimator:"pinned-pi"});
-      const output=await stream({provider:'fixture'}, {systemPrompt:'native architecture experiment',messages,tools:host.requestTools()}, {signal});
+      const output=await stream({provider:'fixture'}, {systemPrompt:preparedPrompt.systemPrompt,messages,tools:host.requestTools()}, {signal});
       for await(const _event of output){} // Stream transport consumption, no turn decisions.
       const message=await output.result();
       terminalFailure=['error','aborted'].includes(message.stopReason);

@@ -1,3 +1,4 @@
+import {buildSystemPrompt} from '../vendor/pi-mono/packages/coding-agent/src/core/system-prompt.ts';
 // Actual pinned Pi loader/runner host. See docs/real-plugin-host.md for scope.
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
@@ -31,6 +32,18 @@ export async function createHost(backend, { factories = [], cwd = process.cwd(),
   for (let i = 0; i < factories.length; i++) {
     loaded.extensions.push(await loadExtensionFromFactory(factories[i], cwd, eventBus, loaded.runtime, `<probe-${i}>`));
   }
+  let currentSystemPrompt = "";
+  let currentPromptOptions = {cwd};
+  const preparePrompt = async (prompt) => {
+    currentPromptOptions = {cwd, selectedTools: backend.getActiveTools()};
+    const base = buildSystemPrompt(currentPromptOptions);
+    currentSystemPrompt = base;
+    const text = typeof prompt === "string" ? prompt : prompt.filter(p => p.type === "text").map(p => p.text).join("\n");
+    const images = Array.isArray(prompt) ? prompt.filter(p => p.type === "image") : [];
+    const result = await runner.emitBeforeAgentStart(text, images.length ? images : undefined, base, currentPromptOptions);
+    currentSystemPrompt = result?.systemPrompt ?? base;
+    return {systemPrompt: currentSystemPrompt, messages: result?.messages ?? []};
+  };
   const providers = new Map();
   const modelRegistry = {
     registerProvider: (nameOrProvider, config) => {
@@ -117,7 +130,7 @@ export async function createHost(backend, { factories = [], cwd = process.cwd(),
   const contextActions = Object.fromEntries([
     'getSignal',
   ].map((name) => [name, unsupported(name)]));
-  Object.assign(contextActions, { getSignal: () => lifecycleAbort.signal, getScopedModels: () => [...providers.values()].flatMap(p => Array.isArray(p.models) ? p.models : []), getSystemPrompt: () => '', getSystemPromptOptions: () => ({cwd}), abort: () => { lifecycleAbort.abort(); runner.invalidate('aborted by extension'); }, shutdown: () => runner.invalidate('shutdown requested'), getModel: () => selectedModel, isIdle: () => activeDrive === undefined, isProjectTrusted: () => true, hasPendingMessages: () => pendingMessages.length > 0 });
+  Object.assign(contextActions, { getSignal: () => lifecycleAbort.signal, getScopedModels: () => [...providers.values()].flatMap(p => Array.isArray(p.models) ? p.models : []), getSystemPrompt: () => currentSystemPrompt, getSystemPromptOptions: () => currentPromptOptions, abort: () => { lifecycleAbort.abort(); runner.invalidate('aborted by extension'); }, shutdown: () => runner.invalidate('shutdown requested'), getModel: () => selectedModel, isIdle: () => activeDrive === undefined, isProjectTrusted: () => true, hasPendingMessages: () => pendingMessages.length > 0 });
   Object.assign(contextActions, { getContextUsage: () => { const entries = typeof sessionManager.getEntries === 'function' ? sessionManager.getEntries() : []; return estimateContextTokens(entries.flatMap(sessionEntryToContextMessages)); }, compact: async (options = {}) => { assert.ok(typeof sessionManager.appendCompaction === 'function', 'sessionManager.appendCompaction required'); return sessionManager.appendCompaction(String(options.summary ?? ''), options.firstKeptEntryId, Number(options.tokensBefore ?? 0)); } });
   runner.bindCore(actions, contextActions);
   const waitForIdle = () => activeDrive ?? Promise.resolve();
@@ -138,7 +151,7 @@ export async function createHost(backend, { factories = [], cwd = process.cwd(),
     assert.ok(definition, `unregistered tool: ${name}`);
     return { name, description: definition.description, parameters: definition.parameters };
   });
-  return { modelRuntime, beginDrive, waitForIdle, runner, eventBus, errors, providers, modelRegistry, contextActions, execute, requestTools, runtime: loaded.runtime, actions, pendingMessages, peekNextTurnMessages: () => pendingMessages.filter(q => q.options?.deliverAs === 'nextTurn'),
+  return { preparePrompt, modelRuntime, beginDrive, waitForIdle, runner, eventBus, errors, providers, modelRegistry, contextActions, execute, requestTools, runtime: loaded.runtime, actions, pendingMessages, peekNextTurnMessages: () => pendingMessages.filter(q => q.options?.deliverAs === 'nextTurn'),
     acknowledgeNextTurnMessages: messages => { for (const message of messages) { const index = pendingMessages.indexOf(message); if (index >= 0) pendingMessages.splice(index, 1); } },
     drainMessages: () => { const ready = pendingMessages.filter(q => q.options?.deliverAs !== 'nextTurn'); for (const message of ready) pendingMessages.splice(pendingMessages.indexOf(message), 1); return ready; } };
 }
