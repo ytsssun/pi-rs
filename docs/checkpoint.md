@@ -1,8 +1,10 @@
 # Current checkpoint
 
-PR17 merged as c975fee after exact-head CI 34799759878 and 34799756011 succeeded. Coordinator independently reran with-session-contract, session-owner-failures, session-parent-option, cli-new-session and cli-command-input. Bounded idle withSession callback, stale-context rejection and true native subprocess reopen work; trigger/user scheduling remains unsupported in replacement context.
+Main 8f278db includes PR21 bounded final-boundary user steer. Exact implementation 8523dda passed CI 34819378579 and 34819373980; coordinator reproduced native steer, upstream oracle and followUp. Tool-boundary/custom steer and live scheduling remain unverified.
 
-Active next milestone: queued user followUp execution through the existing Rust driver. Current done path appends user followUp and returns success without asking the model to act. Worker user_followup_execution will verify pinned upstream behavior and implement the bounded execution path in isolation. Acceptance: real host/store, actual tool queues message, follow-up model/tool execution before idle, FIFO semantics, bounded loops, failure/no false delivery, subprocess history. Deferred/nextTurn behavior must remain intact. No steer or provider-cancellation claim.
+Current highest-level priority: quantify core replacement obligations and close the provider-plugin execution gap. Worker core_parity_denominator owns an upstream-backed requirement matrix and arithmetic; worker provider_plugin_dispatch owns isolated formal-CLI registered-stream routing through the unchanged JS provider boundary, retaining Rust loop/store. CLI currently rejects non-OpenAI providers despite retaining registration, a concrete ecosystem blocker. No new provider or OAuth implementation is requested.
+
+Correction: chat estimate of 45–50% coverage is withdrawn. It used subjective half-credit and inconsistent category counts; no complete verified denominator exists yet. Coverage of sampled cases, public contracts and full replacement readiness must be reported separately. Preserving upstream UI in Node is part of ecosystem compatibility, not an obligation to rewrite TUI in Rust.
 
 ## Historical checkpoint
 
