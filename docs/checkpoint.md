@@ -1,8 +1,8 @@
 # Current checkpoint
 
-PR23 merged as afdec88 after exact head 7b455ba CI 34842501620/34842496959 passed. Independently reproduced unchanged pirate extension before_agent_start behavior, provider roundtrip and followUp. Prompt no longer uses experimental literal. Skills/project instruction discovery remains absent.
+Main 78723a5 includes PR24 repository instructions after exact-head CI 34848719344/34848715325 passed. Coordinator independently reproduced project/ancestor/override ordering, deduplication, hook-visible instructions, real tool continuation and fresh-process reread, plus provider/prompt regressions. Deterministic only; live adherence unverified.
 
-Active priority: project_instruction_context worker is wiring pinned upstream project instruction discovery into formal CLI prompt construction. Acceptance: isolated HOME/workspace, AGENTS.override precedence, ancestor ordering/dedup against upstream, provider-visible instructions before hooks and through tools, changed instructions reread on fresh-process resume. Preserve upstream files and existing policy; add CI. Skills/SYSTEM remain separately scoped.
+Active task system_resource_compat extends the same upstream-compatible prompt path to SYSTEM.md / APPEND_SYSTEM.md. Require upstream precedence, empty-file behavior, trust constraints, AGENTS+hook composition, formal provider/tool assertion and process reread. Worker owns unique worktree; no skills/provider expansion. This completes project prompt configuration before the next broader core compatibility decision.
 
 ## Historical checkpoint
 
