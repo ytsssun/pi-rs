@@ -1,8 +1,8 @@
 # Current checkpoint
 
-Main 046af14 includes PR25 SYSTEM/APPEND composition after exact-head CI 34865507003/34865498172 and merge CI succeeded. Independently reproduced system-resource, project-instruction and before-agent-start fixtures. Prompt resource support is bounded; unreadable-file fallback differs and skills discovery remains open.
+Main 9b59458 passed merge CI. PR27 active-tool fix passed exact head 5df056a CI 34884994967/34884990555. Inactive calls now have deterministic sequential/parallel no-side-effect error tests and unchanged dynamic activation gates. Prior unreviewed push 476dc659 was reverted before corrected integration; history retained in board.
 
-Active task formal_dynamic_tools: unchanged upstream kimi-deferred-tools through formal CLI, not old helper architecture experiment. Verify tool_search-only first request, actual tool-driven Calculator activation in next schema, persisted result, and session_start activation reset on process resume; add CI. Current active-tool state is JS tsBackend while loop/store are Rust—do not conflate ownership with observed compatibility.
+Active task context_hook_mutation in /tmp/pi-context-hook (base 9b59458). Formal context mutation fixture has provider-registration setup failure (ctx/tiny not found); worker is repairing it using working registered-provider fixture. This is ordinary unfinished implementation, not an architectural blocker. Acceptance remains formal CLI chained context mutation/replacement, provider visibility, canonical-history isolation, tool roundtrip and fresh-process recovery; add CI. Existing driver already invokes emitContext, so do not introduce redundant runtime changes if only coverage is missing.
 
 ## Historical checkpoint
 
