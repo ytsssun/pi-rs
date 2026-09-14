@@ -1,8 +1,8 @@
 # Current checkpoint
 
-PR28 merged as 4eb30d1 after exact-head CI 34894576230/34894569948 passed. Coordinator reproduced formal context hook chain/replacement, canonical isolation, tools and process recovery. This was coverage of existing behavior, not a new runtime feature.
+Main f0e9960 includes PR29 idle same-workspace switchSession. Exact head 960a429 CI 34906281373/34906278349 and merge CI succeeded. Independently reproduced formal registered-provider switching including prompt resources, real tool result, source-file preservation and saved-model process resume. Active switching/cross-workspace behavior remains unsupported.
 
-Active highest-value missing operation: idle switchSession, currently unsupported in native owner. Worker session_switch_core owns isolated implementation. Acceptance: formal command selects existing same-workspace session, preserved identities/history, old file unchanged, veto and invalid target preserve old owner, fresh guarded callback, actual tool continuation and subprocess recovery. Different workspace must be handled correctly or explicitly rejected before teardown; no active cancellation/fork/reload scope expansion.
+Active task session_fork_core implements missing fork command. Pinned semantics: default before-user excludes selected user and returns selectedText; at-entry retains selection. Require a new native session/file, correct ancestry/parent metadata against upstream, source bytes unchanged, veto/invalid selection safety, callback/tool continuation and process resume. Existing branch selection is not a substitute for fork. Worker owns isolated implementation; CI before integration.
 
 ## Historical checkpoint
 
