@@ -78,6 +78,16 @@ if (!slashHandled && resolvedModel && !options['--fixture'] && options['--input'
     let commandError = null;
     try { await command.handler(commandArgs, host.runner.createCommandContext()); } catch (error) { commandError = error instanceof Error ? error.message : String(error); }
     ({manager,host}=owner.current);
+    // Replacement recreates ModelRuntime and extension registrations; resolve the
+    // selected model against the new host before any post-command drive.
+    if (!commandError && selectedModel && !fixture) {
+      const slash=selectedModel.indexOf('/');
+      const provider=slash>0?selectedModel.slice(0,slash):'openai';
+      const modelId=slash>0?selectedModel.slice(slash+1):selectedModel;
+      resolvedModel=host.modelRuntime.getModel(provider, modelId);
+      if (!resolvedModel) throw Error(`model not found after session switch: provider=${provider} id=${modelId}`);
+      if (!host.providers.get(resolvedModel.provider)?.streamSimple) transportModel=openAITransportModel(resolvedModel);
+    }
     await manager.appendCustomEntry('pi-rs.command.v1', {name: options['--command'], args: commandArgs, ok: commandError === null, error: commandError});
     if (commandError) throw Error(`command ${options['--command']} failed: ${commandError}`);
     commandResult = {name: options['--command'], args: commandArgs, dispatched: true};
