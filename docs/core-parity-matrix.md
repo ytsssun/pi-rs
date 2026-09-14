@@ -1,3 +1,5 @@
+> **Provisional inventory under review.** These 37 rows are selected capabilities, not an exhaustive core contract denominator. Status labels require correction: parallel execution has native evidence; withSession/read have documented exclusions. Do not use the 9/20/8 counts as verified coverage until the source/evidence audit is complete.
+
 # Pi core capability parity matrix
 
 Reference: `Pi coding-agent 0.85.1 @ 9767ba275f3e9a5ee0f5c5342249b629ab1b2282`
