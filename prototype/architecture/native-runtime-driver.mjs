@@ -119,6 +119,7 @@ async function driveActive({manager,host,prompt,stream,trace=[],onToolUpdate=()=
         if(call.skipError)throw Error(call.skipError); // Rust rejected truncated call.
         const registered=host.runner.getAllRegisteredTools().find(t=>t.definition.name===call.name);
         if(!registered)throw Error(`Tool ${call.name} not found`);
+        if(!host.requestTools().some(t=>t.name===call.name)) throw Error(`Tool ${call.name} not found`);
         const tool=wrapRegisteredTool(registered,host.runner);
         const validated=validateToolArguments(tool,call);
         const hookEvent={type:'tool_call',toolCallId:call.id,toolName:call.name,input:validated};
@@ -149,6 +150,7 @@ async function driveActive({manager,host,prompt,stream,trace=[],onToolUpdate=()=
         try {
         const registered=host.runner.getAllRegisteredTools().find(t=>t.definition.name===call.name);
         if(!registered) throw Error(`Tool ${call.name} not found`);
+        if(!host.requestTools().some(t=>t.name===call.name)) throw Error(`Tool ${call.name} not found`);
         const tool=wrapRegisteredTool(registered,host.runner);
         const validated=validateToolArguments(tool,call);
         const hookEvent={type:'tool_call',toolCallId:call.id,toolName:call.name,input:validated};
