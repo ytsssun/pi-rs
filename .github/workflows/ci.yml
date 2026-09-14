@@ -56,6 +56,8 @@ jobs:
         run: node --experimental-strip-types experiments/next-turn-queue.mjs
       - name: User follow-up execution
         run: node --experimental-strip-types experiments/user-followup-execution.mjs
+      - name: Native user steer boundary
+        run: node --experimental-strip-types experiments/user-steer-execution.mjs
       - name: Verify deferred custom session event ordering
         run: node --experimental-strip-types experiments/deferred-message-events.mjs
       - name: Verify cooperative sequential tool cancellation
