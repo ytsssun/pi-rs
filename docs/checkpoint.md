@@ -2,6 +2,8 @@
 
 Main 78723a5 includes PR24 repository instructions after exact-head CI 34848719344/34848715325 passed. Coordinator independently reproduced project/ancestor/override ordering, deduplication, hook-visible instructions, real tool continuation and fresh-process reread, plus provider/prompt regressions. Deterministic only; live adherence unverified.
 
+SYSTEM resource audit is currently blocked on trust semantics: upstream gates project SYSTEM.md/APPEND_SYSTEM.md through isProjectTrusted, while CLI has no trust state. Do not auto-trust workspace files; either add an explicit opt-in or retain unsupported status.
+
 Active task system_resource_compat extends the same upstream-compatible prompt path to SYSTEM.md / APPEND_SYSTEM.md. Require upstream precedence, empty-file behavior, trust constraints, AGENTS+hook composition, formal provider/tool assertion and process reread. Worker owns unique worktree; no skills/provider expansion. This completes project prompt configuration before the next broader core compatibility decision.
 
 ## Historical checkpoint
