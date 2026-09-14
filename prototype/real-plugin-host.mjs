@@ -25,7 +25,7 @@ export function tsBackend(initial = []) {
   };
 }
 
-export async function createHost(backend, { factories = [], cwd = process.cwd(), extensionPaths = [pluginPath], sessionManager = guardedObject('sessionManager'), modelRuntime }  = {}) {
+export async function createHost(backend, { factories = [], cwd = process.cwd(), extensionPaths = [pluginPath], sessionManager = guardedObject('sessionManager'), modelRuntime, contextFiles = [] }  = {}) {
   const eventBus = createEventBus();
   const loaded = await loadExtensions(extensionPaths, cwd, eventBus);
   assert.deepEqual(loaded.errors, [], 'unchanged upstream extension must load');
@@ -35,7 +35,7 @@ export async function createHost(backend, { factories = [], cwd = process.cwd(),
   let currentSystemPrompt = "";
   let currentPromptOptions = {cwd};
   const preparePrompt = async (prompt) => {
-    currentPromptOptions = {cwd, selectedTools: backend.getActiveTools()};
+    currentPromptOptions = {cwd, selectedTools: backend.getActiveTools(), contextFiles};
     const base = buildSystemPrompt(currentPromptOptions);
     currentSystemPrompt = base;
     const text = typeof prompt === "string" ? prompt : prompt.filter(p => p.type === "text").map(p => p.text).join("\n");
