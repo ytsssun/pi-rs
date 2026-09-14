@@ -21,6 +21,8 @@ export async function createSessionOwner({path, cwd, mode, makeHost}) {
     const context = Object.defineProperties({}, Object.getOwnPropertyDescriptors(session.host.runner.createCommandContext()));
     context.sendMessage = async (message, options) => {
       context.isIdle(); // Also validates this context's lifetime before mutation.
+      if (options?.deliverAs !== undefined && options.deliverAs !== 'nextTurn')
+        throw Error('replacement sendMessage deliverAs unsupported; use nextTurn or omit');
       if (options?.deliverAs === 'nextTurn') {
         session.host.actions.sendMessage(message, options);
         return;
