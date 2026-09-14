@@ -1,10 +1,8 @@
 # Current checkpoint
 
-Main 87d51cd includes PR22 registered provider dispatch. Exact head 2459734 passed CI 34828568829/34828563927; merge SHA CI succeeded. Independent registered-provider CLI fixture and adjacent command/model tests passed. Synthetic provider only: real tool effect, result continuation, saved-model process resume, missing-provider rejection and persisted error. No unchanged third-party/live/OAuth claim.
+PR23 merged as afdec88 after exact head 7b455ba CI 34842501620/34842496959 passed. Independently reproduced unchanged pirate extension before_agent_start behavior, provider roundtrip and followUp. Prompt no longer uses experimental literal. Skills/project instruction discovery remains absent.
 
-Active critical path: prompt construction and before_agent_start compatibility. Native driver still sends the literal system prompt "native architecture experiment" and omits the hook. Worker prompt_hook_compat is implementing against pinned upstream with an unchanged example extension, formal CLI and deterministic provider assertions; acceptance includes chained prompt effects, custom-message persistence/order, real tool roundtrip and process resume. Add CI before integration. Unimplemented hooks remain explicitly unclaimed.
-
-Quantification: scripts/report-core-parity.py --check verifies report consistency for 37 SELECTED groups, not exhaustive feature coverage. Current labels 33 partial / 3 unknown / 1 missing reflect broad incomplete groups, not absence of working slices or a compatibility percentage. Full parity percentage remains unavailable.
+Active priority: project_instruction_context worker is wiring pinned upstream project instruction discovery into formal CLI prompt construction. Acceptance: isolated HOME/workspace, AGENTS.override precedence, ancestor ordering/dedup against upstream, provider-visible instructions before hooks and through tools, changed instructions reread on fresh-process resume. Preserve upstream files and existing policy; add CI. Skills/SYSTEM remain separately scoped.
 
 ## Historical checkpoint
 
