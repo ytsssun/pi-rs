@@ -1,6 +1,8 @@
 # Current checkpoint
 
-Main 466c014 CI passed. SYSTEM trust blocker is superseded: source review confirms existing host isProjectTrusted() returns true and upstream SettingsManager defaults true. Preserve current policy; do not invent a mandatory new permission flag. Worker system_resource_compat resumed bounded SYSTEM/APPEND implementation with upstream precedence, empty/BOM and false-policy tests plus formal CLI/tool/recovery acceptance. No complete trust-manager parity claim.
+Main 046af14 includes PR25 SYSTEM/APPEND composition after exact-head CI 34865507003/34865498172 and merge CI succeeded. Independently reproduced system-resource, project-instruction and before-agent-start fixtures. Prompt resource support is bounded; unreadable-file fallback differs and skills discovery remains open.
+
+Active task formal_dynamic_tools: unchanged upstream kimi-deferred-tools through formal CLI, not old helper architecture experiment. Verify tool_search-only first request, actual tool-driven Calculator activation in next schema, persisted result, and session_start activation reset on process resume; add CI. Current active-tool state is JS tsBackend while loop/store are Rust—do not conflate ownership with observed compatibility.
 
 ## Historical checkpoint
 
