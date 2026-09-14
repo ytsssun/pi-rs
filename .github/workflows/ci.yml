@@ -77,3 +77,5 @@ jobs:
           node --experimental-strip-types experiments/active-tool-enforcement.mjs
           node --experimental-strip-types experiments/disabled-tool-oracle.mjs
           node --experimental-strip-types experiments/cli-dynamic-tools.mjs
+      - name: Formal CLI context hook mutation
+        run: node --experimental-strip-types experiments/cli-context-hook.mjs
