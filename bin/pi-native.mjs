@@ -42,7 +42,7 @@ const {ModelRuntime}=await import('../vendor/pi-mono/packages/coding-agent/src/c
 const tools=createCodingTools(cwd);
 const {createSessionOwner}=await import('../prototype/architecture/session-owner.mjs');
 const owner=await createSessionOwner({path,cwd,mode:options['--resume']?'open':'create',
-  makeHost:manager=>createHost(tsBackend(tools.map(t=>t.name)),{cwd,sessionManager:manager,extensionPaths:extensions,factories:[pi=>{for(const tool of tools) pi.registerTool(tool);}]})});
+  makeHost:async manager=>createHost(tsBackend(tools.map(t=>t.name)),{cwd,modelRuntime:await ModelRuntime.create({modelsPath:null,refreshOnCreate:false,allowModelNetwork:false}),sessionManager:manager,extensionPaths:extensions,factories:[pi=>{for(const tool of tools) pi.registerTool(tool);}]})});
 let {manager,host}=owner.current;
 try {
 if (options['--branch']) await manager.branch(options['--branch']);
@@ -59,8 +59,8 @@ let transportModel;
   const input = options['--input'];
   const space = input?.indexOf(' ') ?? -1;
   const slashHandled = !options['--command'] && Boolean(input?.startsWith('/') && host.runner.getCommand(space === -1 ? input.slice(1) : input.slice(1, space)));
-if (!slashHandled && selectedModel && !options['--fixture'] && options['--input']) { const slash=selectedModel.indexOf('/'); const provider=slash>0?selectedModel.slice(0,slash):'openai'; const modelId=slash>0?selectedModel.slice(slash+1):selectedModel; const runtime=await ModelRuntime.create({modelsPath:null,refreshOnCreate:false,allowModelNetwork:false}); resolvedModel=runtime.getModel(provider, modelId); if (!resolvedModel) throw Error(`model not found: provider=${provider} id=${modelId}`); }
-if (!slashHandled && resolvedModel && !options['--fixture'] && options['--input']) transportModel = openAITransportModel(resolvedModel);
+if (!slashHandled && selectedModel && !options['--fixture'] && options['--input']) { const slash=selectedModel.indexOf('/'); const provider=slash>0?selectedModel.slice(0,slash):'openai'; const modelId=slash>0?selectedModel.slice(slash+1):selectedModel; resolvedModel=host.modelRuntime.getModel(provider, modelId); if (!resolvedModel) throw Error(`model not found: provider=${provider} id=${modelId}`); }
+if (!slashHandled && resolvedModel && !options['--fixture'] && options['--input']) { if (!host.providers.get(resolvedModel.provider)?.streamSimple) transportModel = openAITransportModel(resolvedModel); }
 
   if (!slashHandled && options['--input'] && !fixture && !selectedModel) throw Error('--model required for new sessions or when no saved model exists');
 // Initial process startup also covers --resume; replacement reasons belong to
@@ -84,7 +84,9 @@ if (options['--compact-summary']) await manager.appendCompaction(options['--comp
   if(options['--context-tool-chars']!==undefined) { const raw=options['--context-tool-chars']; manager.setContextPolicy(raw==='none'?null:Number(raw)); }
   let index=0;
   if (!slashHandled && options['--model'] && options['--input']) await manager.appendCustomEntry('pi-rs.model.v1', {model: options['--model']});
-  const stream=fixture?async()=>{const message=fixture[index++]; if(!message)throw Error(`fixture exhausted after ${index} assistant responses; provide the next assistant message for the tool result`);return {async *[Symbol.asyncIterator](){},async result(){return message;}};}:nativeProviderStream({model:transportModel,streaming:true});
+  const stream=fixture?async()=>{const message=fixture[index++]; if(!message)throw Error(`fixture exhausted after ${index} assistant responses; provide the next assistant message for the tool result`);return {async *[Symbol.asyncIterator](){},async result(){return message;}};}:resolvedModel && host.providers.get(resolvedModel.provider)?.streamSimple
+    ? (_model, context, streamOptions) => host.modelRuntime.streamSimple(resolvedModel, context, streamOptions)
+    : nativeProviderStream({model:transportModel,streaming:true});
   const result=options['--input'] && !slashHandled ? await drive({manager,host,prompt:options['--input'],stream}) : null;
   const activePath=owner.current.path;
   const compaction=options['--compact-summary']?manager.snapshot().contextEntries.find(e=>e.type==='compaction')??null:null;
