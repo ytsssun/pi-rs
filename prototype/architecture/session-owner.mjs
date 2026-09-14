@@ -1,4 +1,4 @@
-import {dirname, join} from 'node:path';
+import {dirname, join, resolve} from 'node:path';
 import {randomUUID} from 'node:crypto';
 import {createBackend} from './native-store-backend.mjs';
 
@@ -9,8 +9,8 @@ export async function createSessionOwner({path, cwd, mode, makeHost}) {
   const errors = [];
   const bind = host => host.runner.bindCommandContext({
     waitForIdle: host.waitForIdle,
-    newSession,
-    ...Object.fromEntries(['fork','navigateTree','switchSession','reload'].map(name => [name, () => {throw Error(`Unexercised host binding: ${name}`);}]))
+    newSession, switchSession,
+    ...Object.fromEntries(['fork','navigateTree','reload'].map(name => [name, () => {throw Error(`Unexercised host binding: ${name}`);}]))
   });
   const prepare = async (path, parentSession) => {
     const manager = await createBackend({path,cwd,mode:'create',parentSession});
@@ -36,6 +36,41 @@ export async function createSessionOwner({path, cwd, mode, makeHost}) {
       throw Error('replacement sendUserMessage requires a scheduling consumer; unsupported');
     };
     return context;
+  }
+  async function switchSession(sessionPath, options = {}) {
+    if (terminal) throw Error('session owner is terminal');
+    if (typeof sessionPath !== 'string' || !sessionPath) throw Error('switchSession path must be a nonempty string');
+    if (!options || typeof options !== 'object' || Array.isArray(options)) throw Error('switchSession options must be an object');
+    if (options.withSession !== undefined && typeof options.withSession !== 'function') throw Error('switchSession withSession must be a function');
+    if (options.cwdOverride !== undefined || options.projectTrustContextFactory !== undefined) throw Error('switchSession cwdOverride/trust factory unsupported');
+    if (replacing || !current.host.contextActions.isIdle()) throw Error('switchSession requires an idle owner');
+    replacing = true;
+    let next;
+    try {
+      const before = await current.host.runner.emit({type:'session_before_switch',reason:'resume',targetSessionFile:sessionPath});
+      if (before?.cancel === true) return {cancelled:true};
+      const target = resolve(sessionPath);
+      const manager = await createBackend({path:target,cwd,mode:'open'});
+      next = {path:target,manager};
+      const header = manager.snapshot().header;
+      if (!header?.cwd || resolve(header.cwd) !== resolve(cwd)) throw Error('switchSession different workspace unsupported');
+      const old = current, previousSessionFile = old.path;
+      terminal = true;
+      await old.host.runner.emit({type:'session_shutdown',reason:'resume',targetSessionFile:target});
+      old.host.runner.invalidate();
+      errors.push(...old.host.errors);
+      await old.manager.close();
+      current = next; started = false;
+      next.host = await makeHost(manager); bind(next.host);
+      started = true;
+      await next.host.runner.emit({type:'session_start',reason:'resume',previousSessionFile});
+      terminal = false; replacing = false;
+      if (options.withSession) await options.withSession(replacedContext(next));
+      return {cancelled:false};
+    } finally {
+      if (next && current !== next) await next.manager.close();
+      replacing = false;
+    }
   }
   async function newSession(options = {}) {
     if (terminal) throw Error('session owner is terminal');
