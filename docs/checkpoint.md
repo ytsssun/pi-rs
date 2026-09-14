@@ -1,5 +1,13 @@
 # Current checkpoint
 
+Active milestone: idle newSession withSession support. Native owner currently rejects the option; pinned upstream defines a fresh command-capable ReplacedSessionContext with message methods. Worker with_session_contract owns isolated implementation, acceptance in board with-session-idle-milestone. Coordinator independently checks upstream ordering/error semantics and actual owner fixture before integration. Provider transport cancellation remains open; no additional audit loop is needed to rediscover blocking reads.
+
+Main fb482b9 CI passed. PR16 correction merged as a17a528. Latest tested transport evidence is bounded local HTTP only, not live cancellation. No new parity claim.
+
+## Historical checkpoint
+
+# Current checkpoint
+
 Independent HTTP cancellation recheck: corrected fixture waits for actual request arrival, observes unfinished producer 100ms after queue_close, then disconnects the server and verifies producer completion within 2s. Reproduction: node --experimental-strip-types experiments/provider-http-cancel-blocker.mjs. Local fixture only, no live model. Previous process-hang interpretation was confounded by the test server leaving sockets open; superseded below. Branch codex/http-cancel-evidence adds bounded cleanup; CI pending.
 
 Source audit confirms current `reqwest::blocking` response read cannot be interrupted by queue close; only 120s client timeout bounds it. Transport cancellation is therefore a separate deliberate migration milestone (async reqwest or bounded isolated lifecycle), not a small queue fix. with yielding JS queue consumption. Keep the existing non-streaming provider behavior unchanged. Require stalled-header and stalled-body cancellation, producer completion before idle, persisted aborted result once, and continuation/reopen. Existing synchronous HTTP read cannot observe queue closure while waiting for bytes.
