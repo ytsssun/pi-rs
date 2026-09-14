@@ -1,43 +1,599 @@
 {
   "reference": "Pi coding-agent 0.85.1 @ 9767ba275f3e9a5ee0f5c5342249b629ab1b2282",
-  "method": "Auditable capability requirements from Agent, AgentSession, ModelRegistry and extension host surfaces. Status is evidence-based; unknown remains unknown. Counts are unweighted and must not be presented as a compatibility percentage.",
+  "method": "Conservative source/evidence inventory at pi-rs 8f278db. No new runtime verification. Prior 45\u201350% and half-credit estimate withdrawn: no defensible exhaustive denominator or weighting. Partial rows receive no invented credit. Grouping overlaps (Agent vs AgentSession events, context transform vs editing); counts cannot be used as overall replacement coverage.",
   "rows": [
-    ["agent.prompt loop","Agent.prompt/continue","prototype/architecture/native-runtime-driver.mjs; live acceptance","verified"],
-    ["agent.state","state/isStreaming/isIdle/signal","runtime fixtures","partial"],
-    ["agent.subscribe","Agent.subscribe event listener","no full native equivalent","missing"],
-    ["agent.abort","abort/waitForIdle/settlement","cancel-settlement-probe; cooperative-tool-cancel","partial"],
-    ["steering","steer FIFO at boundary","user-steer-execution","partial"],
-    ["follow-up","followUp executes model/tool turn","user-followup-execution","verified"],
-    ["tool read","read contract/limits","native fixtures","verified"],
-    ["tool write","write contract/errors","native fixtures","verified"],
-    ["tool edit","multi-edit/overlap semantics","edit differential fixtures","partial"],
-    ["tool bash","executeBash/result/abort","native batch fixtures","partial"],
-    ["tool parallel","parallel batch ordering","upstream-parallel-contract only","missing"],
-    ["tool updates","partial tool updates","native update barrier","partial"],
-    ["tool truncation","length prevents tool effects","upstream oracle; native batch","verified"],
-    ["session JSONL","v3 append-only entries","native store","partial"],
-    ["session context","leaf projection/custom omission","pi-session-context","verified"],
-    ["session recovery","fresh-process reopen","live/native recovery","verified"],
-    ["session fork","navigate/fork/tree","branch-cli only; no full API","missing"],
-    ["session switch/reload","switchSession/reload","unsupported host bindings","missing"],
-    ["session compaction","compact/abortCompaction","bounded compact only","partial"],
-    ["newSession","owner and replacement","with-session-contract","partial"],
-    ["withSession","replacement callback context","with-session-contract","verified"],
-    ["model selection","set/cycle model and thinking","host actions","partial"],
-    ["model registry","providers/models/availability","provider-composer","partial"],
-    ["provider stream","OpenAI SSE translation","live OpenAI/native stream","partial"],
-    ["provider auth","OAuth/checkAuth/refresh","no native OAuth","missing"],
-    ["provider breadth","provider-specific APIs","OpenAI only evidence","missing"],
-    ["context transform","transformContext/convertToLlm","context seam fixtures","partial"],
-    ["context editing","canonical/projected history","context seam","partial"],
-    ["extension loader","unchanged TS loading","extension recovery","verified"],
-    ["extension tools","registerTool/activation","parity inventory","partial"],
-    ["extension hooks","beforeAgent/context/provider hooks","context-audit","partial"],
-    ["extension events","15-event ordering/identity","deferred events only","partial"],
-    ["extension commands","command context/dispatch","command fixtures","partial"],
-    ["extension UI","components/prompts/shortcuts/renderers","unsupported bindings","missing"],
-    ["extension lifecycle","dispose/reload/shutdown","partial host","partial"],
-    ["resources","discover/package resources","inventory only","missing"],
-    ["crash safety","producer/tool crash recovery","native crash fixtures","partial"]
-  ]
+    {
+      "id": "C01",
+      "capability": "agent.prompt loop",
+      "upstream": {
+        "file": "packages/agent/src/agent.ts",
+        "member": "prompt; continue"
+      },
+      "native": "src/pi_runtime.rs",
+      "evidence": [
+        "experiments/native-runtime.mjs"
+      ],
+      "status": "partial",
+      "limitation": "Live baseline is bounded; complete prompt overload/continue parity unverified.",
+      "assessment": "source/evidence review only; runtime not rerun in this audit",
+      "priority": "P2"
+    },
+    {
+      "id": "C02",
+      "capability": "agent.state",
+      "upstream": {
+        "file": "packages/agent/src/agent.ts",
+        "member": "state; signal"
+      },
+      "native": "prototype/architecture/native-runtime-driver.mjs",
+      "evidence": [
+        "experiments/command-idle.mjs"
+      ],
+      "status": "partial",
+      "limitation": "Full state identity/getter contract unverified.",
+      "assessment": "source/evidence review only; runtime not rerun in this audit",
+      "priority": "P2"
+    },
+    {
+      "id": "C03",
+      "capability": "agent.subscribe",
+      "upstream": {
+        "file": "packages/agent/src/agent.ts",
+        "member": "subscribe"
+      },
+      "native": "prototype/architecture/native-runtime-driver.mjs",
+      "evidence": [
+        "experiments/deferred-message-events.mjs"
+      ],
+      "status": "partial",
+      "limitation": "Deferred custom observer exists; complete normal event subscription/order unverified.",
+      "assessment": "source/evidence review only; runtime not rerun in this audit",
+      "priority": "P1"
+    },
+    {
+      "id": "C04",
+      "capability": "agent.abort",
+      "upstream": {
+        "file": "packages/agent/src/agent.ts",
+        "member": "abort; waitForIdle"
+      },
+      "native": "prototype/architecture/native-runtime-driver.mjs",
+      "evidence": [
+        "experiments/cooperative-tool-cancel.mjs"
+      ],
+      "status": "partial",
+      "limitation": "HTTP cancellation unresolved.",
+      "assessment": "source/evidence review only; runtime not rerun in this audit",
+      "priority": "P2"
+    },
+    {
+      "id": "C05",
+      "capability": "steering",
+      "upstream": {
+        "file": "packages/agent/src/agent.ts",
+        "member": "steer"
+      },
+      "native": "prototype/architecture/native-runtime-driver.mjs",
+      "evidence": [
+        "experiments/user-steer-execution.mjs"
+      ],
+      "status": "partial",
+      "limitation": "User turn boundary only; tool boundary/custom steer incomplete.",
+      "assessment": "source/evidence review only; runtime not rerun in this audit",
+      "priority": "P2"
+    },
+    {
+      "id": "C06",
+      "capability": "follow-up",
+      "upstream": {
+        "file": "packages/agent/src/agent.ts",
+        "member": "followUp"
+      },
+      "native": "prototype/architecture/native-runtime-driver.mjs",
+      "evidence": [
+        "experiments/user-followup-execution.mjs"
+      ],
+      "status": "partial",
+      "limitation": "FIFO bounded execution evidence; all queue modes/overloads not established.",
+      "assessment": "source/evidence review only; runtime not rerun in this audit",
+      "priority": "P2"
+    },
+    {
+      "id": "C07",
+      "capability": "tool read",
+      "upstream": {
+        "file": "packages/coding-agent/src/core/tools/read.ts",
+        "member": "createReadTool"
+      },
+      "native": "src/read.rs",
+      "evidence": [
+        "experiments/read-verification.md"
+      ],
+      "status": "partial",
+      "limitation": "19 text comparisons; zero offset/limit and >8MiB differ; image/schema/cancel excluded.",
+      "assessment": "source/evidence review only; runtime not rerun in this audit",
+      "priority": "P2"
+    },
+    {
+      "id": "C08",
+      "capability": "tool write",
+      "upstream": {
+        "file": "packages/coding-agent/src/core/tools/write.ts",
+        "member": "createWriteTool"
+      },
+      "native": "src/tools.rs",
+      "evidence": [
+        "experiments/write-differential.md"
+      ],
+      "status": "partial",
+      "limitation": "Bounded differential evidence, not full write contract.",
+      "assessment": "source/evidence review only; runtime not rerun in this audit",
+      "priority": "P2"
+    },
+    {
+      "id": "C09",
+      "capability": "tool edit",
+      "upstream": {
+        "file": "packages/coding-agent/src/core/tools/edit.ts",
+        "member": "createEditTool"
+      },
+      "native": "src/edit.rs",
+      "evidence": [
+        "experiments/edit-differential.md"
+      ],
+      "status": "partial",
+      "limitation": "Bounded cases do not prove complete tool contract.",
+      "assessment": "source/evidence review only; runtime not rerun in this audit",
+      "priority": "P2"
+    },
+    {
+      "id": "C10",
+      "capability": "tool bash",
+      "upstream": {
+        "file": "packages/coding-agent/src/core/agent-session.ts",
+        "member": "executeBash; abortBash"
+      },
+      "native": "src/tools.rs",
+      "evidence": [
+        "experiments/cooperative-tool-cancel.mjs"
+      ],
+      "status": "partial",
+      "limitation": "Tool bash is distinct from full user-bash session API.",
+      "assessment": "source/evidence review only; runtime not rerun in this audit",
+      "priority": "P2"
+    },
+    {
+      "id": "C11",
+      "capability": "tool parallel",
+      "upstream": {
+        "file": "packages/agent/src/agent-loop.ts",
+        "member": "tool batch execution"
+      },
+      "native": "prototype/architecture/native-runtime-driver.mjs",
+      "evidence": [
+        "experiments/native-batch-termination.mjs"
+      ],
+      "status": "partial",
+      "limitation": "Native parallel path exists; termination fixture covers mixed/all results; full differential conformance unverified.",
+      "assessment": "source/evidence review only; runtime not rerun in this audit",
+      "priority": "P2"
+    },
+    {
+      "id": "C12",
+      "capability": "tool updates",
+      "upstream": {
+        "file": "packages/agent/src/agent-loop.ts",
+        "member": "tool execution updates"
+      },
+      "native": "prototype/architecture/tool-update-barrier.mjs",
+      "evidence": [
+        "experiments/native-update-barrier.mjs"
+      ],
+      "status": "partial",
+      "limitation": "Bounded update contract.",
+      "assessment": "source/evidence review only; runtime not rerun in this audit",
+      "priority": "P2"
+    },
+    {
+      "id": "C13",
+      "capability": "tool truncation",
+      "upstream": {
+        "file": "packages/agent/src/agent-loop.ts",
+        "member": "length stop tool suppression"
+      },
+      "native": "src/pi_runtime.rs",
+      "evidence": [
+        "experiments/native-batch.mjs"
+      ],
+      "status": "partial",
+      "limitation": "Fixture evidence requires named length assertions before narrower verified claim.",
+      "assessment": "source/evidence review only; runtime not rerun in this audit",
+      "priority": "P2"
+    },
+    {
+      "id": "C14",
+      "capability": "session JSONL",
+      "upstream": {
+        "file": "packages/coding-agent/src/core/session-manager.ts",
+        "member": "SessionManager"
+      },
+      "native": "src/pi_session_store.rs",
+      "evidence": [
+        "experiments/native-store-lifecycle.mjs"
+      ],
+      "status": "partial",
+      "limitation": "Migration/import/export not complete.",
+      "assessment": "source/evidence review only; runtime not rerun in this audit",
+      "priority": "P2"
+    },
+    {
+      "id": "C15",
+      "capability": "session context",
+      "upstream": {
+        "file": "packages/coding-agent/src/core/session-manager.ts",
+        "member": "buildSessionContext"
+      },
+      "native": "src/pi_session_index.rs",
+      "evidence": [
+        "experiments/pi-session-context.mjs"
+      ],
+      "status": "partial",
+      "limitation": "Selected branch/compaction projection cases only.",
+      "assessment": "source/evidence review only; runtime not rerun in this audit",
+      "priority": "P2"
+    },
+    {
+      "id": "C16",
+      "capability": "session recovery",
+      "upstream": {
+        "file": "packages/coding-agent/src/core/session-manager.ts",
+        "member": "open"
+      },
+      "native": "src/pi_session_store.rs",
+      "evidence": [
+        "experiments/user-steer-execution.mjs"
+      ],
+      "status": "partial",
+      "limitation": "Fresh native subprocess verified in prior runs; complete upstream open/migration not established.",
+      "assessment": "source/evidence review only; runtime not rerun in this audit",
+      "priority": "P2"
+    },
+    {
+      "id": "C17",
+      "capability": "session fork",
+      "upstream": {
+        "file": "packages/coding-agent/src/core/agent-session.ts",
+        "member": "navigateTree; getUserMessagesForForking"
+      },
+      "native": "prototype/architecture/session-owner.mjs",
+      "evidence": [
+        "experiments/branch-cli.mjs"
+      ],
+      "status": "partial",
+      "limitation": "Native branch functionality exists; plugin fork/tree API unsupported.",
+      "assessment": "source/evidence review only; runtime not rerun in this audit",
+      "priority": "P1"
+    },
+    {
+      "id": "C18",
+      "capability": "session switch/reload",
+      "upstream": {
+        "file": "packages/coding-agent/src/core/agent-session.ts",
+        "member": "reload"
+      },
+      "native": "prototype/real-plugin-host.mjs",
+      "evidence": [
+        "prototype/real-plugin-host.mjs"
+      ],
+      "status": "missing",
+      "limitation": "switchSession/reload command bindings unsupported.",
+      "assessment": "source/evidence review only; runtime not rerun in this audit",
+      "priority": "P1"
+    },
+    {
+      "id": "C19",
+      "capability": "session compaction",
+      "upstream": {
+        "file": "packages/coding-agent/src/core/agent-session.ts",
+        "member": "compact; abortCompaction"
+      },
+      "native": "prototype/real-plugin-host.mjs",
+      "evidence": [
+        "experiments/pi-session-context.mjs"
+      ],
+      "status": "partial",
+      "limitation": "Append summary differs from full model compaction lifecycle.",
+      "assessment": "source/evidence review only; runtime not rerun in this audit",
+      "priority": "P2"
+    },
+    {
+      "id": "C20",
+      "capability": "newSession",
+      "upstream": {
+        "file": "packages/coding-agent/src/core/extensions/types.ts",
+        "member": "ExtensionCommandContext.newSession"
+      },
+      "native": "prototype/architecture/session-owner.mjs",
+      "evidence": [
+        "experiments/cli-new-session.mjs"
+      ],
+      "status": "partial",
+      "limitation": "Idle replacement only.",
+      "assessment": "source/evidence review only; runtime not rerun in this audit",
+      "priority": "P1"
+    },
+    {
+      "id": "C21",
+      "capability": "withSession",
+      "upstream": {
+        "file": "packages/coding-agent/src/core/extensions/types.ts",
+        "member": "ReplacedSessionContext"
+      },
+      "native": "prototype/architecture/session-owner.mjs",
+      "evidence": [
+        "experiments/with-session-contract.mjs"
+      ],
+      "status": "partial",
+      "limitation": "sendUserMessage and triggerTurn explicitly rejected.",
+      "assessment": "source/evidence review only; runtime not rerun in this audit",
+      "priority": "P1"
+    },
+    {
+      "id": "C22",
+      "capability": "model selection",
+      "upstream": {
+        "file": "packages/coding-agent/src/core/agent-session.ts",
+        "member": "setModel; cycleModel; setThinkingLevel"
+      },
+      "native": "prototype/real-plugin-host.mjs",
+      "evidence": [
+        "experiments/host-actions.test.mjs"
+      ],
+      "status": "partial",
+      "limitation": "Model selection storage is not complete runtime mutation semantics.",
+      "assessment": "source/evidence review only; runtime not rerun in this audit",
+      "priority": "P2"
+    },
+    {
+      "id": "C23",
+      "capability": "model registry",
+      "upstream": {
+        "file": "packages/coding-agent/src/core/model-runtime.ts",
+        "member": "getProviders; getModels; getAvailable"
+      },
+      "native": "prototype/architecture/provider-composer.mjs",
+      "evidence": [
+        "experiments/model-runtime-probe.mjs"
+      ],
+      "status": "partial",
+      "limitation": "Full runtime availability/auth registry not established.",
+      "assessment": "source/evidence review only; runtime not rerun in this audit",
+      "priority": "P1"
+    },
+    {
+      "id": "C24",
+      "capability": "provider stream",
+      "upstream": {
+        "file": "packages/ai/src/api.ts",
+        "member": "stream"
+      },
+      "native": "prototype/architecture/native-provider-stream.mjs",
+      "evidence": [
+        "experiments/openai-stream-canonical.mjs"
+      ],
+      "status": "partial",
+      "limitation": "OpenAI bounded stream only.",
+      "assessment": "source/evidence review only; runtime not rerun in this audit",
+      "priority": "P2"
+    },
+    {
+      "id": "C25",
+      "capability": "provider auth",
+      "upstream": {
+        "file": "packages/coding-agent/src/core/model-runtime.ts",
+        "member": "checkAuth"
+      },
+      "native": "prototype/real-plugin-host.mjs",
+      "evidence": [
+        "prototype/real-plugin-host.mjs"
+      ],
+      "status": "unknown",
+      "limitation": "This audit did not establish complete native auth implementation or absence; earlier missing label unsupported.",
+      "assessment": "source/evidence review only; runtime not rerun in this audit",
+      "priority": "P2"
+    },
+    {
+      "id": "C26",
+      "capability": "provider breadth",
+      "upstream": {
+        "file": "packages/ai/src/api.ts",
+        "member": "stream provider dispatch"
+      },
+      "native": "src/provider.rs",
+      "evidence": [
+        "experiments/native-provider-live.mjs"
+      ],
+      "status": "partial",
+      "limitation": "OpenAI evidence does not establish other providers.",
+      "assessment": "source/evidence review only; runtime not rerun in this audit",
+      "priority": "P2"
+    },
+    {
+      "id": "C27",
+      "capability": "context transform",
+      "upstream": {
+        "file": "packages/agent/src/agent-loop.ts",
+        "member": "transformContext; convertToLlm"
+      },
+      "native": "prototype/architecture/native-runtime-driver.mjs",
+      "evidence": [
+        "experiments/context-seam.mjs"
+      ],
+      "status": "partial",
+      "limitation": "Hook slices only.",
+      "assessment": "source/evidence review only; runtime not rerun in this audit",
+      "priority": "P2"
+    },
+    {
+      "id": "C28",
+      "capability": "context editing",
+      "upstream": {
+        "file": "packages/agent/src/agent-loop.ts",
+        "member": "transformContext"
+      },
+      "native": "src/pi_runtime.rs",
+      "evidence": [
+        "experiments/context-seam.mjs"
+      ],
+      "status": "partial",
+      "limitation": "Canonical/projection separation is bounded enhancement, not extra parity credit.",
+      "assessment": "source/evidence review only; runtime not rerun in this audit",
+      "priority": "P2"
+    },
+    {
+      "id": "C29",
+      "capability": "extension loader",
+      "upstream": {
+        "file": "packages/coding-agent/src/core/extensions/loader.ts",
+        "member": "loadExtensions"
+      },
+      "native": "prototype/real-plugin-host.mjs",
+      "evidence": [
+        "experiments/extension-entry-recovery.mjs"
+      ],
+      "status": "partial",
+      "limitation": "Unchanged loader retained; discovery/package distribution incomplete.",
+      "assessment": "source/evidence review only; runtime not rerun in this audit",
+      "priority": "P1"
+    },
+    {
+      "id": "C30",
+      "capability": "extension tools",
+      "upstream": {
+        "file": "packages/coding-agent/src/core/extensions/types.ts",
+        "member": "ExtensionAPI.registerTool"
+      },
+      "native": "prototype/real-plugin-host.mjs",
+      "evidence": [
+        "prototype/real-plugin-host.mjs"
+      ],
+      "status": "partial",
+      "limitation": "Dynamic Calculator/tool_search exercise exists; arbitrary extension tool contract unverified.",
+      "assessment": "source/evidence review only; runtime not rerun in this audit",
+      "priority": "P1"
+    },
+    {
+      "id": "C31",
+      "capability": "extension hooks",
+      "upstream": {
+        "file": "packages/coding-agent/src/core/extensions/runner.ts",
+        "member": "emitContext; emitBeforeProviderRequest"
+      },
+      "native": "prototype/real-plugin-host.mjs",
+      "evidence": [
+        "experiments/context-audit.md"
+      ],
+      "status": "partial",
+      "limitation": "Selected hook chaining only.",
+      "assessment": "source/evidence review only; runtime not rerun in this audit",
+      "priority": "P1"
+    },
+    {
+      "id": "C32",
+      "capability": "extension events",
+      "upstream": {
+        "file": "packages/coding-agent/src/core/agent-session.ts",
+        "member": "subscribe"
+      },
+      "native": "prototype/architecture/native-runtime-driver.mjs",
+      "evidence": [
+        "experiments/deferred-message-events.mjs"
+      ],
+      "status": "partial",
+      "limitation": "Full session event stream absent from evidence.",
+      "assessment": "source/evidence review only; runtime not rerun in this audit",
+      "priority": "P1"
+    },
+    {
+      "id": "C33",
+      "capability": "extension commands",
+      "upstream": {
+        "file": "packages/coding-agent/src/core/extensions/types.ts",
+        "member": "ExtensionCommandContext"
+      },
+      "native": "prototype/architecture/command-invocation.mjs",
+      "evidence": [
+        "experiments/cli-command-input.mjs"
+      ],
+      "status": "partial",
+      "limitation": "Command dispatch works; fork/switch/reload context unsupported.",
+      "assessment": "source/evidence review only; runtime not rerun in this audit",
+      "priority": "P1"
+    },
+    {
+      "id": "C34",
+      "capability": "extension UI",
+      "upstream": {
+        "file": "packages/coding-agent/src/core/extensions/types.ts",
+        "member": "ExtensionUIContext"
+      },
+      "native": "prototype/real-plugin-host.mjs",
+      "evidence": [
+        "prototype/real-plugin-host.mjs"
+      ],
+      "status": "unknown",
+      "limitation": "Unchanged UI core obligations included; complete UI binding coverage not audited.",
+      "assessment": "source/evidence review only; runtime not rerun in this audit",
+      "priority": "P2"
+    },
+    {
+      "id": "C35",
+      "capability": "extension lifecycle",
+      "upstream": {
+        "file": "packages/coding-agent/src/core/agent-session.ts",
+        "member": "dispose; reload; bindExtensions"
+      },
+      "native": "prototype/real-plugin-host.mjs",
+      "evidence": [
+        "experiments/cli-lifecycle.mjs"
+      ],
+      "status": "partial",
+      "limitation": "Shutdown/stale context slices; full reload cleanup unverified.",
+      "assessment": "source/evidence review only; runtime not rerun in this audit",
+      "priority": "P1"
+    },
+    {
+      "id": "C36",
+      "capability": "resources",
+      "upstream": {
+        "file": "packages/coding-agent/src/core/agent-session.ts",
+        "member": "resourceLoader; promptTemplates"
+      },
+      "native": "prototype/real-plugin-host.mjs",
+      "evidence": [
+        "experiments/parity-inventory.json"
+      ],
+      "status": "unknown",
+      "limitation": "Inventory is static; no executed resource discovery compatibility proof.",
+      "assessment": "source/evidence review only; runtime not rerun in this audit",
+      "priority": "P1"
+    },
+    {
+      "id": "C37",
+      "capability": "crash safety",
+      "upstream": {
+        "file": "packages/coding-agent/src/core/session-manager.ts",
+        "member": "append entry persistence"
+      },
+      "native": "src/pi_session_store.rs",
+      "evidence": [
+        "experiments/native-crash-recovery.mjs"
+      ],
+      "status": "partial",
+      "limitation": "Selected failure cases, not exhaustive crash safety.",
+      "assessment": "source/evidence review only; runtime not rerun in this audit",
+      "priority": "P2"
+    }
+  ],
+  "scope": "Selected 37 capability groups; NOT complete public API denominator. Completeness unknown. Includes unchanged UI/plugin core obligations but excludes rewriting UI."
 }
