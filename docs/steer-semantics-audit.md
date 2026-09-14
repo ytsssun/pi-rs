@@ -1,9 +1,24 @@
 # Steer semantics audit
 
-Status: tested blocker (2026-09-14, main f570fc0).
+Status: tested against pinned upstream `9767ba275f3e9a5ee0f5c5342249b629ab1b2282`, pi-rs baseline `f570fc0`.
 
-Pinned Pi's `steer` is admitted while an active model/tool turn is running, aborts the current turn, persists the aborted assistant/tool settlement, then starts the queued steer message exactly once in the same drive. Ordering and persistence are observable through the session history; a fresh process must not replay an already admitted steer.
+## Correction
 
-pi-rs currently has no equivalent admission seam. `native-runtime-driver.mjs` only drains queued messages after Rust reports `done`; entries labelled `steer` are treated as deferred custom messages (or rejected when no consumer exists). During `model` or `tool` actions, queued steer is neither observed nor causes cancellation. Therefore the required active-drive abort/order/once-only semantics cannot be claimed.
+The initial audit in `14bce1b` is superseded. It incorrectly stated that steering aborts the current turn and requires aborted settlement. That claim was not based on an executed upstream probe. Steering and abort are separate operations.
 
-Reproduction/source evidence: inspect the driver branch at `f570fc0` and run the existing deferred-message fixtures. They pass only for `triggerTurn:false`/`nextTurn`; no fixture can demonstrate active-turn steer because the runtime has no injection point. This is an architecture gap, not a missing assertion. A future implementation must add a Rust-owned admission operation tied to the active request id, with tests for FIFO, abort settlement before steer begin, duplicate rejection, restart no-replay, and same-host continuation.
+## Executed upstream evidence
+
+Run `node --experimental-strip-types experiments/upstream-steer-boundary.mjs` with the pinned vendor dependencies installed. The fixture executes the actual upstream `Agent`, using an explicitly blocked fixture stream (no live provider).
+
+- Queue two steer messages while the first stream is blocked: signal remains un-aborted, neither message enters history, and only one provider call has started.
+- Release a normal final response: default one-at-a-time admission produces two subsequent model requests in FIFO order, with each message present once in in-memory history.
+- Prompt again on the same Agent: consumed steer messages do not replay.
+- Release an aborted or error response: the run ends with both steering messages still queued and no subsequent model call.
+
+Source: `packages/agent/src/agent.ts:283-285` only enqueues; `agent.ts:475-482` drains through the queue callback. `packages/agent/src/agent-loop.ts:167-260` polls initially and after completed turns, injects pending messages before the next response, and returns immediately on error/aborted results. These are fixed-reference paths under `vendor/pi-mono`.
+
+## pi-rs gap and next acceptance
+
+At `f570fc0`, `prototype/architecture/native-runtime-driver.mjs` drains steer only after Rust reports done. Custom steer is persisted as deferred content without a subsequent model request; user steer needs an external consumer or throws. It does not implement upstream turn-boundary admission before the next model response during a continuing tool loop.
+
+The next implementation should add boundary admission through Rust with FIFO/default one-at-a-time handling, persist only accepted messages once, preserve pending messages when error/aborted ends a run, and prove subsequent same-host execution. Native subprocess recovery/no-replay needs its own test: the upstream Agent probe is in-memory and proves no disk persistence or restore behavior. Tool-boundary delivery is source-backed here, not exercised by this blocked-stream probe.
