@@ -1,11 +1,15 @@
 # Current checkpoint
 
-Main `7b59ab5` contains the last verified live smoke artifact: stage 0 passed, while stage 1 failed because the model modified protected `test_maths.py`. The failure is preserved at `/tmp/pi-integrated-live-smoke`; no acceptance was lowered. Three clean repetitions have finished: each first stage passed and each second stage failed protected-file integrity (3/6 stages accepted; 0/3 complete workflows). These results still need artifact-level audit and a committed sanitized summary.
+At main `2473f6e`, the committed [live evidence](experiments/integrated-live-1adafc1/README.md) records three accepted bugfix stages and zero accepted resumed stages: 0/3 complete workflows, without steering. All resumed stages modified protected tests. This observation does not establish whether the cause is model behavior or runtime prompt delivery. The earlier checkpoint's pending-artifact statement is superseded; evidence was merged in PR #32.
 
-Completed recent core slices include project instructions, SYSTEM/APPEND resources, provider dispatch, before-agent-start/context hooks, active-tool enforcement, followUp/steer boundaries, withSession, switchSession and idle fork. These are bounded deterministic slices; full Pi core replacement is not claimed. The selected 37-row matrix remains provisional: 33 partial, 3 unknown, 1 missing; it is not an exhaustive denominator or percentage.
+The runtime is hybrid. Rust owns the action state machine, canonical store and context projection; the JS driver still owns steer/follow-up queue admission, turn scheduling limits and parts of failure handling. Full Rust ownership and full Pi compatibility are not verified. The selected 37 capability groups are a provisional inventory, not a compatibility percentage.
 
-Next: audit and record the completed live repetitions and then close the largest remaining extension/session contract gap with unchanged upstream plugins and exact CI evidence.
+## Current critical path
+
+Move steer/follow-up queue admission and turn scheduling into Rust, preserving the unchanged Node plugin boundary defined in [AGENTS.md](../AGENTS.md). This is proposed work, not an implemented migration. Start by tracing current queue producers/consumers and freezing the pinned-upstream cases in `experiments/upstream-steer-boundary.mjs` and `experiments/user-steer-execution.mjs`.
+
+Acceptance: Rust decides message admission and steer/follow-up ordering; JS forwards callback requests and executes returned effects. Deterministic tests must cover FIFO ordering, steer priority, terminal error/abort retention, failed admission without message loss, and the existing tool/fresh-process continuation cases. Retain failing cases and compare observable behavior with the pinned upstream. Update the architecture map, then require the relevant suite and exact-commit CI before integration. A successful migration does not resolve the recorded live instruction-following failure; prompt-delivery/upstream comparison remains a separate open investigation.
 
 ## History
 
-[Archived checkpoint snapshots](checkpoint-history.md) preserve the previous text. Corrections remain in [board.jsonl](board.jsonl).
+[Archived checkpoint snapshots](checkpoint-history.md) retain superseded handoffs. [board.jsonl](board.jsonl) records decisions and evidence.
