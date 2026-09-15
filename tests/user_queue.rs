@@ -47,6 +47,6 @@ fn native_custom_next_turn_fifo_and_deferred() {
 fn custom_enqueue_is_idempotent_on_retry() {
  let p=std::env::temp_dir().join(format!("pi-custom-retry-{}.jsonl",std::process::id())); let _=std::fs::remove_file(&p);
  let mut s=PiSessionStore::create(&p,json!({"type":"session","version":3,"id":"c","cwd":"/tmp","timestamp":"2026-01-01T00:00:00Z"})).unwrap(); let mut r=PiRuntime::default(); let m=json!({"customType":"one","content":"one","display":false});
- r.step(&mut s,&json!({"event":"enqueue_custom","message":m})).unwrap(); assert!(r.step(&mut s,&json!({"event":"begin","prompt":"bad","nextTurnMessages": [{"customType":"bad"}]})).is_err());
- r.step(&mut s,&json!({"event":"enqueue_custom","message":m})).unwrap(); let a=r.step(&mut s,&json!({"event":"begin","prompt":"ok"})).unwrap(); assert_eq!(a["type"],"model"); let snap=s.snapshot().unwrap(); let e=snap["entries"].as_array().unwrap(); assert_eq!(e.iter().filter(|x| x["type"]=="custom_message").count(),1); let _=std::fs::remove_file(p);
+ r.step(&mut s,&json!({"event":"enqueue_custom","queueId":"retry-1","message":m})).unwrap(); assert!(r.step(&mut s,&json!({"event":"begin","prompt":"bad","nextTurnMessages": [{"customType":"bad"}]})).is_err());
+ r.step(&mut s,&json!({"event":"enqueue_custom","queueId":"retry-1","message":m})).unwrap(); r.step(&mut s,&json!({"event":"enqueue_custom","queueId":"distinct-2","message":m})).unwrap(); let a=r.step(&mut s,&json!({"event":"begin","prompt":"ok"})).unwrap(); assert_eq!(a["type"],"model"); let snap=s.snapshot().unwrap(); let e=snap["entries"].as_array().unwrap(); assert_eq!(e.iter().filter(|x| x["type"]=="custom_message").count(),2); let _=std::fs::remove_file(p);
 }

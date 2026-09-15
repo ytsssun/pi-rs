@@ -109,8 +109,14 @@ impl PiRuntime {
         }
         if op == "enqueue_custom" {
             let message = request["message"].clone();
-            if !message["customType"].is_string() || !(message["content"].is_string() || message["content"].is_array()) || !message["display"].is_boolean() { bail!("invalid custom message"); }
-            if !self.custom_messages.iter().any(|queued| queued == &message) { self.custom_messages.push_back(message); }
+            if !message["customType"].is_string() || !(message["content"].is_string() || message["content"].is_array()) || !message["display"].is_boolean() { bail!("invalid nextTurn custom message"); }
+            let id = request["queueId"].clone();
+            if !id.is_null() && !id.is_string() { bail!("queueId must be a string"); }
+            if let Some(existing) = self.custom_messages.iter().find(|q| !id.is_null() && q["queueId"] == id) {
+                if existing["message"] != message { bail!("queueId payload mismatch"); }
+            } else {
+                self.custom_messages.push_back(json!({"queueId":id,"message":message}));
+            }
             return Ok(Value::Null);
         }
         if op == "pending_custom" { return Ok(json!(self.custom_messages)); }
@@ -203,7 +209,7 @@ impl PiRuntime {
             }
             let supplied = request.get("nextTurnMessages").cloned().unwrap_or(json!([]));
             let supplied = supplied.as_array().context("nextTurnMessages must be an array")?;
-            let mut owned = self.custom_messages.iter().cloned().collect::<Vec<_>>();
+            let mut owned = self.custom_messages.iter().map(|q| q["message"].clone()).collect::<Vec<_>>();
             owned.extend(supplied.iter().cloned());
             let queued = owned.as_slice();
             for message in queued {

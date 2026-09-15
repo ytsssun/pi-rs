@@ -1,3 +1,5 @@
+import {randomUUID} from 'node:crypto';
+const customQueueIds = new WeakMap();
 import {estimateContextTokens} from '../../vendor/pi-mono/packages/coding-agent/src/core/compaction/compaction.ts';
 // JS dispatches Rust actions; Rust decides sequencing and persists model/tool results.
 import {executeWithUpdates} from './tool-update-barrier.mjs';
@@ -22,7 +24,8 @@ async function driveActive({manager,host,prompt,stream,trace=[],onToolUpdate=()=
   for (const queued of pending) {
     if (queued.kind !== 'agent') throw Error('nextTurn requires a custom message');
     const message = queued.message;
-    step({event:'enqueue_custom', message});
+    if (!customQueueIds.has(queued)) customQueueIds.set(queued, randomUUID());
+    step({event:'enqueue_custom', message, queueId:customQueueIds.get(queued)});
   }
   const preparedPrompt = await host.preparePrompt(prompt);
   nextTurnMessages.push(...preparedPrompt.messages.map(message => ({...message, content: message.content ?? []})));
