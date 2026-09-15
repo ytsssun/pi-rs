@@ -220,6 +220,12 @@ impl PiRuntime {
             return Ok(json!(messages));
         }
         if op == "begin" {
+            // Reject continuation before appending input or consuming queued messages.
+            if request["driveStart"] != true
+                && self.action_count >= if self.max_actions == 0 { 32 } else { self.max_actions }
+            {
+                bail!("bounded fixture action limit exceeded");
+            }
             if self.waiting.is_some() {
                 bail!("runtime already awaiting completion");
             }
