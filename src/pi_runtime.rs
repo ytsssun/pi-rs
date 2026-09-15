@@ -410,7 +410,7 @@ impl PiRuntime {
             if all_terminate {
                 return Ok(json!({"type":"done","reason":"all_tools_terminated"}));
             }
-            return self.after_tools(store, request);
+            return self.next(store);
         }
         if op == "tool_update" {
             let call = self.active_tool.as_ref().context("no active tool")?;

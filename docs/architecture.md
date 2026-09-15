@@ -1,6 +1,6 @@
 # Architecture and feature map
 
-> Ownership update (2026-09-15): the target boundary is defined in [AGENTS.md](../AGENTS.md#runtime-ownership). Default user steer/follow-up selection (one-at-a-time/all at final response boundary), drive action budget and nextTurn custom storage/admission live in Rust. Node forwards nextTurn sends immediately and exposes detached pending snapshots; deferred custom delivery still lives in Node. The original snapshot below dates from 2026-09-10, with this queue update applied; consult [checkpoint](checkpoint.md) and the board for later provider, prompt-resource and session-control slices.
+> Ownership update (2026-09-15): the target boundary is defined in [AGENTS.md](../AGENTS.md#runtime-ownership). Default user steer/follow-up selection (one-at-a-time/all at final response and completed sequential tool boundaries), drive action budget and nextTurn custom storage/admission live in Rust. Node forwards nextTurn sends immediately and exposes detached pending snapshots; deferred custom delivery still lives in Node. The original snapshot below dates from 2026-09-10, with this queue update applied; consult [checkpoint](checkpoint.md) and the board for later provider, prompt-resource and session-control slices.
 
 Maintained snapshot: 2026-09-10. Source baseline: `87ccf68`, plus the pending installation verification and unused-accumulator cleanup. This document describes the implementation, not the intended finished product. Upstream reference: Pi `9767ba275f3e9a5ee0f5c5342249b629ab1b2282` ([reference details](upstream.md)).
 
