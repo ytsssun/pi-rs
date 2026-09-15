@@ -89,6 +89,10 @@ export async function createHost(backend, { factories = [], cwd = process.cwd(),
   const actions = Object.fromEntries(['setModel'].map((name) => [name, unsupported(name)]));
   Object.assign(actions, {
     sendMessage: (message, options) => {
+      if (options?.deliverAs === 'nextTurn' && typeof sessionManager?.handle === 'string') {
+        sessionManager.enqueueCustom({...message, content:message.content ?? [], display:message.display ?? false});
+        return;
+      }
       // Capture the custom event payload at admission, as AgentSession does.
       const sessionMessage = options?.triggerTurn === false && options?.deliverAs === undefined
         ? {role:'custom', customType:message.customType, content:message.content ?? [], display:message.display, details:message.details, timestamp:Date.now()}
@@ -133,7 +137,7 @@ export async function createHost(backend, { factories = [], cwd = process.cwd(),
   const contextActions = Object.fromEntries([
     'getSignal',
   ].map((name) => [name, unsupported(name)]));
-  Object.assign(contextActions, { getSignal: () => lifecycleAbort.signal, getScopedModels: () => [...providers.values()].flatMap(p => Array.isArray(p.models) ? p.models : []), getSystemPrompt: () => currentSystemPrompt, getSystemPromptOptions: () => currentPromptOptions, abort: () => { lifecycleAbort.abort(); runner.invalidate('aborted by extension'); }, shutdown: () => runner.invalidate('shutdown requested'), getModel: () => selectedModel, isIdle: () => activeDrive === undefined, isProjectTrusted: () => true, hasPendingMessages: () => pendingMessages.length > 0 || (typeof sessionManager?.handle === 'string' && sessionManager.pendingUsers().length > 0) });
+  Object.assign(contextActions, { getSignal: () => lifecycleAbort.signal, getScopedModels: () => [...providers.values()].flatMap(p => Array.isArray(p.models) ? p.models : []), getSystemPrompt: () => currentSystemPrompt, getSystemPromptOptions: () => currentPromptOptions, abort: () => { lifecycleAbort.abort(); runner.invalidate('aborted by extension'); }, shutdown: () => runner.invalidate('shutdown requested'), getModel: () => selectedModel, isIdle: () => activeDrive === undefined, isProjectTrusted: () => true, hasPendingMessages: () => pendingMessages.length > 0 || (typeof sessionManager?.handle === 'string' && (sessionManager.pendingUsers().length > 0 || sessionManager.pendingCustom().length > 0)) });
   Object.assign(contextActions, { getContextUsage: () => { const entries = typeof sessionManager.getEntries === 'function' ? sessionManager.getEntries() : []; return estimateContextTokens(entries.flatMap(sessionEntryToContextMessages)); }, compact: async (options = {}) => { assert.ok(typeof sessionManager.appendCompaction === 'function', 'sessionManager.appendCompaction required'); return sessionManager.appendCompaction(String(options.summary ?? ''), options.firstKeptEntryId, Number(options.tokensBefore ?? 0)); } });
   runner.bindCore(actions, contextActions);
   const waitForIdle = () => activeDrive ?? Promise.resolve();
@@ -154,7 +158,7 @@ export async function createHost(backend, { factories = [], cwd = process.cwd(),
     assert.ok(definition, `unregistered tool: ${name}`);
     return { name, description: definition.description, parameters: definition.parameters };
   });
-  return { preparePrompt, modelRuntime, beginDrive, waitForIdle, runner, eventBus, errors, providers, modelRegistry, contextActions, execute, requestTools, runtime: loaded.runtime, actions, get pendingMessages() { return typeof sessionManager?.handle === 'string' ? [...pendingMessages,...sessionManager.pendingUsers()] : pendingMessages; }, peekNextTurnMessages: () => pendingMessages.filter(q => q.options?.deliverAs === 'nextTurn'),
+  return { preparePrompt, modelRuntime, beginDrive, waitForIdle, runner, eventBus, errors, providers, modelRegistry, contextActions, execute, requestTools, runtime: loaded.runtime, actions, get pendingMessages() { return typeof sessionManager?.handle === 'string' ? [...pendingMessages,...sessionManager.pendingUsers(),...sessionManager.pendingCustom().map(q=>({kind:"agent",message:q.message,options:{deliverAs:"nextTurn"}}))] : pendingMessages; }, peekNextTurnMessages: () => { const local = pendingMessages.filter(q => q.options?.deliverAs === 'nextTurn'); return typeof sessionManager?.handle === 'string' ? [...local, ...sessionManager.pendingCustom().map(q=>({kind:"agent",message:q.message,options:{deliverAs:"nextTurn"}}))] : local; },
     acknowledgeNextTurnMessages: messages => { for (const message of messages) { const index = pendingMessages.indexOf(message); if (index >= 0) pendingMessages.splice(index, 1); } },
     restoreMessages: messages => pendingMessages.unshift(...messages),
     drainMessages: () => { const ready = pendingMessages.filter(q => q.options?.deliverAs !== 'nextTurn'); for (const message of ready) pendingMessages.splice(pendingMessages.indexOf(message), 1); return ready; } };

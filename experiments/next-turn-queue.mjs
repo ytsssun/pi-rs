@@ -36,11 +36,12 @@ if (stage) {
       if (stage === 'consumed') {
         // Invalid admission must leave BOTH history and host queue unchanged.
         const before = JSON.stringify(manager.getEntries());
-        host.pendingMessages[0].message.display = 'invalid';
+        const prepare = host.preparePrompt;
+        host.preparePrompt = async prompt => ({...await prepare(prompt),messages:[{customType:'invalid',content:'invalid',display:'invalid'}]});
         await assert.rejects(drive({manager, host, prompt: 'invalid', stream}), /invalid nextTurn/);
         assert.equal(JSON.stringify(manager.getEntries()), before);
         assert.equal(host.pendingMessages.length, 2);
-        host.pendingMessages[0].message.display = false;
+        host.preparePrompt = prepare;
         await drive({manager, host, prompt: 'second', stream});
         const entries = manager.getEntries();
         const userIndex = entries.findIndex(e => e.message?.role === 'user' && e.message.content === 'second');

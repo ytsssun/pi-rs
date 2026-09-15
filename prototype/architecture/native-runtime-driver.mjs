@@ -1,5 +1,3 @@
-import {randomUUID} from 'node:crypto';
-const customQueueIds = new WeakMap();
 import {estimateContextTokens} from '../../vendor/pi-mono/packages/coding-agent/src/core/compaction/compaction.ts';
 // JS dispatches Rust actions; Rust decides sequencing and persists model/tool results.
 import {executeWithUpdates} from './tool-update-barrier.mjs';
@@ -19,19 +17,14 @@ export async function drive(options) {
 }
 async function driveActive({manager,host,prompt,stream,trace=[],onToolUpdate=()=>{},onMessage,onSessionEvent,propagateUpdateErrors=false,parallel=false,signal}) {
   const step=payload=>{ const now=Date.now(); return request({op:'runtime',handle:manager.handle,timestamp:new Date(now).toISOString(),messageTimestamp:now,...payload}); };
-  const pending = host.peekNextTurnMessages?.() ?? [];
-  const nextTurnMessages = [];
-  for (const queued of pending) {
+  // Reject unsupported legacy user delivery before admitting a prompt.
+  for (const queued of host.peekNextTurnMessages?.() ?? []) {
     if (queued.kind !== 'agent') throw Error('nextTurn requires a custom message');
-    const message = queued.message;
-    if (!customQueueIds.has(queued)) customQueueIds.set(queued, randomUUID());
-    step({event:'enqueue_custom', message, queueId:customQueueIds.get(queued)});
   }
+  const nextTurnMessages = [];
   const preparedPrompt = await host.preparePrompt(prompt);
   nextTurnMessages.push(...preparedPrompt.messages.map(message => ({...message, content: message.content ?? []})));
   let action=step({event:'begin',prompt,parallel,nextTurnMessages,driveStart:true,maxActions:32});
-  // Acknowledge only after Rust accepts and appends the user plus queued messages.
-  host.acknowledgeNextTurnMessages?.(pending);
   const consumedMessages = [];
   trace.push({type:'turn_start'});
   for(let count=0;;count++) {
