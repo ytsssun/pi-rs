@@ -9,6 +9,8 @@ pub struct PiRuntime {
     user_messages: VecDeque<Value>,
     custom_messages: VecDeque<Value>,
     terminal_failure: bool,
+    steering_all: bool,
+    followup_all: bool,
     tools: VecDeque<Value>,
     active_tool: Option<Value>,
     tool_updates: Vec<Value>,
@@ -136,6 +138,16 @@ impl PiRuntime {
         if op == "pending_custom" {
             return Ok(json!(self.custom_messages));
         }
+        if op == "queue_modes" {
+            for key in ["steeringMode", "followUpMode"] {
+                if let Some(value) = request.get(key) {
+                    if !matches!(value.as_str(), Some("all" | "one-at-a-time")) { bail!("invalid queue mode"); }
+                }
+            }
+            if request.get("steeringMode").is_some() { self.steering_all = request["steeringMode"] == "all"; }
+            if request.get("followUpMode").is_some() { self.followup_all = request["followUpMode"] == "all"; }
+            return Ok(json!({"steeringMode":if self.steering_all {"all"} else {"one-at-a-time"},"followUpMode":if self.followup_all {"all"} else {"one-at-a-time"}}));
+        }
         if op == "pending_users" {
             return Ok(json!(self.user_messages));
         }
@@ -155,23 +167,26 @@ impl PiRuntime {
                 return Ok(json!({"type":"empty"}));
             };
             let queued = self.user_messages[index].clone();
-            let message = &queued["message"];
-            let content = if message.is_string() {
-                message
-            } else {
-                &message["content"]
-            };
-            if !content.is_string() && !content.is_array() {
-                bail!("Invalid queued user content");
+            let all = if queued["options"]["deliverAs"] == "steer" { self.steering_all } else { self.followup_all };
+            let indices: Vec<usize> = self.user_messages.iter().enumerate().filter_map(|(i,q)|
+                ((all && q["options"]["deliverAs"] == queued["options"]["deliverAs"]) || i == index).then_some(i)).collect();
+            let selected: Vec<Value> = indices.iter().map(|&i|self.user_messages[i].clone()).collect();
+            let mut contents = Vec::new();
+            for item in &selected {
+                let message = &item["message"];
+                let content = if message.is_string() {message} else {&message["content"]};
+                if !content.is_string() && !content.is_array() { bail!("Invalid queued user content"); }
+                contents.push(content.clone());
             }
             let mut begin = request.clone();
             begin["event"] = json!("begin");
-            begin["prompt"] = content.clone();
+            begin["prompt"] = contents[0].clone();
+            begin["additionalUsers"] = json!(&contents[1..]);
             let action = self.step(store, &begin)?;
-            // Retain the queue when admission fails, including unresolved history.
-            self.user_messages.remove(index);
-            return Ok(json!({"type":"admitted","queued":queued,"action":action}));
+            for i in indices.into_iter().rev() { self.user_messages.remove(i); }
+            return Ok(json!({"type":"admitted","queued":queued,"queuedMessages":selected,"action":action}));
         }
+
         if op == "policy" {
             let limit = &request["limit"];
             if !limit.is_null() && !limit.is_u64() {
@@ -300,6 +315,11 @@ impl PiRuntime {
                 json!({"type":"message","message":{"role":"user","content":request["prompt"],"timestamp":request["messageTimestamp"].as_u64().unwrap_or(0)}}),
                 timestamp,
             )?;
+            if let Some(users) = request["additionalUsers"].as_array() {
+                for content in users {
+                    Self::append(store,json!({"type":"message","message":{"role":"user","content":content,"timestamp":request["messageTimestamp"].as_u64().unwrap_or(0)}}),timestamp)?;
+                }
+            }
             for message in queued {
                 Self::append(
                     store,

@@ -50,3 +50,22 @@ fn custom_enqueue_is_idempotent_on_retry() {
  r.step(&mut s,&json!({"event":"enqueue_custom","queueId":"retry-1","message":m})).unwrap(); assert!(r.step(&mut s,&json!({"event":"begin","prompt":"bad","nextTurnMessages": [{"customType":"bad"}]})).is_err());
  r.step(&mut s,&json!({"event":"enqueue_custom","queueId":"retry-1","message":m})).unwrap(); r.step(&mut s,&json!({"event":"enqueue_custom","queueId":"distinct-2","message":m})).unwrap(); let a=r.step(&mut s,&json!({"event":"begin","prompt":"ok"})).unwrap(); assert_eq!(a["type"],"model"); let snap=s.snapshot().unwrap(); let e=snap["entries"].as_array().unwrap(); assert_eq!(e.iter().filter(|x| x["type"]=="custom_message").count(),2); let _=std::fs::remove_file(p);
 }
+
+#[test]
+fn all_mode_validates_entire_group_before_admission() {
+    let path=std::env::temp_dir().join(format!("pi-all-invalid-{}.jsonl",std::process::id()));
+    let _=std::fs::remove_file(&path);
+    let mut store=PiSessionStore::create(&path,json!({"type":"session","version":3,"id":"all","cwd":"/tmp","timestamp":"2026-01-01T00:00:00Z"})).unwrap();
+    let mut runtime=PiRuntime::default();
+    runtime.step(&mut store,&json!({"event":"queue_modes","steeringMode":"all"})).unwrap();
+    for content in [json!("valid"),json!(42)] {
+        runtime.step(&mut store,&json!({"event":"enqueue_user","queued":{"kind":"user","message":content,"options":{"deliverAs":"steer"}}})).unwrap();
+    }
+    let before=store.snapshot().unwrap();
+    assert!(runtime.step(&mut store,&json!({"event":"advance_queued"})).is_err());
+    assert_eq!(store.snapshot().unwrap(),before);
+    assert_eq!(runtime.step(&mut store,&json!({"event":"pending_users"})).unwrap().as_array().unwrap().len(),2);
+    assert!(runtime.step(&mut store,&json!({"event":"queue_modes","steeringMode":"one-at-a-time","followUpMode":"invalid"})).is_err());
+    assert_eq!(runtime.step(&mut store,&json!({"event":"queue_modes"})).unwrap()["steeringMode"],"all");
+    drop(store);assert!(!path.exists(),"rejected admission must not persist a file");
+}

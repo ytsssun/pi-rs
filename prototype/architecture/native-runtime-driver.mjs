@@ -37,7 +37,7 @@ async function driveActive({manager,host,prompt,stream,trace=[],onToolUpdate=()=
       if (scheduled.type === 'admitted') {
         action = scheduled.action;
         trace.push({type:scheduled.queued.options.deliverAs === 'steer' ? 'steer_admitted' : 'followup_admitted'});
-        consumedMessages.push(scheduled.queued);
+        consumedMessages.push(...scheduled.queuedMessages);
         continue;
       }
       const drainedMessages = typeof host.drainMessages === 'function' ? host.drainMessages() : [];

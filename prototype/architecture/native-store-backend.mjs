@@ -13,6 +13,8 @@ export async function createBackend({path,cwd=process.cwd(),mode='create',parent
     return call({op:'append',entry:{...payload,id:'e'+next++,timestamp:new Date().toISOString()}});
   }
   return {handle,snapshot,appendRaw:append,
+    getQueueModes:()=>call({op:"runtime",event:"queue_modes"}),
+    setQueueModes:modes=>call({op:"runtime",event:"queue_modes",...modes}),
     enqueueUser:queued=>call({op:"runtime",event:"enqueue_user",queued}),
     enqueueCustom:message=>call({op:"runtime",event:"enqueue_custom",message}),
     pendingCustom:()=>call({op:"runtime",event:"pending_custom"}),
