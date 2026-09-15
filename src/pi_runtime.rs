@@ -7,6 +7,7 @@ use std::collections::VecDeque;
 pub struct PiRuntime {
     waiting: Option<(String, String)>,
     user_messages: VecDeque<Value>,
+    custom_messages: VecDeque<Value>,
     terminal_failure: bool,
     tools: VecDeque<Value>,
     active_tool: Option<Value>,
@@ -106,6 +107,13 @@ impl PiRuntime {
             self.user_messages.push_back(queued);
             return Ok(Value::Null);
         }
+        if op == "enqueue_custom" {
+            let message = request["message"].clone();
+            if !message["customType"].is_string() || !(message["content"].is_string() || message["content"].is_array()) || !message["display"].is_boolean() { bail!("invalid custom message"); }
+            self.custom_messages.push_back(message);
+            return Ok(Value::Null);
+        }
+        if op == "pending_custom" { return Ok(json!(self.custom_messages)); }
         if op == "pending_users" {
             return Ok(json!(self.user_messages));
         }
@@ -193,13 +201,11 @@ impl PiRuntime {
             if self.waiting.is_some() {
                 bail!("runtime already awaiting completion");
             }
-            let queued = request
-                .get("nextTurnMessages")
-                .cloned()
-                .unwrap_or(json!([]));
-            let queued = queued
-                .as_array()
-                .context("nextTurnMessages must be an array")?;
+            let supplied = request.get("nextTurnMessages").cloned().unwrap_or(json!([]));
+            let supplied = supplied.as_array().context("nextTurnMessages must be an array")?;
+            let mut owned = self.custom_messages.iter().cloned().collect::<Vec<_>>();
+            owned.extend(supplied.iter().cloned());
+            let queued = owned.as_slice();
             for message in queued {
                 if !message["customType"].is_string()
                     || !(message["content"].is_string() || message["content"].is_array())
@@ -264,6 +270,7 @@ impl PiRuntime {
                     timestamp,
                 )?;
             }
+            self.custom_messages.clear();
             self.terminal_failure = false;
             self.action_count = 0;
             self.max_actions = request["maxActions"].as_u64().unwrap_or(32) as u32;

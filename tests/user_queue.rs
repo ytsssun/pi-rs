@@ -33,3 +33,12 @@ fn native_queue_orders_and_retains_failed_admission() {
     drop(store);
     std::fs::remove_file(path).unwrap();
 }
+
+#[test]
+fn native_custom_next_turn_fifo_and_deferred() {
+ let p=std::env::temp_dir().join(format!("pi-custom-{}.jsonl",std::process::id())); let _=std::fs::remove_file(&p);
+ let mut s=PiSessionStore::create(&p,json!({"type":"session","version":3,"id":"c","cwd":"/tmp","timestamp":"2026-01-01T00:00:00Z"})).unwrap(); let mut r=PiRuntime::default();
+ for t in ["one","two"] { r.step(&mut s,&json!({"event":"enqueue_custom","message":{"customType":t,"content":t,"display":false}})).unwrap(); }
+ let a=r.step(&mut s,&json!({"event":"begin","prompt":"go","maxActions":1})).unwrap(); assert_eq!(r.step(&mut s,&json!({"event":"model_result","requestId":a["requestId"],"message":{"role":"assistant","content":[],"stopReason":"stop"}})).unwrap()["type"],"done");
+ let es=s.snapshot().unwrap()["entries"].as_array().unwrap().clone(); let got:Vec<_>=es.iter().filter(|e|e["type"]=="custom_message").map(|e|e["customType"].as_str().unwrap()).collect(); assert_eq!(got,["one","two"]); let _=std::fs::remove_file(p);
+}
