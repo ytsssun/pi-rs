@@ -43,5 +43,29 @@ try {
    assert.equal(child.status,0,child.stderr);
   } catch(error){try{manager.close();}catch{}throw error;}
  }
+ // The pending snapshot combines native users with JS custom messages. A failed
+ // unsupported delivery must restore the real host queue, not mutate that snapshot.
+ {
+  const manager=await createBackend({path:join(directory,'restore.jsonl')});
+  try {
+   const host=await createHost(tsBackend([]),{sessionManager:manager,extensionPaths:[]});
+   host.actions.sendUserMessage('unsupported',{deliverAs:'nextTurn'});
+   host.actions.sendMessage({customType:'later',content:'preserve',display:false},{triggerTurn:false});
+   const before=host.pendingMessages;
+   await assert.rejects(drive({manager,host,prompt:'start',stream:async()=>{throw Error('must not call provider');}}),/nextTurn requires a custom message/);
+   assert.deepEqual(host.pendingMessages,before);
+   // Exercise post-final restoration with a user delivery mode outside this slice.
+   host.actions.sendMessage({customType:'unsupported',content:'requires scheduling',display:false},{deliverAs:'followUp',triggerTurn:true});
+   host.actions.sendUserMessage('unsupported scheduling',{});
+   const stream=async()=>({async *[Symbol.asyncIterator](){},async result(){return {role:'assistant',content:[],stopReason:'stop'};}});
+   // Remove unsupported nextTurn through the explicit acknowledgement adapter.
+   host.acknowledgeNextTurnMessages(host.peekNextTurnMessages());
+   await assert.rejects(drive({manager,host,prompt:'start',stream}),/requires a scheduling consumer/);
+   assert.equal(host.pendingMessages.length,3);
+   assert.equal(host.pendingMessages[0].message.customType,'unsupported');
+   assert.equal(host.pendingMessages[1].message.customType,'later');
+   assert.equal(host.pendingMessages[2].message,'unsupported scheduling');
+  } finally {manager.close();}
+ }
  console.log('PASS user steer at normal final boundary: no abort/early persistence, FIFO before followUp, error/aborted retention, same-host continuation, native subprocess history');
 } finally {rmSync(directory,{recursive:true,force:true});}

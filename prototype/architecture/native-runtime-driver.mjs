@@ -28,36 +28,18 @@ async function driveActive({manager,host,prompt,stream,trace=[],onToolUpdate=()=
   // Acknowledge only after Rust accepts and appends the user plus queued messages.
   host.acknowledgeNextTurnMessages?.(pending);
   const consumedMessages = [];
-  let terminalFailure = false;
   trace.push({type:'turn_start'});
   for(let count=0;count<32;count++) {
     if(action.type==='done') {
-      // Upstream ends error/aborted turns without draining steering/follow-up.
-      if (terminalFailure) {
+      const scheduled = step({event:'advance_queued',parallel,cancelled:signal.aborted});
+      if (scheduled.type === 'retained') {
         trace.push({type:'turn_end',consumedMessages:0});
         return {action,trace,consumedMessages};
       }
-      const steer = host.pendingMessages.find(q => q.kind === 'user' && q.options?.deliverAs === 'steer');
-      if (steer && !signal.aborted) {
-        const content = typeof steer.message === 'string' ? steer.message : steer.message?.content;
-        if (typeof content !== 'string' && !Array.isArray(content)) throw Error('Invalid steer content');
-        action = step({event:'begin',prompt:content,parallel});
-        host.pendingMessages.splice(host.pendingMessages.indexOf(steer),1);
-        trace.push({type:'steer_admitted'});
-        consumedMessages.push(steer);
-        continue;
-      }
-      // Match upstream's default one-at-a-time follow-up drain. Begin through
-      // Rust before acknowledging admission; queued messages are not delivery.
-      const followUp = host.pendingMessages.find(q => q.kind === 'user' && q.options?.deliverAs === 'followUp');
-      if (followUp && !signal.aborted) {
-        const content = typeof followUp.message === 'string' ? followUp.message : followUp.message?.content;
-        if (typeof content !== 'string' && !Array.isArray(content)) throw Error('Invalid followUp content');
-        action = step({event:'begin', prompt:content, parallel});
-        host.pendingMessages.splice(host.pendingMessages.indexOf(followUp), 1);
-        trace.push({type:'followup_admitted'});
-        consumedMessages.push(followUp);
-        // Continue under the same active-drive lease and global action budget.
+      if (scheduled.type === 'admitted') {
+        action = scheduled.action;
+        trace.push({type:scheduled.queued.options.deliverAs === 'steer' ? 'steer_admitted' : 'followup_admitted'});
+        consumedMessages.push(scheduled.queued);
         continue;
       }
       const drainedMessages = typeof host.drainMessages === 'function' ? host.drainMessages() : [];
@@ -79,11 +61,11 @@ async function driveActive({manager,host,prompt,stream,trace=[],onToolUpdate=()=
             onSessionEvent({type:'message_end', message:queued.sessionMessage});
           }
         } else if (queued.kind === 'user' && queued.options?.deliverAs === 'followUp') {
-          host.pendingMessages.unshift(...messages.slice(messages.indexOf(queued)));
+          host.restoreMessages(messages.slice(messages.indexOf(queued)));
           throw Error('Cancelled drive retains pending followUp messages');
         } else if (!onMessage) {
           // Do not report delivery when the runtime has no scheduling consumer.
-          host.pendingMessages.unshift(...messages.slice(messages.indexOf(queued)));
+          host.restoreMessages(messages.slice(messages.indexOf(queued)));
           throw Error('Extension message requires a scheduling consumer: triggerTurn/steer/followUp/nextTurn is not implemented');
         }
         if (onMessage) await onMessage(queued);
@@ -95,7 +77,6 @@ async function driveActive({manager,host,prompt,stream,trace=[],onToolUpdate=()=
     if(action.type==='model') {
       if(signal.aborted) {
         action=step({event:'model_result',requestId,message:{role:'assistant',content:[],stopReason:'aborted',errorMessage:'Drive cancelled',timestamp:Date.now()}});
-        terminalFailure=true;
         trace.push({type:'cancel_settled',requestId});
         continue;
       }
@@ -108,7 +89,6 @@ async function driveActive({manager,host,prompt,stream,trace=[],onToolUpdate=()=
       const output=await stream({provider:'fixture'}, {systemPrompt:preparedPrompt.systemPrompt,messages,tools:host.requestTools()}, {signal});
       for await(const _event of output){} // Stream transport consumption, no turn decisions.
       const message=await output.result();
-      terminalFailure=['error','aborted'].includes(message.stopReason);
       action=step({event:'model_result',requestId,message});
       trace.push({type:'model_result',requestId});
     } else if(action.type==='tool') {

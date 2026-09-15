@@ -107,3 +107,10 @@ A diagnostic counterexample in `experiments/disabled-tool-oracle.mjs` records an
 ## Idle same-workspace switchSession
 
 The formal CLI owner supports `switchSession(path, {withSession})` for existing native sessions in the same workspace. The pinned `AgentSessionRuntime.switchSession` ordering is retained: before-switch veto, open and validate target, old shutdown/invalidation, new startup with resume reason, then guarded callback. Target identity and history are retained. Missing/corrupt targets and different workspace targets fail before teardown. Callback errors propagate after replacement commits, leaving the new owner usable; host construction/start failures after teardown remain terminal as for newSession. Active switching, cwdOverride, projectTrustContextFactory and cross-workspace tool reconstruction are explicitly unsupported. Deterministic formal CLI verification: `node --experimental-strip-types experiments/cli-switch-session.mjs`; real write execution and subsequent process resume are included, but no live model claim.
+
+
+## Rust user-queue ownership migration
+
+The native host forwards user `deliverAs:steer` and `deliverAs:followUp` to the Rust runtime immediately, including during provider/tool execution. Rust owns their in-memory queue, default one-at-a-time selection (steer before followUp, FIFO within each), terminal error/abort retention, and dequeue only after successful `begin`. Node executes the returned model/tool effects. `pendingMessages` is an observation snapshot; explicit `restoreMessages` restores drained legacy/custom deliveries on unsupported scheduling errors.
+
+This is bounded to the existing normal-final-response seam. Upstream queue mode `all`, tool-boundary steering, custom steer/followUp scheduling, nextTurn ownership, the JS 32-action budget and broader failure/cancellation policy remain open migration tasks. Pending user messages do not survive process exit; successfully admitted history does. The unchanged upstream oracle and existing user-steer/followUp fixtures plus `cargo test --test user_queue` verify deterministic behavior only, not live model quality or full scheduling parity.

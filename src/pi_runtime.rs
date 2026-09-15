@@ -6,6 +6,8 @@ use std::collections::VecDeque;
 #[derive(Default)]
 pub struct PiRuntime {
     waiting: Option<(String, String)>,
+    user_messages: VecDeque<Value>,
+    terminal_failure: bool,
     tools: VecDeque<Value>,
     active_tool: Option<Value>,
     tool_updates: Vec<Value>,
@@ -70,6 +72,37 @@ impl PiRuntime {
         let timestamp = request["timestamp"]
             .as_str()
             .unwrap_or("2026-01-01T00:00:00.000Z");
+        if op == "enqueue_user" {
+            let queued = request["queued"].clone();
+            if queued["kind"] != "user" || !matches!(queued["options"]["deliverAs"].as_str(), Some("steer" | "followUp")) {
+                bail!("user queue requires steer or followUp");
+            }
+            self.user_messages.push_back(queued);
+            return Ok(Value::Null);
+        }
+        if op == "pending_users" {
+            return Ok(json!(self.user_messages));
+        }
+        if op == "advance_queued" {
+            if self.waiting.is_some() { bail!("runtime already awaiting completion"); }
+            if self.terminal_failure || request["cancelled"] == true {
+                return Ok(json!({"type":"retained"}));
+            }
+            let index = self.user_messages.iter().position(|q| q["options"]["deliverAs"] == "steer")
+                .or_else(|| (!self.user_messages.is_empty()).then_some(0));
+            let Some(index) = index else { return Ok(json!({"type":"empty"})); };
+            let queued = self.user_messages[index].clone();
+            let message = &queued["message"];
+            let content = if message.is_string() { message } else { &message["content"] };
+            if !content.is_string() && !content.is_array() { bail!("Invalid queued user content"); }
+            let mut begin = request.clone();
+            begin["event"] = json!("begin");
+            begin["prompt"] = content.clone();
+            let action = self.step(store, &begin)?;
+            // Retain the queue when admission fails, including unresolved history.
+            self.user_messages.remove(index);
+            return Ok(json!({"type":"admitted","queued":queued,"action":action}));
+        }
         if op == "policy" {
             let limit = &request["limit"];
             if !limit.is_null() && !limit.is_u64() {
@@ -169,6 +202,7 @@ impl PiRuntime {
             for message in queued {
                 Self::append(store, json!({"type":"custom_message","customType":message["customType"],"content":message["content"],"display":message["display"],"details":message["details"]}), timestamp)?;
             }
+            self.terminal_failure = false;
             self.parallel = request["parallel"].as_bool().unwrap_or(false);
             return self.next(store);
         }
@@ -261,6 +295,7 @@ impl PiRuntime {
                 json!({"type":"message","message":message}),
                 timestamp,
             )?;
+            self.terminal_failure = message["stopReason"] == "error" || message["stopReason"] == "aborted";
             self.waiting = None;
             self.tools = calls;
             if self.tools.is_empty() {
