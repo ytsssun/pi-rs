@@ -14,6 +14,8 @@ pub struct PiRuntime {
     sequence: u64,
     parallel: bool,
     batch: Option<(String, Vec<Value>)>,
+    action_count: u32,
+    max_actions: u32,
 }
 impl PiRuntime {
     pub fn is_waiting(&self) -> bool {
@@ -37,6 +39,15 @@ impl PiRuntime {
         store.append(entry)
     }
     fn next(&mut self, store: &PiSessionStore) -> Result<Value> {
+        let max = if self.max_actions == 0 {
+            32
+        } else {
+            self.max_actions
+        };
+        if self.action_count >= max {
+            bail!("bounded fixture action limit exceeded");
+        }
+        self.action_count += 1;
         self.sequence = self
             .sequence
             .checked_add(1)
@@ -49,7 +60,17 @@ impl PiRuntime {
         if self.parallel && self.batch.is_none() && self.tools.len() > 1 {
             let mut calls: Vec<Value> = self.tools.drain(..).collect();
             let batch_id = format!("batch-{id}");
-            for call in &mut calls { self.sequence = self.sequence.checked_add(1).context("request sequence exhausted")?; call["requestId"] = json!(format!("{}:{}", store.snapshot()?["entries"].as_array().unwrap().len(), self.sequence)); }
+            for call in &mut calls {
+                self.sequence = self
+                    .sequence
+                    .checked_add(1)
+                    .context("request sequence exhausted")?;
+                call["requestId"] = json!(format!(
+                    "{}:{}",
+                    store.snapshot()?["entries"].as_array().unwrap().len(),
+                    self.sequence
+                ));
+            }
             self.batch = Some((batch_id.clone(), calls.clone()));
             self.waiting = Some(("batch".into(), batch_id.clone()));
             return Ok(json!({"type":"tool_batch","batchId":batch_id,"calls":calls}));
@@ -74,7 +95,12 @@ impl PiRuntime {
             .unwrap_or("2026-01-01T00:00:00.000Z");
         if op == "enqueue_user" {
             let queued = request["queued"].clone();
-            if queued["kind"] != "user" || !matches!(queued["options"]["deliverAs"].as_str(), Some("steer" | "followUp")) {
+            if queued["kind"] != "user"
+                || !matches!(
+                    queued["options"]["deliverAs"].as_str(),
+                    Some("steer" | "followUp")
+                )
+            {
                 bail!("user queue requires steer or followUp");
             }
             self.user_messages.push_back(queued);
@@ -84,17 +110,30 @@ impl PiRuntime {
             return Ok(json!(self.user_messages));
         }
         if op == "advance_queued" {
-            if self.waiting.is_some() { bail!("runtime already awaiting completion"); }
+            if self.waiting.is_some() {
+                bail!("runtime already awaiting completion");
+            }
             if self.terminal_failure || request["cancelled"] == true {
                 return Ok(json!({"type":"retained"}));
             }
-            let index = self.user_messages.iter().position(|q| q["options"]["deliverAs"] == "steer")
+            let index = self
+                .user_messages
+                .iter()
+                .position(|q| q["options"]["deliverAs"] == "steer")
                 .or_else(|| (!self.user_messages.is_empty()).then_some(0));
-            let Some(index) = index else { return Ok(json!({"type":"empty"})); };
+            let Some(index) = index else {
+                return Ok(json!({"type":"empty"}));
+            };
             let queued = self.user_messages[index].clone();
             let message = &queued["message"];
-            let content = if message.is_string() { message } else { &message["content"] };
-            if !content.is_string() && !content.is_array() { bail!("Invalid queued user content"); }
+            let content = if message.is_string() {
+                message
+            } else {
+                &message["content"]
+            };
+            if !content.is_string() && !content.is_array() {
+                bail!("Invalid queued user content");
+            }
             let mut begin = request.clone();
             begin["event"] = json!("begin");
             begin["prompt"] = content.clone();
@@ -154,8 +193,13 @@ impl PiRuntime {
             if self.waiting.is_some() {
                 bail!("runtime already awaiting completion");
             }
-            let queued = request.get("nextTurnMessages").cloned().unwrap_or(json!([]));
-            let queued = queued.as_array().context("nextTurnMessages must be an array")?;
+            let queued = request
+                .get("nextTurnMessages")
+                .cloned()
+                .unwrap_or(json!([]));
+            let queued = queued
+                .as_array()
+                .context("nextTurnMessages must be an array")?;
             for message in queued {
                 if !message["customType"].is_string()
                     || !(message["content"].is_string() || message["content"].is_array())
@@ -166,9 +210,23 @@ impl PiRuntime {
             }
             // Do not silently replay an unfinished persisted tool on reopen.
             let mut unresolved = vec![];
-            let resolved: std::collections::HashSet<Value> = store.snapshot()?["branch"].as_array().unwrap().iter().filter(|e| e["customType"]=="pi-rs.in-flight.v1" && e["data"]["state"]=="resolved").map(|e|e["data"]["toolCallId"].clone()).collect();
+            let resolved: std::collections::HashSet<Value> = store.snapshot()?["branch"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .filter(|e| {
+                    e["customType"] == "pi-rs.in-flight.v1" && e["data"]["state"] == "resolved"
+                })
+                .map(|e| e["data"]["toolCallId"].clone())
+                .collect();
             for entry in store.snapshot()?["branch"].as_array().unwrap() {
-                if entry["type"]=="custom" && entry["customType"]=="pi-rs.in-flight.v1" && entry["data"]["state"]=="pending" && !resolved.contains(&entry["data"]["toolCallId"]) { unresolved.push(entry["data"]["toolCallId"].clone()); }
+                if entry["type"] == "custom"
+                    && entry["customType"] == "pi-rs.in-flight.v1"
+                    && entry["data"]["state"] == "pending"
+                    && !resolved.contains(&entry["data"]["toolCallId"])
+                {
+                    unresolved.push(entry["data"]["toolCallId"].clone());
+                }
                 if entry["type"] != "message" {
                     continue;
                 }
@@ -200,9 +258,15 @@ impl PiRuntime {
                 timestamp,
             )?;
             for message in queued {
-                Self::append(store, json!({"type":"custom_message","customType":message["customType"],"content":message["content"],"display":message["display"],"details":message["details"]}), timestamp)?;
+                Self::append(
+                    store,
+                    json!({"type":"custom_message","customType":message["customType"],"content":message["content"],"display":message["display"],"details":message["details"]}),
+                    timestamp,
+                )?;
             }
             self.terminal_failure = false;
+            self.action_count = 0;
+            self.max_actions = request["maxActions"].as_u64().unwrap_or(32) as u32;
             self.parallel = request["parallel"].as_bool().unwrap_or(false);
             return self.next(store);
         }
@@ -210,24 +274,46 @@ impl PiRuntime {
             let (batch_id, calls) = self.batch.as_ref().context("no pending batch")?;
             let batch_id = batch_id.clone();
             let calls = calls.clone();
-            if request["batchId"] != batch_id { bail!("stale or mismatched batch"); }
-            let results = request["results"].as_array().context("results array required")?;
-            if results.len() != calls.len() { bail!("batch result count mismatch"); }
+            if request["batchId"] != batch_id {
+                bail!("stale or mismatched batch");
+            }
+            let results = request["results"]
+                .as_array()
+                .context("results array required")?;
+            if results.len() != calls.len() {
+                bail!("batch result count mismatch");
+            }
             let mut by_id = std::collections::HashMap::new();
             for result in results {
-                let rid = result["requestId"].as_str().context("batch result requestId required")?;
-                if by_id.insert(rid.to_string(), result).is_some() { bail!("duplicate batch result requestId"); }
+                let rid = result["requestId"]
+                    .as_str()
+                    .context("batch result requestId required")?;
+                if by_id.insert(rid.to_string(), result).is_some() {
+                    bail!("duplicate batch result requestId");
+                }
             }
-            let all_terminate = results.iter().all(|r| r["terminate"].as_bool().unwrap_or(false));
+            let all_terminate = results
+                .iter()
+                .all(|r| r["terminate"].as_bool().unwrap_or(false));
             for call in &calls {
                 let rid = call["requestId"].as_str().unwrap();
-                let result = by_id.remove(rid).context("missing batch result requestId")?;
+                let result = by_id
+                    .remove(rid)
+                    .context("missing batch result requestId")?;
                 let message = json!({"role":"toolResult","toolCallId":call["id"],"toolName":call["name"],"content":result.get("content").cloned().unwrap_or(json!([])),"details":result["details"],"isError":result["isError"].as_bool().unwrap_or(false),"timestamp":request["messageTimestamp"].as_u64().unwrap_or(0)});
                 let mut message = message;
-                if let Some(usage) = result.get("usage") { message["usage"] = usage.clone(); }
-                Self::append(store, json!({"type":"message","message":message}), timestamp)?;
+                if let Some(usage) = result.get("usage") {
+                    message["usage"] = usage.clone();
+                }
+                Self::append(
+                    store,
+                    json!({"type":"message","message":message}),
+                    timestamp,
+                )?;
             }
-            if !by_id.is_empty() { bail!("unknown batch result requestId"); }
+            if !by_id.is_empty() {
+                bail!("unknown batch result requestId");
+            }
             self.waiting = None;
             self.batch = None;
             if all_terminate {
@@ -237,21 +323,43 @@ impl PiRuntime {
         }
         if op == "tool_update" {
             let call = self.active_tool.as_ref().context("no active tool")?;
-            if request["requestId"] != self.waiting.as_ref().map(|(_, id)| json!(id)).unwrap_or(Value::Null) { bail!("stale or mismatched update"); }
+            if request["requestId"]
+                != self
+                    .waiting
+                    .as_ref()
+                    .map(|(_, id)| json!(id))
+                    .unwrap_or(Value::Null)
+            {
+                bail!("stale or mismatched update");
+            }
             let update = request.get("update").cloned().context("update required")?;
             self.tool_updates.push(update);
-            return Ok(json!({"type":"accepted","toolCallId":call["id"],"updateCount":self.tool_updates.len()}));
+            return Ok(
+                json!({"type":"accepted","toolCallId":call["id"],"updateCount":self.tool_updates.len()}),
+            );
         }
         if op == "mark_in_flight" {
-            let name=request["toolName"].as_str().context("toolName required")?;
-            if !matches!(name,"write"|"edit"|"bash") { bail!("in-flight marker requires mutation tool"); }
-            Self::append(store,json!({"type":"custom","customType":"pi-rs.in-flight.v1","data":{"requestId":request["requestId"],"toolCallId":request["toolCallId"],"toolName":name,"state":"pending"}}),timestamp)?;
+            let name = request["toolName"].as_str().context("toolName required")?;
+            if !matches!(name, "write" | "edit" | "bash") {
+                bail!("in-flight marker requires mutation tool");
+            }
+            Self::append(
+                store,
+                json!({"type":"custom","customType":"pi-rs.in-flight.v1","data":{"requestId":request["requestId"],"toolCallId":request["toolCallId"],"toolName":name,"state":"pending"}}),
+                timestamp,
+            )?;
             return Ok(json!({"type":"marked"}));
         }
         if op == "resolve_in_flight" {
-            let tool_call_id=request["toolCallId"].as_str().context("toolCallId required")?;
-            let outcome=request["outcome"].as_str().context("outcome required")?;
-            Self::append(store,json!({"type":"custom","customType":"pi-rs.in-flight.v1","data":{"requestId":request["requestId"],"toolCallId":tool_call_id,"toolName":request["toolName"],"state":"resolved","outcome":outcome}}),timestamp)?;
+            let tool_call_id = request["toolCallId"]
+                .as_str()
+                .context("toolCallId required")?;
+            let outcome = request["outcome"].as_str().context("outcome required")?;
+            Self::append(
+                store,
+                json!({"type":"custom","customType":"pi-rs.in-flight.v1","data":{"requestId":request["requestId"],"toolCallId":tool_call_id,"toolName":request["toolName"],"state":"resolved","outcome":outcome}}),
+                timestamp,
+            )?;
             return Ok(json!({"type":"resolved"}));
         }
         let expected_kind = if op == "model_result" {
@@ -295,7 +403,8 @@ impl PiRuntime {
                 json!({"type":"message","message":message}),
                 timestamp,
             )?;
-            self.terminal_failure = message["stopReason"] == "error" || message["stopReason"] == "aborted";
+            self.terminal_failure =
+                message["stopReason"] == "error" || message["stopReason"] == "aborted";
             self.waiting = None;
             self.tools = calls;
             if self.tools.is_empty() {
@@ -319,7 +428,11 @@ impl PiRuntime {
                 json!({"type":"message","message":message}),
                 timestamp,
             )?;
-            Self::append(store,json!({"type":"custom","customType":"pi-rs.in-flight.v1","data":{"requestId":request["requestId"],"toolCallId":call["id"],"toolName":call["name"],"state":"resolved","isError":request["isError"].as_bool().unwrap_or(false)}}),timestamp)?;
+            Self::append(
+                store,
+                json!({"type":"custom","customType":"pi-rs.in-flight.v1","data":{"requestId":request["requestId"],"toolCallId":call["id"],"toolName":call["name"],"state":"resolved","isError":request["isError"].as_bool().unwrap_or(false)}}),
+                timestamp,
+            )?;
             self.waiting = None;
             self.active_tool = None;
             self.tool_updates.clear();
