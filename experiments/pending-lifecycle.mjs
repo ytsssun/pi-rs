@@ -16,7 +16,12 @@ const notes=manager=>manager.getEntries().filter(e=>e.type==='custom_message');
 try {
  await owner.start();
  const {host,manager}=owner.current;
+ assert.throws(()=>host.actions.sendMessage({customType:"invalid",content:"bad",display:"invalid"},{deliverAs:"nextTurn"}),/invalid nextTurn/);
+ assert.equal(request({op:"runtime",handle:manager.handle,event:"pending_custom"}).length,0);
  send(host);send(host);
+ assert.equal(request({op:"runtime",handle:manager.handle,event:"pending_custom"}).length,2,"Rust owns pending immediately at send time");
+ const view=host.pendingMessages;view[0].message.content="tampered snapshot";
+ assert.equal(request({op:"runtime",handle:manager.handle,event:"pending_custom"})[0].message.content,"same");
  const prepare=host.preparePrompt;
  host.preparePrompt=async()=>{throw Error('injected prepare failure');};
  const before=manager.getEntries();

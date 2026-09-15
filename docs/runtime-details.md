@@ -10,7 +10,7 @@ Extensions can register named provider configurations through the unchanged `pi.
 
 ## Extension message delivery
 
-Custom messages with `triggerTurn:false` and no `deliverAs` are appended after execution and survive restart. `deliverAs:nextTurn` instead stays in the host's in-memory queue until the next drive: Rust validates all custom inputs before appending the user followed by queued messages in FIFO order, and the host removes them only after successful begin. Unconsumed pending messages are lost on process exit, matching pinned upstream; consumed messages persist once. Deterministic reproduction: `node --experimental-strip-types experiments/next-turn-queue.mjs`. This proves native ordering and real subprocess recovery with fixture responses, not live-model scheduling, steering, cancellation, or lifecycle-event parity.
+Custom messages with `triggerTurn:false` and no `deliverAs` are appended after execution and survive restart. `deliverAs:nextTurn` instead is immediately copied into the Rust runtime's process-local queue at send time: Rust validates all custom inputs before appending the user followed by queued messages in FIFO order, and Rust removes them only after successful begin. Unconsumed pending messages are lost on process exit, matching pinned upstream; consumed messages persist once. Deterministic reproduction: `node --experimental-strip-types experiments/next-turn-queue.mjs`. This proves native ordering and real subprocess recovery with fixture responses, not live-model scheduling, steering, cancellation, or lifecycle-event parity.
 
 ## Legacy CLI behavior and recovery
 
