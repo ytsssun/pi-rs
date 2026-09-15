@@ -1,5 +1,7 @@
 # Architecture and feature map
 
+> Ownership clarification (2026-09-15): the target boundary is defined in [AGENTS.md](../AGENTS.md#runtime-ownership). The current driver still selects and removes queued steer/follow-up messages and enforces the dispatch budget in JavaScript. Moving these decisions to Rust is the next migration, not completed work. The snapshot below is historical (2026-09-10); consult [checkpoint](checkpoint.md) and the board for later provider, prompt-resource and session-control slices.
+
 Maintained snapshot: 2026-09-10. Source baseline: `87ccf68`, plus the pending installation verification and unused-accumulator cleanup. This document describes the implementation, not the intended finished product. Upstream reference: Pi `9767ba275f3e9a5ee0f5c5342249b629ab1b2282` ([reference details](upstream.md)).
 
 ## The core loop is small
