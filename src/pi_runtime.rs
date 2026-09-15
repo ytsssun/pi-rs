@@ -110,7 +110,7 @@ impl PiRuntime {
         if op == "enqueue_custom" {
             let message = request["message"].clone();
             if !message["customType"].is_string() || !(message["content"].is_string() || message["content"].is_array()) || !message["display"].is_boolean() { bail!("invalid custom message"); }
-            self.custom_messages.push_back(message);
+            if !self.custom_messages.iter().any(|queued| queued == &message) { self.custom_messages.push_back(message); }
             return Ok(Value::Null);
         }
         if op == "pending_custom" { return Ok(json!(self.custom_messages)); }

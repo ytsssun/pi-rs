@@ -42,3 +42,11 @@ fn native_custom_next_turn_fifo_and_deferred() {
  let a=r.step(&mut s,&json!({"event":"begin","prompt":"go","maxActions":1})).unwrap(); assert_eq!(r.step(&mut s,&json!({"event":"model_result","requestId":a["requestId"],"message":{"role":"assistant","content":[],"stopReason":"stop"}})).unwrap()["type"],"done");
  let es=s.snapshot().unwrap()["entries"].as_array().unwrap().clone(); let got:Vec<_>=es.iter().filter(|e|e["type"]=="custom_message").map(|e|e["customType"].as_str().unwrap()).collect(); assert_eq!(got,["one","two"]); let _=std::fs::remove_file(p);
 }
+
+#[test]
+fn custom_enqueue_is_idempotent_on_retry() {
+ let p=std::env::temp_dir().join(format!("pi-custom-retry-{}.jsonl",std::process::id())); let _=std::fs::remove_file(&p);
+ let mut s=PiSessionStore::create(&p,json!({"type":"session","version":3,"id":"c","cwd":"/tmp","timestamp":"2026-01-01T00:00:00Z"})).unwrap(); let mut r=PiRuntime::default(); let m=json!({"customType":"one","content":"one","display":false});
+ r.step(&mut s,&json!({"event":"enqueue_custom","message":m})).unwrap(); assert!(r.step(&mut s,&json!({"event":"begin","prompt":"bad","nextTurnMessages": [{"customType":"bad"}]})).is_err());
+ r.step(&mut s,&json!({"event":"enqueue_custom","message":m})).unwrap(); let a=r.step(&mut s,&json!({"event":"begin","prompt":"ok"})).unwrap(); assert_eq!(a["type"],"model"); let snap=s.snapshot().unwrap(); let e=snap["entries"].as_array().unwrap(); assert_eq!(e.iter().filter(|x| x["type"]=="custom_message").count(),1); let _=std::fs::remove_file(p);
+}
