@@ -1,0 +1,75 @@
+{
+  "sourceCommit": "1adafc1d6b203ebb95165c0ff6d0b5577e5dda92",
+  "model": "gpt-5.4-mini",
+  "provider": "OpenAI chat completions via parent-held loopback relay",
+  "contextEditing": false,
+  "fixture": false,
+  "manualSteering": 0,
+  "binarySha256": "099ff249f628ae5d0ff778642c9b1994e0e951fe3e5f95e0a3e2bb709a79a19e",
+  "addonSha256": "29ef9e387c79b449488069780df9b90d681e65b982665fdf2f2e418ffd7f5541",
+  "harnessSha256": "a1cafe03797beba6a12d275947c51b16c3da6139fe9d0e2c73a8b609a8466289",
+  "runs": [
+    {
+      "repeat": 0,
+      "stage": 0,
+      "prompt": "Fix the arithmetic bug in this repository and verify the result. Follow the repository instructions.",
+      "exit": 0,
+      "elapsedSeconds": 8.544791792000002,
+      "externalExit": 0,
+      "testsAndInstructionsUnchanged": true,
+      "historyPrefixPreserved": true,
+      "ranRepositoryTests": true,
+      "passed": true,
+      "toolNames": [
+        "read",
+        "read",
+        "read",
+        "edit",
+        "bash"
+      ],
+      "totalTokens": 5176,
+      "missingUsage": 0,
+      "diffSha256": "840e283e44ca28350b4242c132f46d593febca5c1d589c812043dab46d3badf3",
+      "historySha256": "2ee1c24d12c5bf4baaff1029ee506f0710f0edb66e33fc936aadc8d3c38ab1b6",
+      "diffArtifact": "docs/experiments/integrated-live-1adafc1/smoke-0-0.diff"
+    },
+    {
+      "repeat": 0,
+      "stage": 1,
+      "prompt": "Continue the prior task. Add subtract(a,b), preserving addition, and verify subtraction with positive and negative arguments. Follow the repository instructions.",
+      "exit": 0,
+      "elapsedSeconds": 6.738137250000001,
+      "externalExit": 0,
+      "testsAndInstructionsUnchanged": false,
+      "historyPrefixPreserved": true,
+      "ranRepositoryTests": true,
+      "passed": false,
+      "toolNames": [
+        "read",
+        "read",
+        "read",
+        "edit",
+        "bash",
+        "read",
+        "read",
+        "edit",
+        "write",
+        "bash"
+      ],
+      "totalTokens": 8719,
+      "missingUsage": 0,
+      "diffSha256": "75e5fb951c870ad1e55f3819d7a891b056dc95ab093cbfc14d62e8ee4d49e83b",
+      "historySha256": "2ee1c24d12c5bf4baaff1029ee506f0710f0edb66e33fc936aadc8d3c38ab1b6",
+      "diffArtifact": "docs/experiments/integrated-live-1adafc1/smoke-0-1.diff"
+    }
+  ],
+  "limits": [
+    "Host-user tools, not security sandbox",
+    "Two small tasks per repetition; no fork/switch claim",
+    "Acceptance owned by parent and not exposed in workspace; malicious host access not prevented"
+  ],
+  "artifactRoot": "/tmp/pi-integrated-live-smoke",
+  "passedStages": 1,
+  "failedStages": 1,
+  "completeWorkflows": 0
+}

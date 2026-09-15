@@ -1,0 +1,195 @@
+{
+  "sourceCommit": "1adafc1d6b203ebb95165c0ff6d0b5577e5dda92",
+  "model": "gpt-5.4-mini",
+  "provider": "OpenAI chat completions via parent-held loopback relay",
+  "contextEditing": false,
+  "fixture": false,
+  "manualSteering": 0,
+  "binarySha256": "099ff249f628ae5d0ff778642c9b1994e0e951fe3e5f95e0a3e2bb709a79a19e",
+  "addonSha256": "29ef9e387c79b449488069780df9b90d681e65b982665fdf2f2e418ffd7f5541",
+  "harnessSha256": "49df2917afec3455ecc1231c69fce75c2fac2e06abd477925ecebb0a92baf274",
+  "runs": [
+    {
+      "repeat": 0,
+      "stage": 0,
+      "prompt": "Fix the arithmetic bug in this repository and verify the result. Follow the repository instructions.",
+      "exit": 0,
+      "elapsedSeconds": 7.7701315410000005,
+      "externalExit": 0,
+      "testsAndInstructionsUnchanged": true,
+      "integrity": {
+        "AGENTS.md": true,
+        "test_maths.py": true
+      },
+      "historyPrefixPreserved": true,
+      "ranRepositoryTests": true,
+      "passed": true,
+      "toolNames": [
+        "read",
+        "read",
+        "read",
+        "edit",
+        "bash"
+      ],
+      "totalTokens": 6369,
+      "missingUsage": 0,
+      "diffSha256": "840e283e44ca28350b4242c132f46d593febca5c1d589c812043dab46d3badf3",
+      "historySha256": "5a56e678d91f86039276055c2be16981209610e48b1a5745a154c856ca5c788d",
+      "incrementalDiffSha256": "d260a77036e3a4f54fa98529fc0068a68f7ea21937de672d178bb5679684ec98",
+      "diffArtifact": "docs/experiments/integrated-live-1adafc1/three-repetitions-0-0.diff"
+    },
+    {
+      "repeat": 0,
+      "stage": 1,
+      "prompt": "Continue the prior task. Add subtract(a,b), preserving addition, and verify subtraction with positive and negative arguments. Follow the repository instructions.",
+      "exit": 0,
+      "elapsedSeconds": 5.118684291,
+      "externalExit": 0,
+      "testsAndInstructionsUnchanged": false,
+      "integrity": {
+        "AGENTS.md": true,
+        "test_maths.py": false
+      },
+      "historyPrefixPreserved": true,
+      "ranRepositoryTests": true,
+      "passed": false,
+      "toolNames": [
+        "read",
+        "write",
+        "write",
+        "bash"
+      ],
+      "totalTokens": 8282,
+      "missingUsage": 0,
+      "diffSha256": "0697f5db7b1b08dfe25c5b9f3f75d9095b7e4c6513f873d960da646012e971f3",
+      "historySha256": "5a56e678d91f86039276055c2be16981209610e48b1a5745a154c856ca5c788d",
+      "incrementalDiffSha256": "ccab790371b4dc72a28c82c7bfc7141242e0ec076a2015a568ab5b7bdd95fc9c",
+      "diffArtifact": "docs/experiments/integrated-live-1adafc1/three-repetitions-0-1.diff"
+    },
+    {
+      "repeat": 1,
+      "stage": 0,
+      "prompt": "Fix the arithmetic bug in this repository and verify the result. Follow the repository instructions.",
+      "exit": 0,
+      "elapsedSeconds": 5.231444708,
+      "externalExit": 0,
+      "testsAndInstructionsUnchanged": true,
+      "integrity": {
+        "AGENTS.md": true,
+        "test_maths.py": true
+      },
+      "historyPrefixPreserved": true,
+      "ranRepositoryTests": true,
+      "passed": true,
+      "toolNames": [
+        "read",
+        "read",
+        "read",
+        "edit",
+        "bash"
+      ],
+      "totalTokens": 5124,
+      "missingUsage": 0,
+      "diffSha256": "840e283e44ca28350b4242c132f46d593febca5c1d589c812043dab46d3badf3",
+      "historySha256": "97a84703855eb37ed46e02d24a0735ed8c20bda948e99bd88087dd1a38d4f3e3",
+      "incrementalDiffSha256": "d260a77036e3a4f54fa98529fc0068a68f7ea21937de672d178bb5679684ec98",
+      "diffArtifact": "docs/experiments/integrated-live-1adafc1/three-repetitions-1-0.diff"
+    },
+    {
+      "repeat": 1,
+      "stage": 1,
+      "prompt": "Continue the prior task. Add subtract(a,b), preserving addition, and verify subtraction with positive and negative arguments. Follow the repository instructions.",
+      "exit": 0,
+      "elapsedSeconds": 4.458068790999999,
+      "externalExit": 0,
+      "testsAndInstructionsUnchanged": false,
+      "integrity": {
+        "AGENTS.md": true,
+        "test_maths.py": false
+      },
+      "historyPrefixPreserved": true,
+      "ranRepositoryTests": true,
+      "passed": false,
+      "toolNames": [
+        "read",
+        "read",
+        "edit",
+        "write",
+        "bash"
+      ],
+      "totalTokens": 8632,
+      "missingUsage": 0,
+      "diffSha256": "a79d3895b91c1d8b043cd5188f91093c97d3c042fe21e3c7112abf23882dc89c",
+      "historySha256": "97a84703855eb37ed46e02d24a0735ed8c20bda948e99bd88087dd1a38d4f3e3",
+      "incrementalDiffSha256": "d3bbca4cc7e4481a54e14d9b48e654d6036ab2cdbecc8e7a9a077aa338825d2f",
+      "diffArtifact": "docs/experiments/integrated-live-1adafc1/three-repetitions-1-1.diff"
+    },
+    {
+      "repeat": 2,
+      "stage": 0,
+      "prompt": "Fix the arithmetic bug in this repository and verify the result. Follow the repository instructions.",
+      "exit": 0,
+      "elapsedSeconds": 5.5768006660000005,
+      "externalExit": 0,
+      "testsAndInstructionsUnchanged": true,
+      "integrity": {
+        "AGENTS.md": true,
+        "test_maths.py": true
+      },
+      "historyPrefixPreserved": true,
+      "ranRepositoryTests": true,
+      "passed": true,
+      "toolNames": [
+        "read",
+        "read",
+        "read",
+        "write",
+        "bash"
+      ],
+      "totalTokens": 7355,
+      "missingUsage": 0,
+      "diffSha256": "840e283e44ca28350b4242c132f46d593febca5c1d589c812043dab46d3badf3",
+      "historySha256": "499835527ce1f114b27e9c5ff70a0ec75bebd4c7cef6f12322c8fa850d728f8e",
+      "incrementalDiffSha256": "d260a77036e3a4f54fa98529fc0068a68f7ea21937de672d178bb5679684ec98",
+      "diffArtifact": "docs/experiments/integrated-live-1adafc1/three-repetitions-2-0.diff"
+    },
+    {
+      "repeat": 2,
+      "stage": 1,
+      "prompt": "Continue the prior task. Add subtract(a,b), preserving addition, and verify subtraction with positive and negative arguments. Follow the repository instructions.",
+      "exit": 0,
+      "elapsedSeconds": 4.540723249999999,
+      "externalExit": 0,
+      "testsAndInstructionsUnchanged": false,
+      "integrity": {
+        "AGENTS.md": true,
+        "test_maths.py": false
+      },
+      "historyPrefixPreserved": true,
+      "ranRepositoryTests": true,
+      "passed": false,
+      "toolNames": [
+        "read",
+        "read",
+        "edit",
+        "write",
+        "bash"
+      ],
+      "totalTokens": 8551,
+      "missingUsage": 0,
+      "diffSha256": "c4a46b94214146e877f1fecc7131e1a1e0b3b1177776b3417d3a0e85ed9d4d18",
+      "historySha256": "499835527ce1f114b27e9c5ff70a0ec75bebd4c7cef6f12322c8fa850d728f8e",
+      "incrementalDiffSha256": "df7a527bfd28782a418e64bde34309c1806ccd3cab290631c10631cae60b3553",
+      "diffArtifact": "docs/experiments/integrated-live-1adafc1/three-repetitions-2-1.diff"
+    }
+  ],
+  "limits": [
+    "Host-user tools, not security sandbox",
+    "Two small tasks per repetition; no fork/switch claim",
+    "Acceptance owned by parent and not exposed in workspace; malicious host access not prevented"
+  ],
+  "artifactRoot": "/tmp/pi-integrated-live-three",
+  "passedStages": 3,
+  "failedStages": 3,
+  "completeWorkflows": 0
+}
