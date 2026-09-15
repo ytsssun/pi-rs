@@ -65,6 +65,8 @@ jobs:
           node --experimental-strip-types experiments/dispatch-followup-differential.mjs
       - name: User follow-up execution
         run: node --experimental-strip-types experiments/user-followup-execution.mjs
+      - name: Upstream and native user queue modes
+        run: node --experimental-strip-types experiments/user-queue-modes.mjs
       - name: Native user steer boundary
         run: node --experimental-strip-types experiments/user-steer-execution.mjs
       - name: Registered provider CLI
