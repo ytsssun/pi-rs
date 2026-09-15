@@ -1,14 +1,34 @@
+<div align="center">
+
 # pi-rs
 
-[![CI](https://github.com/ytsssun/pi-rs/actions/workflows/ci.yml/badge.svg)](https://github.com/ytsssun/pi-rs/actions/workflows/ci.yml) [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+### Pi’s ecosystem. A Rust core.
 
-**Pi’s coding-agent ecosystem, with a Rust core.**
+A coding-agent runtime built for compatibility—and room to evolve.
 
-pi-rs rewrites the core runtime of [Pi](https://github.com/badlogic/pi-mono) in Rust while keeping its TypeScript/Node.js extension boundary. Rust owns execution decisions, session storage, and context projection; the Node host loads Pi tools and extensions unchanged.
+[![CI](https://github.com/ytsssun/pi-rs/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/ytsssun/pi-rs/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![Status: experimental](https://img.shields.io/badge/status-experimental-orange.svg)](docs/checkpoint.md)
 
-This is an early, headless implementation. Basic coding and session continuation have live-model evidence, but full plugin compatibility and a measured 70–80% feature coverage have **not** been established. See [current status](docs/checkpoint.md) for evidence and limitations.
+[Get started](#get-started) · [Architecture](docs/architecture.md) · [Compatibility](docs/core-parity-matrix.md) · [Documentation](docs/README.md)
 
-## Install
+</div>
+
+pi-rs replaces the core runtime of [Pi](https://github.com/badlogic/pi-mono) with Rust while retaining its TypeScript/Node.js extension boundary. The goal is to keep the Pi ecosystem familiar while making execution, session storage, and context editing independently evolvable.
+
+**Experimental and headless today.** Real-model coding and session continuation have been exercised. Full ecosystem compatibility and drop-in replacement readiness have not been established.
+
+## What works today
+
+- **Coding and continuation:** model/tool turns, durable sessions, and fresh-process resume.
+- **Project context:** AGENTS files, SYSTEM/APPEND_SYSTEM prompts, and selected extension hooks.
+- **Pi extensions:** unchanged TypeScript loading, dynamic tool activation, and registered provider dispatch with bounded acceptance tests.
+- **Session controls:** tested idle newSession, switchSession, and fork workflows.
+- **Context editing:** projected model context while retaining canonical history.
+
+These capabilities have different evidence levels. See the [compatibility inventory](docs/core-parity-matrix.md) and [current checkpoint](docs/checkpoint.md) for exact scope. TUI integration, complete provider/auth support, active cancellation, and the full extension API remain incomplete.
+
+## Get started
 
 On macOS or Linux, install from source with Rust, Node.js 22.19+, npm, Python 3, and Git:
 
@@ -16,54 +36,45 @@ On macOS or Linux, install from source with Rust, Node.js 22.19+, npm, Python 3,
 curl -fsSL https://raw.githubusercontent.com/ytsssun/pi-rs/main/scripts/install.sh | sh
 ```
 
-The installer builds pi-rs and installs the command into `~/.cargo/bin` (or `$CARGO_HOME/bin`). Ensure that directory is on your PATH, then run `pi-rs --help`. It retains the required Node host and runtime files under `~/.local/share/pi-rs`; this is a source installer, not a prebuilt binary download.
-
-Already have a checkout?
+The installer puts `pi-rs` in `~/.cargo/bin` (or `$CARGO_HOME/bin`) and keeps its Node runtime files under `~/.local/share/pi-rs`. Ensure the binary directory is on your PATH. This currently builds from source.
 
 ```sh
-sh scripts/install.sh --source "$PWD"
-```
+pi-rs --help
+export OPENAI_API_KEY='your-api-key'
 
-To use `~/.local/bin` instead, add `--prefix "$HOME/.local"`. See [installation details](docs/installation.md) for updates, removal, and development builds.
-
-## Use
-
-Set `OPENAI_API_KEY` (or place it in a project-local `.env`) and choose a tool-capable model. The current live-verified path uses `gpt-5.6-luna`; run in a disposable repository while evaluating:
-
-```sh
 pi-rs --workspace /absolute/path/to/repo \
   --session /absolute/path/to/session.jsonl \
   --input 'Fix the failing test and run it' --model MODEL_ID
 
 pi-rs --resume --workspace /absolute/path/to/repo \
   --session /absolute/path/to/session.jsonl \
-  --input 'Add a regression test and run it' --model MODEL_ID
+  --input 'Continue the work and verify the result' --model MODEL_ID
 ```
 
-Original Pi tools can modify files and run shell commands with your user permissions. The workspace is not a sandbox. Keep credentials and session artifacts out of commits.
+Choose an available tool-capable model. Tools execute with your user permissions; use a disposable repository while evaluating. The workspace is not a sandbox.
 
-Load an extension with `--extension /absolute/path/to/extension.ts`; repeat the option on resume. Loading an extension does not imply every Pi API or UI feature it uses is supported.
+Load an extension with `--extension /absolute/path/to/extension.ts`; include it again when resuming. Selected extension paths are tested, but successful loading does not establish full API compatibility.
 
-## Verify
+For installation from a checkout, `~/.local/bin`, updates, or removal, see [installation](docs/installation.md).
+
+## Why Rust and Node?
+
+Rust owns the execution loop, session storage, and context projection. The Node host retains Pi’s loader, tool and extension code, and JavaScript-facing state. This keeps JavaScript callbacks and synchronous APIs available while the runtime evolves. See the [architecture](docs/architecture.md) for the ownership boundaries.
+
+Performance is a measurement question: startup, memory, and model/tool latency are separate concerns. We do not claim an end-to-end speedup.
+
+## Development
+
+From a prepared checkout, run the deterministic CLI acceptance:
 
 ```sh
 python3 experiments/formal-cli.py
 ```
 
-This deterministic acceptance uses scripted model messages and actual tools: write, fresh-process resume/edit, and rejection by an unchanged upstream extension. It does not call a live model. For a real provider/tool/recovery check, repeat the two commands above with a temporary workspace; evidence and known gaps are maintained in the [checkpoint](docs/checkpoint.md).
+It uses scripted model responses and actual tools; it is not a live-model test. Build instructions, runtime details, historical evidence, and legacy comparisons are indexed in the [documentation](docs/README.md). Contributions should follow [AGENTS.md](AGENTS.md).
 
-The current usable slice is headless coding with the original Pi tools, OpenAI-compatible model calls, session recovery, context projection, and selected extension bindings. UI prompts, provider OAuth, full lifecycle scheduling, and complete extension parity remain under development. Do not treat the project as a drop-in replacement yet.
+## Upstream and license
 
-## Project
+pi-rs builds on [Pi](https://github.com/badlogic/pi-mono). The upstream reference is pinned for reproducible compatibility checks; see [upstream provenance](docs/upstream.md) and [NOTICE](NOTICE).
 
-- [Architecture and feature map](docs/architecture.md)
-
-- [Checkpoint and evidence](docs/checkpoint.md)
-- [Runtime details](docs/runtime-details.md)
-- [Pinned upstream reference](docs/upstream.md)
-- [Architecture decision](docs/architecture-decision.md)
-- [Contribution guide](AGENTS.md)
-
-The previous snapshot-based runtime remains available as `pi-rs-legacy` for regression comparisons. Its session format, fixture schema, and permission flags differ; see [legacy CLI notes](docs/legacy-cli-guide.md). Existing legacy sessions are not automatically migrated.
-
-MIT licensed. Upstream Pi is MIT licensed; its source is retained at the pinned reference. No end-to-end speed or memory advantage is claimed without measurements.
+Both pi-rs and the referenced Pi source are MIT licensed. See [LICENSE](LICENSE).
