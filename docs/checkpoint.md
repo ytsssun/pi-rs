@@ -1,8 +1,8 @@
 # Current checkpoint
 
-Main f0e9960 includes PR29 idle same-workspace switchSession. Exact head 960a429 CI 34906281373/34906278349 and merge CI succeeded. Independently reproduced formal registered-provider switching including prompt resources, real tool result, source-file preservation and saved-model process resume. Active switching/cross-workspace behavior remains unsupported.
+PR30 merged as 1adafc1 after exact-head CI 34913314881/34913311601 passed. Independent fork/switch fixtures passed. Idle fork now creates a distinct native session with before/at history selection and selectedText; no full tree UI/active-fork claim.
 
-Active task session_fork_core implements missing fork command. Pinned semantics: default before-user excludes selected user and returns selectedText; at-entry retains selection. Require a new native session/file, correct ancestry/parent metadata against upstream, source bytes unchanged, veto/invalid selection safety, callback/tool continuation and process resume. Existing branch selection is not a substitute for fork. Worker owns isolated implementation; CI before integration.
+Active milestone integrated_live_dogfood: validate accumulated prompt/resources/session/tool changes together using existing authorized model access, not another isolated fixture. Disposable repository, protected external checks, AGENTS instruction, bugfix/test then fresh-process continuation; serial runs and three repetitions after smoke if access works. Record SHA/config/diff/traces/usage/time/failure/steering and sanitized checkpoint. Worker must preserve failures and distinguish missing access from model/tool/runtime defects. No new credentials or internal access.
 
 ## Historical checkpoint
 
