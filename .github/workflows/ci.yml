@@ -47,6 +47,7 @@ jobs:
         run: |
           node --experimental-strip-types experiments/cli-new-session.mjs
           node --experimental-strip-types experiments/cli-switch-session.mjs
+          node --experimental-strip-types experiments/cli-fork-session.mjs
           node --experimental-strip-types experiments/cli-switch-provider.mjs
           node --experimental-strip-types experiments/session-owner-failures.mjs
           node --experimental-strip-types experiments/with-session-contract.mjs
