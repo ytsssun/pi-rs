@@ -14,6 +14,8 @@ export async function createBackend({path,cwd=process.cwd(),mode='create',parent
   }
   return {handle,snapshot,appendRaw:append,
     enqueueUser:queued=>call({op:"runtime",event:"enqueue_user",queued}),
+    enqueueCustom:message=>call({op:"runtime",event:"enqueue_custom",message}),
+    pendingCustom:()=>call({op:"runtime",event:"pending_custom"}),
     pendingUsers:()=>call({op:"runtime",event:"pending_users"}),
     appendPreserved:entry=>call({op:'append',entry}),
     // Synchronous compatibility methods required by unchanged Pi tool context.
