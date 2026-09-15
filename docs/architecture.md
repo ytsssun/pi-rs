@@ -1,6 +1,6 @@
 # Architecture and feature map
 
-> Ownership clarification (2026-09-15): the target boundary is defined in [AGENTS.md](../AGENTS.md#runtime-ownership). The current driver still selects and removes queued steer/follow-up messages and enforces the dispatch budget in JavaScript. Moving these decisions to Rust is the next migration, not completed work. The snapshot below is historical (2026-09-10); consult [checkpoint](checkpoint.md) and the board for later provider, prompt-resource and session-control slices.
+> Ownership update (2026-09-15): the target boundary is defined in [AGENTS.md](../AGENTS.md#runtime-ownership). Default user steer/follow-up selection now lives in Rust; the JS dispatch budget and custom/nextTurn queues remain migration work. The original snapshot below dates from 2026-09-10, with this queue update applied; consult [checkpoint](checkpoint.md) and the board for later provider, prompt-resource and session-control slices.
 
 Maintained snapshot: 2026-09-10. Source baseline: `87ccf68`, plus the pending installation verification and unused-accumulator cleanup. This document describes the implementation, not the intended finished product. Upstream reference: Pi `9767ba275f3e9a5ee0f5c5342249b629ab1b2282` ([reference details](upstream.md)).
 
@@ -20,7 +20,7 @@ repeat:
 
 Recovery, cancellation, tool validation, provider protocols and extension callbacks complicate the boundaries. They should not require multiple competing implementations of this loop.
 
-The current implementation is a hybrid: Rust decides the next action and persists results; JavaScript dispatches model/tool effects and runs unchanged Pi code. “Rust core” does not mean all control flow currently lives in Rust. In particular, the JavaScript driver contains iteration limits, extension message ordering and error handling.
+The current implementation is a hybrid: Rust decides the next action and persists results; JavaScript dispatches model/tool effects and runs unchanged Pi code. “Rust core” does not mean all control flow currently lives in Rust. Rust now owns the in-memory user steer/followUp queues, selection at a normal final-response boundary, and removal after successful admission. The JavaScript driver still contains the 32-action iteration limit, custom/nextTurn message handling and parts of error handling. This bounded migration does not complete the target ownership boundary.
 
 ## What actually runs
 
@@ -44,6 +44,7 @@ There is one Node host process after the Unix Rust launcher replaces itself with
 | Installed executable | `src/main.rs` | Launches Node with checkout-relative assets resolved from the compile-time source directory. |
 | CLI configuration | `bin/pi-rs.mjs` → `bin/pi-native.mjs` | Parses input/session/model flags, loads dependencies, constructs host and runtime. |
 | Action decisions | `src/pi_runtime.rs` | Receives begin/model/tool events; yields model, tool, tool_batch or done actions. |
+| User scheduling | `src/pi_runtime.rs` (`enqueue_user`, `pending_users`, `advance_queued`) | Default one-at-a-time, FIFO per mode, steer before followUp, terminal failure/cancel retention; pending messages are in memory, consumed messages canonical. JS forwards requests and observes returned admissions. |
 | Effect dispatch | `prototype/architecture/native-runtime-driver.mjs` | Runs model requests and original tools, invokes hooks, sends results back to Rust; capped at 32 dispatch iterations. |
 | Node-API bridge | `prototype/native-session.rs`, `prototype/architecture/native-store-backend.mjs` | JSON request/response interface and native handles. Despite their directory names, these files are on the default CLI path. |
 | Canonical session history | `src/pi_session_store.rs`, `src/pi_session_index.rs` | File-backed entries and branch context. JS supplies some entry metadata. |

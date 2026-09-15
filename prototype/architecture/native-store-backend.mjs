@@ -13,6 +13,8 @@ export async function createBackend({path,cwd=process.cwd(),mode='create',parent
     return call({op:'append',entry:{...payload,id:'e'+next++,timestamp:new Date().toISOString()}});
   }
   return {handle,snapshot,appendRaw:append,
+    enqueueUser:queued=>call({op:"runtime",event:"enqueue_user",queued}),
+    pendingUsers:()=>call({op:"runtime",event:"pending_users"}),
     appendPreserved:entry=>call({op:'append',entry}),
     // Synchronous compatibility methods required by unchanged Pi tool context.
     getSessionId:()=>snapshot().header?.id,

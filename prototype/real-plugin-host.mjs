@@ -74,9 +74,8 @@ export async function createHost(backend, { factories = [], cwd = process.cwd(),
     if (entry?.customType === 'session_name') sessionName = entry.data?.name;
     if (entry?.customType === 'session_label') labels.set(String(entry.data?.key), String(entry.data?.value));
   }
-  // Messages are queued at the host boundary; the outer runtime drains this
-  // queue after extension dispatch. Keeping the queue explicit makes the
-  // contract deterministic without pretending to run a provider here.
+  // Only custom/legacy messages stay here. Native user steer/followUp requests
+  // are forwarded immediately to the Rust session runtime, including while busy.
   const pendingMessages = [];
   let activeDrive;
   const beginDrive = () => {
@@ -96,7 +95,11 @@ export async function createHost(backend, { factories = [], cwd = process.cwd(),
         : undefined;
       pendingMessages.push({ kind: 'agent', message, options, ...(sessionMessage ? {sessionMessage} : {}) });
     },
-    sendUserMessage: (message, options) => { pendingMessages.push({ kind: 'user', message, options }); },
+    sendUserMessage: (message, options) => {
+      const queued = {kind:'user', message, options};
+      if (typeof sessionManager?.handle === 'string' && ['steer','followUp'].includes(options?.deliverAs)) sessionManager.enqueueUser(queued);
+      else pendingMessages.push(queued);
+    },
     appendEntry: (customType, data) => {
       assert.ok(sessionManager && typeof sessionManager.appendCustomEntry === 'function', 'sessionManager.appendCustomEntry required');
       sessionManager.appendCustomEntry(customType, data);
@@ -130,7 +133,7 @@ export async function createHost(backend, { factories = [], cwd = process.cwd(),
   const contextActions = Object.fromEntries([
     'getSignal',
   ].map((name) => [name, unsupported(name)]));
-  Object.assign(contextActions, { getSignal: () => lifecycleAbort.signal, getScopedModels: () => [...providers.values()].flatMap(p => Array.isArray(p.models) ? p.models : []), getSystemPrompt: () => currentSystemPrompt, getSystemPromptOptions: () => currentPromptOptions, abort: () => { lifecycleAbort.abort(); runner.invalidate('aborted by extension'); }, shutdown: () => runner.invalidate('shutdown requested'), getModel: () => selectedModel, isIdle: () => activeDrive === undefined, isProjectTrusted: () => true, hasPendingMessages: () => pendingMessages.length > 0 });
+  Object.assign(contextActions, { getSignal: () => lifecycleAbort.signal, getScopedModels: () => [...providers.values()].flatMap(p => Array.isArray(p.models) ? p.models : []), getSystemPrompt: () => currentSystemPrompt, getSystemPromptOptions: () => currentPromptOptions, abort: () => { lifecycleAbort.abort(); runner.invalidate('aborted by extension'); }, shutdown: () => runner.invalidate('shutdown requested'), getModel: () => selectedModel, isIdle: () => activeDrive === undefined, isProjectTrusted: () => true, hasPendingMessages: () => pendingMessages.length > 0 || (typeof sessionManager?.handle === 'string' && sessionManager.pendingUsers().length > 0) });
   Object.assign(contextActions, { getContextUsage: () => { const entries = typeof sessionManager.getEntries === 'function' ? sessionManager.getEntries() : []; return estimateContextTokens(entries.flatMap(sessionEntryToContextMessages)); }, compact: async (options = {}) => { assert.ok(typeof sessionManager.appendCompaction === 'function', 'sessionManager.appendCompaction required'); return sessionManager.appendCompaction(String(options.summary ?? ''), options.firstKeptEntryId, Number(options.tokensBefore ?? 0)); } });
   runner.bindCore(actions, contextActions);
   const waitForIdle = () => activeDrive ?? Promise.resolve();
@@ -151,8 +154,9 @@ export async function createHost(backend, { factories = [], cwd = process.cwd(),
     assert.ok(definition, `unregistered tool: ${name}`);
     return { name, description: definition.description, parameters: definition.parameters };
   });
-  return { preparePrompt, modelRuntime, beginDrive, waitForIdle, runner, eventBus, errors, providers, modelRegistry, contextActions, execute, requestTools, runtime: loaded.runtime, actions, pendingMessages, peekNextTurnMessages: () => pendingMessages.filter(q => q.options?.deliverAs === 'nextTurn'),
+  return { preparePrompt, modelRuntime, beginDrive, waitForIdle, runner, eventBus, errors, providers, modelRegistry, contextActions, execute, requestTools, runtime: loaded.runtime, actions, get pendingMessages() { return typeof sessionManager?.handle === 'string' ? [...pendingMessages,...sessionManager.pendingUsers()] : pendingMessages; }, peekNextTurnMessages: () => pendingMessages.filter(q => q.options?.deliverAs === 'nextTurn'),
     acknowledgeNextTurnMessages: messages => { for (const message of messages) { const index = pendingMessages.indexOf(message); if (index >= 0) pendingMessages.splice(index, 1); } },
+    restoreMessages: messages => pendingMessages.unshift(...messages),
     drainMessages: () => { const ready = pendingMessages.filter(q => q.options?.deliverAs !== 'nextTurn'); for (const message of ready) pendingMessages.splice(pendingMessages.indexOf(message), 1); return ready; } };
 }
 
