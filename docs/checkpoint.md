@@ -6,7 +6,9 @@ Live-model evidence remains 0/3 complete protected-test workflows; [results](exp
 
 ## Current critical path
 
-Worker is implementing and comparing upstream `all` / `one-at-a-time` user queue modes from `d7a2338` in an isolated worktree. Acceptance: executable pinned-upstream oracle, FIFO and mode-specific model contexts, steer priority, error/abort retention, default behavior unchanged. Selection belongs in Rust. Scope remains the supported final-response boundary; tool-boundary steering and full lifecycle are separate gaps. Coordinator must independently reproduce and require exact-SHA CI before integration.
+PR #44 merged as `7f38537`: `all` / `one-at-a-time` user queue modes passed six executed upstream/native context comparisons and CI runs 35021981722 / 35021986171. Scope remains final-response boundary.
+
+Current task: actual tool-boundary steering comparison. Audit commit `81e88c4` is not integrated: its upstream half never executes a tool, so its compatibility conclusion is rejected. Native observed context delays steer until after one additional model call. Pinned `agent-loop.ts:257` polls steering after tool results/turn_end; this suggests a real timing gap, pending equivalent executed oracle. Worker is replacing the unrelated upstream smoke with the same tool scenario on both sides. Acceptance: equal inputs, tool-time enqueue, recorded next-model contexts, execution count and signal state; then implement the smallest Rust-owned correction supported by that evidence.
 
 PR #43 required repairs for omitted display normalization, Rust-backed nextTurn inspection, and preserving invalid user-nextTurn rejection before provider calls. Earlier local subsets missed these interactions; run combined replacement and steer gates after inspection API changes. Failed CI remains recorded in the board.
 
