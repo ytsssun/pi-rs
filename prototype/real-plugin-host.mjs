@@ -90,7 +90,7 @@ export async function createHost(backend, { factories = [], cwd = process.cwd(),
   Object.assign(actions, {
     sendMessage: (message, options) => {
       if (options?.deliverAs === 'nextTurn' && typeof sessionManager?.handle === 'string') {
-        sessionManager.enqueueCustom({...message, content:message.content ?? []});
+        sessionManager.enqueueCustom({...message, content:message.content ?? [], display:message.display ?? false});
         return;
       }
       // Capture the custom event payload at admission, as AgentSession does.
