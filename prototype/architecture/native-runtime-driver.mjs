@@ -18,10 +18,12 @@ export async function drive(options) {
 async function driveActive({manager,host,prompt,stream,trace=[],onToolUpdate=()=>{},onMessage,onSessionEvent,propagateUpdateErrors=false,parallel=false,signal}) {
   const step=payload=>{ const now=Date.now(); return request({op:'runtime',handle:manager.handle,timestamp:new Date(now).toISOString(),messageTimestamp:now,...payload}); };
   const pending = host.peekNextTurnMessages?.() ?? [];
-  const nextTurnMessages = pending.map(queued => {
+  const nextTurnMessages = [];
+  for (const queued of pending) {
     if (queued.kind !== 'agent') throw Error('nextTurn requires a custom message');
-    return queued.message;
-  });
+    const message = queued.message;
+    step({event:'enqueue_custom', message});
+  }
   const preparedPrompt = await host.preparePrompt(prompt);
   nextTurnMessages.push(...preparedPrompt.messages.map(message => ({...message, content: message.content ?? []})));
   let action=step({event:'begin',prompt,parallel,nextTurnMessages});
