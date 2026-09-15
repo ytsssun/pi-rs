@@ -109,17 +109,33 @@ impl PiRuntime {
         }
         if op == "enqueue_custom" {
             let message = request["message"].clone();
-            if !message["customType"].is_string() || !(message["content"].is_string() || message["content"].is_array()) || !message["display"].is_boolean() { bail!("invalid nextTurn custom message"); }
+            if !message["customType"].is_string()
+                || !(message["content"].is_string() || message["content"].is_array())
+                || !message["display"].is_boolean()
+            {
+                bail!("invalid nextTurn custom message");
+            }
             let id = request["queueId"].clone();
-            if !id.is_null() && !id.is_string() { bail!("queueId must be a string"); }
-            if let Some(existing) = self.custom_messages.iter().find(|q| !id.is_null() && q["queueId"] == id) {
-                if existing["message"] != message { bail!("queueId payload mismatch"); }
+            if !id.is_null() && !id.is_string() {
+                bail!("queueId must be a string");
+            }
+            if let Some(existing) = self
+                .custom_messages
+                .iter()
+                .find(|q| !id.is_null() && q["queueId"] == id)
+            {
+                if existing["message"] != message {
+                    bail!("queueId payload mismatch");
+                }
             } else {
-                self.custom_messages.push_back(json!({"queueId":id,"message":message}));
+                self.custom_messages
+                    .push_back(json!({"queueId":id,"message":message}));
             }
             return Ok(Value::Null);
         }
-        if op == "pending_custom" { return Ok(json!(self.custom_messages)); }
+        if op == "pending_custom" {
+            return Ok(json!(self.custom_messages));
+        }
         if op == "pending_users" {
             return Ok(json!(self.user_messages));
         }
@@ -207,9 +223,18 @@ impl PiRuntime {
             if self.waiting.is_some() {
                 bail!("runtime already awaiting completion");
             }
-            let supplied = request.get("nextTurnMessages").cloned().unwrap_or(json!([]));
-            let supplied = supplied.as_array().context("nextTurnMessages must be an array")?;
-            let mut owned = self.custom_messages.iter().map(|q| q["message"].clone()).collect::<Vec<_>>();
+            let supplied = request
+                .get("nextTurnMessages")
+                .cloned()
+                .unwrap_or(json!([]));
+            let supplied = supplied
+                .as_array()
+                .context("nextTurnMessages must be an array")?;
+            let mut owned = self
+                .custom_messages
+                .iter()
+                .map(|q| q["message"].clone())
+                .collect::<Vec<_>>();
             owned.extend(supplied.iter().cloned());
             let queued = owned.as_slice();
             for message in queued {
@@ -278,8 +303,12 @@ impl PiRuntime {
             }
             self.custom_messages.clear();
             self.terminal_failure = false;
-            self.action_count = 0;
-            self.max_actions = request["maxActions"].as_u64().unwrap_or(32) as u32;
+            if request["driveStart"] == true {
+                self.action_count = 0;
+            }
+            if request.get("maxActions").is_some() {
+                self.max_actions = request["maxActions"].as_u64().unwrap_or(32) as u32;
+            }
             self.parallel = request["parallel"].as_bool().unwrap_or(false);
             return self.next(store);
         }
