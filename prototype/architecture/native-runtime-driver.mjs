@@ -29,12 +29,12 @@ async function driveActive({manager,host,prompt,stream,trace=[],onToolUpdate=()=
   }
   const preparedPrompt = await host.preparePrompt(prompt);
   nextTurnMessages.push(...preparedPrompt.messages.map(message => ({...message, content: message.content ?? []})));
-  let action=step({event:'begin',prompt,parallel,nextTurnMessages});
+  let action=step({event:'begin',prompt,parallel,nextTurnMessages,driveStart:true,maxActions:32});
   // Acknowledge only after Rust accepts and appends the user plus queued messages.
   host.acknowledgeNextTurnMessages?.(pending);
   const consumedMessages = [];
   trace.push({type:'turn_start'});
-  for(let count=0;count<32;count++) {
+  for(let count=0;;count++) {
     if(action.type==='done') {
       const scheduled = step({event:'advance_queued',parallel,cancelled:signal.aborted});
       if (scheduled.type === 'retained') {
