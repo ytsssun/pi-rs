@@ -1,13 +1,15 @@
 # Current checkpoint
 
-Main `85e0c03` includes PR #34 user queues, PR #36 custom nextTurn staging, and PR #37 drive-level Rust budget. These are deterministic verified slices, not full Pi parity. Node still holds nextTurn pending handles and deferred custom delivery. Live evidence remains 0/3 complete protected-test workflows; see [results](experiments/integrated-live-1adafc1/README.md).
+Main `d7a2338` includes Rust user queues, a drive-level action budget with admission-safety checks, and send-time nextTurn storage. PR #43 head `cb9ca6ea907bfff700cd50a74ffa6a3d8161876b` passed CI runs 35015384939 and 35015394505. Native lifecycle fixtures cover retry, independent identical sends, snapshots, and idle replacement. Node still dispatches effects, invokes upstream hooks, and handles deferred custom delivery. This is partial Pi compatibility, not a completed core replacement.
 
-Independent budget audit found that rejected follow-up admission could append input before detecting exhaustion, leaving the same message queued. PR #38 (`462efea`) moves that check before persistence; exact CI passed. `cargo test --locked --test budget_admission` failed before the fix and passed after; the repair is merged. The immediate critical path is pending-handle lifecycle verification. The earlier 15/16 tool-round fixture did not cover this case.
+Live-model evidence remains 0/3 complete protected-test workflows; [results](experiments/integrated-live-1adafc1/README.md). No new live calls were made during queue migration. Rust budget fixtures prove bounded tool/follow-up execution, not exact equivalence to every old JS done-iteration count or upstream default limits.
 
-The action-generation counter now lives in Rust. PR #39 (`85e0c03`) verifies 32 no-tool follow-up actions consume one drive budget; the 33rd is rejected and one unadmitted message remains queued. This is fixture-only. Pending lifecycle fixture independently passed on real host/native store: four prompt-preparation failures, two identical sends retained without duplicates, and idle replacement without message leakage. CI integration is pending. Next is moving nextTurn storage from Node pending handles into Rust at send time, preserving these regressions, then queue-mode differential testing. Preserve existing acceptance; retain failures and distinguish runtime policy from upstream defaults.
+## Current critical path
 
-Nine leftover modified files were independently reproduced as exact rustfmt output from HEAD and preserved in a named git stash. Prior attribution to other workers was unsupported and is superseded. Use file-scoped formatting to avoid repeating this.
+Worker is implementing and comparing upstream `all` / `one-at-a-time` user queue modes from `d7a2338` in an isolated worktree. Acceptance: executable pinned-upstream oracle, FIFO and mode-specific model contexts, steer priority, error/abort retention, default behavior unchanged. Selection belongs in Rust. Scope remains the supported final-response boundary; tool-boundary steering and full lifecycle are separate gaps. Coordinator must independently reproduce and require exact-SHA CI before integration.
+
+PR #43 required repairs for omitted display normalization, Rust-backed nextTurn inspection, and preserving invalid user-nextTurn rejection before provider calls. Earlier local subsets missed these interactions; run combined replacement and steer gates after inspection API changes. Failed CI remains recorded in the board.
 
 ## History
 
-[Archived handoffs](checkpoint-history.md) and [board](board.jsonl) preserve earlier claims and corrections.
+[Archived handoffs](checkpoint-history.md) and [board](board.jsonl) preserve evidence and corrections. The named coordinator rustfmt stash preserves nine unrelated formatting-only files; no worker ownership is inferred.
