@@ -41,6 +41,29 @@ impl PiRuntime {
         entry["timestamp"] = json!(timestamp);
         store.append(entry)
     }
+    fn after_tools(&mut self, store: &mut PiSessionStore, request: &Value) -> Result<Value> {
+        if self.tools.is_empty() && request["cancelled"] != true {
+            let indices: Vec<usize> = self.user_messages.iter().enumerate()
+                .filter(|(_, q)|q["options"]["deliverAs"] == "steer")
+                .map(|(i,_)|i).take(if self.steering_all {usize::MAX} else {1}).collect();
+            if !indices.is_empty() {
+                let max = if self.max_actions == 0 {32} else {self.max_actions};
+                if self.action_count >= max {bail!("bounded fixture action limit exceeded");}
+                let mut contents = Vec::new();
+                for &i in &indices {
+                    let message = &self.user_messages[i]["message"];
+                    let content = if message.is_string() {message} else {&message["content"]};
+                    if !content.is_string() && !content.is_array() {bail!("Invalid queued user content");}
+                    contents.push(content.clone());
+                }
+                for content in contents {
+                    Self::append(store,json!({"type":"message","message":{"role":"user","content":content,"timestamp":request["messageTimestamp"].as_u64().unwrap_or(0)}}),request["timestamp"].as_str().unwrap_or("2026-01-01T00:00:00.000Z"))?;
+                }
+                for i in indices.into_iter().rev() {self.user_messages.remove(i);}
+            }
+        }
+        self.next(store)
+    }
     fn next(&mut self, store: &PiSessionStore) -> Result<Value> {
         let max = if self.max_actions == 0 {
             32
@@ -387,7 +410,7 @@ impl PiRuntime {
             if all_terminate {
                 return Ok(json!({"type":"done","reason":"all_tools_terminated"}));
             }
-            return self.next(store);
+            return self.after_tools(store, request);
         }
         if op == "tool_update" {
             let call = self.active_tool.as_ref().context("no active tool")?;
@@ -505,6 +528,6 @@ impl PiRuntime {
             self.active_tool = None;
             self.tool_updates.clear();
         }
-        self.next(store)
+        if op == "tool_result" { self.after_tools(store, request) } else { self.next(store) }
     }
 }
