@@ -1,8 +1,10 @@
 # Current checkpoint
 
-PR30 merged as 1adafc1 after exact-head CI 34913314881/34913311601 passed. Independent fork/switch fixtures passed. Idle fork now creates a distinct native session with before/at history selection and selectedText; no full tree UI/active-fork claim.
+Main `7b59ab5` contains the last verified live smoke artifact: stage 0 passed, while stage 1 failed because the model modified protected `test_maths.py`. The failure is preserved at `/tmp/pi-integrated-live-smoke`; no acceptance was lowered. The integrated live harness is rerunning three clean repetitions with incremental usage and per-file integrity reporting.
 
-Active milestone integrated_live_dogfood: validate accumulated prompt/resources/session/tool changes together using existing authorized model access, not another isolated fixture. Disposable repository, protected external checks, AGENTS instruction, bugfix/test then fresh-process continuation; serial runs and three repetitions after smoke if access works. Record SHA/config/diff/traces/usage/time/failure/steering and sanitized checkpoint. Worker must preserve failures and distinguish missing access from model/tool/runtime defects. No new credentials or internal access.
+Completed recent core slices include project instructions, SYSTEM/APPEND resources, provider dispatch, before-agent-start/context hooks, active-tool enforcement, followUp/steer boundaries, withSession, switchSession and idle fork. These are bounded deterministic slices; full Pi core replacement is not claimed. The selected 37-row matrix remains provisional: 33 partial, 3 unknown, 1 missing; it is not an exhaustive denominator or percentage.
+
+Next: finish the live repetitions and then close the largest remaining extension/session contract gap with unchanged upstream plugins and exact CI evidence.
 
 ## Historical checkpoint
 

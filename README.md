@@ -1,5 +1,7 @@
 # pi-rs
 
+[![CI](https://github.com/ytsssun/pi-rs/actions/workflows/ci.yml/badge.svg)](https://github.com/ytsssun/pi-rs/actions/workflows/ci.yml) [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+
 **Pi’s coding-agent ecosystem, with a Rust core.**
 
 pi-rs rewrites the core runtime of [Pi](https://github.com/badlogic/pi-mono) in Rust while keeping its TypeScript/Node.js extension boundary. Rust owns execution decisions, session storage, and context projection; the Node host loads Pi tools and extensions unchanged.
