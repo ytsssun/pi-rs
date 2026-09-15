@@ -57,6 +57,8 @@ jobs:
         run: node --experimental-strip-types experiments/deferred-custom-message.mjs
       - name: Verify nextTurn FIFO and subprocess recovery
         run: node --experimental-strip-types experiments/next-turn-queue.mjs
+      - name: Staged custom message lifecycle
+        run: node --experimental-strip-types experiments/pending-lifecycle.mjs
       - name: Native dispatch budget boundaries
         run: |
           node --experimental-strip-types experiments/dispatch-budget.mjs
