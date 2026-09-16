@@ -41,7 +41,7 @@ async function driveActive({manager,host,prompt,stream,trace=[],onToolUpdate=()=
       if(scheduled.type==='ending'){action=scheduled.action;continue;}
       if (scheduled.type === 'retained') {
         trace.push({type:'turn_end',consumedMessages:0});
-        return {action,trace,consumedMessages};
+        return {action: {type:'done'},trace,consumedMessages};
       }
       if (scheduled.type === 'admitted') {
         action = scheduled.action;
