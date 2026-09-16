@@ -1,14 +1,20 @@
 import {request} from './native-store-backend.mjs';
 import {assembleNativeQueue} from './native-stream-bridge.mjs';
 
+export function nativeContextMessages(model, context) {
+  const supportsDeveloperRole=model?.compat?.supportsDeveloperRole??(model?.provider==='openai');
+  const role=model?.reasoning&&supportsDeveloperRole?'developer':'system';
+  return context.systemPrompt?[{role,content:context.systemPrompt},...context.messages]:context.messages;
+}
+
 // Adapt the synchronous native provider operation to the StreamFn-shaped seam
 // consumed by the existing JS driver. The model request and credentials remain Rust-owned.
 export function nativeProviderStream({model,reasoningEffort,streaming=false}={}) {
   return async (_model, context) => {
-    const messages=context.systemPrompt?[{role:'system',content:context.systemPrompt},...context.messages]:context.messages;
+    const messages=nativeContextMessages(_model,context);
     if (streaming) {
       const selectedModel=model||_model?.id||process.env.PI_RS_MODEL||'gpt-5.6-luna';
-      const handle=request({op:'provider_stream_start',model:selectedModel,messages,tools:context.tools||[],reasoning_effort:reasoningEffort||'none',base_url:_model?.baseUrl,capacity:256});
+      const handle=request({op:'provider_stream_start',model:selectedModel,messages,tools:context.tools||[],reasoning_effort:reasoningEffort,base_url:_model?.baseUrl,capacity:256});
       let canonical;
       try { canonical=assembleNativeQueue(request,handle); }
       finally { request({op:'queue_close',handle}); }
@@ -18,7 +24,7 @@ export function nativeProviderStream({model,reasoningEffort,streaming=false}={})
       const message={...canonical,role:'assistant',model:selectedModel,provider:_model?.provider||'openai',api:_model?.api||'openai-completions',timestamp:Date.now()};
       return {async *[Symbol.asyncIterator](){yield {type:'done'};},async result(){return message;}};
     }
-    const raw=request({op:'provider_chat',model:model||_model?.id||process.env.PI_RS_MODEL||'gpt-5.6-luna',messages,tools:context.tools||[],reasoning_effort:reasoningEffort||'none',base_url:_model?.baseUrl});
+    const raw=request({op:'provider_chat',model:model||_model?.id||process.env.PI_RS_MODEL||'gpt-5.6-luna',messages,tools:context.tools||[],reasoning_effort:reasoningEffort,base_url:_model?.baseUrl});
     const message=toPiAssistant(raw,model||_model?.id||process.env.PI_RS_MODEL||'gpt-5.6-luna');
     return {async *[Symbol.asyncIterator](){yield {type:'done'};},async result(){return message;}};
   };
