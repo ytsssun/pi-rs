@@ -1,0 +1,86 @@
+[
+  {
+    "input": [
+      {
+        "role": "assistant",
+        "content": [
+          {
+            "type": "text",
+            "text": "I will inspect the code."
+          },
+          {
+            "type": "toolCall",
+            "id": "call_1",
+            "name": "read",
+            "arguments": {
+              "path": "maths.py"
+            }
+          }
+        ],
+        "stopReason": "toolUse",
+        "model": "fixture",
+        "provider": "openai",
+        "api": "openai-completions",
+        "timestamp": 1
+      },
+      {
+        "role": "toolResult",
+        "toolCallId": "call_1",
+        "toolName": "read",
+        "content": [
+          {
+            "type": "text",
+            "text": "file contents"
+          }
+        ],
+        "isError": false,
+        "timestamp": 2
+      }
+    ],
+    "expected": [
+      {
+        "role": "assistant",
+        "content": "I will inspect the code.",
+        "tool_calls": [
+          {
+            "id": "call_1",
+            "type": "function",
+            "function": {
+              "name": "read",
+              "arguments": "{\"path\":\"maths.py\"}"
+            }
+          }
+        ]
+      },
+      {
+        "role": "tool",
+        "content": "file contents",
+        "tool_call_id": "call_1"
+      }
+    ]
+  },
+  {
+    "input": [
+      {
+        "role": "assistant",
+        "content": [
+          {
+            "type": "text",
+            "text": "Done."
+          }
+        ],
+        "stopReason": "stop",
+        "model": "fixture",
+        "provider": "openai",
+        "api": "openai-completions",
+        "timestamp": 1
+      }
+    ],
+    "expected": [
+      {
+        "role": "assistant",
+        "content": "Done."
+      }
+    ]
+  }
+]

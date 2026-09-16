@@ -79,7 +79,14 @@ fn chat_request(model: &str, messages: &[Value], tools: &Value, reasoning_effort
         let role=m["role"].as_str().unwrap_or("");
         if role=="user" { let content=m["content"].as_str().map(|s|json!(s)).unwrap_or_else(||json!(m["content"].as_array().map(|a|a.iter().filter_map(|b|b["text"].as_str()).collect::<Vec<_>>().join("")))); return json!({"role":"user","content":content}); }
         if role=="toolResult" { return json!({"role":"tool","tool_call_id":m["toolCallId"],"content":m["content"].as_array().map(|a|a.iter().filter_map(|b|b["text"].as_str()).collect::<Vec<_>>().join("")).unwrap_or_default()}); }
-        if role=="assistant" { let calls=m["content"].as_array().map_or(&[][..], |v| &v[..]).iter().filter(|b|b["type"]=="toolCall").map(|b|json!({"id":b["id"],"type":"function","function":{"name":b["name"],"arguments":b["arguments"].to_string()}})).collect::<Vec<_>>(); if !calls.is_empty(){return json!({"role":"assistant","content":null,"tool_calls":calls});} }
+        if role=="assistant" && m["content"].is_array() {
+            let blocks=m["content"].as_array().unwrap();
+            let text=blocks.iter().filter(|b|b["type"]=="text").filter_map(|b|b["text"].as_str()).filter(|t|!t.trim().is_empty()).collect::<String>();
+            let calls=blocks.iter().filter(|b|b["type"]=="toolCall").map(|b|json!({"id":b["id"],"type":"function","function":{"name":b["name"],"arguments":b["arguments"].to_string()}})).collect::<Vec<_>>();
+            let mut assistant=json!({"role":"assistant","content":if text.is_empty(){Value::Null}else{json!(text)}});
+            if !calls.is_empty(){assistant["tool_calls"]=json!(calls);}
+            return assistant;
+        }
         m.clone()
     }).collect();
     let mut request = json!({"model": model, "messages": openai_messages, "tools": openai_tools});
@@ -159,4 +166,12 @@ mod tests {
         assert!(decoder.finish().is_ok());
         let mut crlf = SseDecoder::default(); assert_eq!(crlf.push("data: {\"ok\":true}\r\n\r\n").unwrap().len(), 1);
     }
+    #[test]
+    fn assistant_wire_content_matches_pinned_upstream() {
+        let cases: serde_json::Value = serde_json::from_str(include_str!("../tests/fixtures/provider-assistant-content.json")).unwrap();
+        for case in cases.as_array().unwrap() {
+            assert_eq!(super::chat_request("fixture",case["input"].as_array().unwrap(),&serde_json::json!([]),None)["messages"],case["expected"]);
+        }
+    }
+
 }
