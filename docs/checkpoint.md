@@ -6,7 +6,7 @@ Live-model evidence remains 0/3 complete protected-test workflows; [results](exp
 
 ## Current critical path
 
-Enable an unchanged upstream extension that requires agent/turn lifecycle events through the formal CLI. Worker is selecting a concrete extension and pinned event-order oracle from `8772e68` in an isolated worktree. Acceptance: extension has an observable effect, actual tool roundtrip, follow-up and provider-failure cleanup coverage; Rust owns lifecycle transitions, Node dispatches callbacks. Non-streaming scope must be explicit. Integrate only after independent reproduction and exact-SHA CI. Complete event parity is not implied by one working extension.
+Enable an unchanged upstream extension that requires agent/turn lifecycle events through the formal CLI. The merged slice uses a concrete unchanged extension and pinned event-order oracle. Acceptance for the next slice: extension has an observable effect, actual tool roundtrip, follow-up and provider-failure cleanup coverage; Rust owns lifecycle transitions, Node dispatches callbacks. Non-streaming scope must be explicit. Integrate only after independent reproduction and exact-SHA CI. Complete event parity is not implied by one working extension.
 
 Review lesson: execution-mode assertions are required. Earlier audit omitted native parallel mode and overstated success; earlier upstream sequential label overlooked its parallel default. Both are superseded in the board. Avoid expanding scheduling experiments without a user-visible compatibility target.
 
