@@ -115,7 +115,7 @@ async function driveActive({manager,host,prompt,stream,trace=[],onToolUpdate=()=
       } catch(error) { if(propagateUpdateErrors && updateFailed) throw updateFailure; isError=true;result={content:[{type:'text',text:error instanceof Error?error.message:String(error)}],details:{}};}
       const hooked=executed && await host.runner.emitToolResult({type:'tool_result',toolCallId:call.id,toolName:call.name,input:args,content:result.content??[],details:result.details,isError,usage:result.usage});
       if(hooked){result.content=hooked.content??result.content;result.details=hooked.details??result.details;result.usage=hooked.usage??result.usage;isError=hooked.isError??isError;}
-      action=step({event:'tool_result',requestId,result,isError});
+      action=step({event:'tool_result',requestId,result,isError,cancelled:signal.aborted});
       trace.push({type:'tool_result',requestId,tool:call.name,isError});
     } else if(action.type==='tool_batch') {
       trace.push({type:'tool_batch_start',batchId:action.batchId,calls:action.calls.length});

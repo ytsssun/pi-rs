@@ -122,3 +122,7 @@ The driver stages pending nextTurn custom messages in Rust with stable per-send 
 ## User queue modes at the final response boundary
 
 The native store's `setQueueModes({steeringMode, followUpMode})` / `getQueueModes()` bridge controls Rust selection using pinned Agent's `steeringMode` and `followUpMode` core property values: `one-at-a-time` (default) or `all`. This is a core adapter seam, not a new extension API or CLI flag. Rust drains the selected queue in FIFO order, prioritizing steering over follow-up. In `all` mode each selected message remains a separate user message in one model request. Terminal error/abort retains pending messages. Modes are process-local. `experiments/user-queue-modes.mjs` executes the unchanged upstream Agent and native driver with identical fixture inputs and compares contexts. No tool-boundary steering, live-model or full Agent API parity is claimed.
+
+## Tool boundary steering
+
+At the sequential tool boundary, Rust now admits queued steering only after all current tool results are persisted, before the next model request. Follow-up remains deferred until the normal completed response boundary. This preserves pinned Agent contexts for one and sequential multi-tool fixtures and never aborts a running tool. Parallel batch steering and realtime cancellation remain open.
