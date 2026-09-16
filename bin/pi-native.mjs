@@ -100,7 +100,7 @@ if (options['--compact-summary']) await manager.appendCompaction(options['--comp
   const stream=fixture?async()=>{const message=fixture[index++]; if(!message)throw Error(`fixture exhausted after ${index} assistant responses; provide the next assistant message for the tool result`);return {async *[Symbol.asyncIterator](){},async result(){return message;}};}:resolvedModel && host.providers.get(resolvedModel.provider)?.streamSimple
     ? (_model, context, streamOptions) => host.modelRuntime.streamSimple(resolvedModel, context, streamOptions)
     : nativeProviderStream({model:transportModel,streaming:true});
-  const result=options['--input'] && !slashHandled ? await drive({manager,host,prompt:options['--input'],stream}) : null;
+  const result=options['--input'] && !slashHandled ? await drive({manager,host,sessionContinuation:true,prompt:options['--input'],stream}) : null;
   const activePath=owner.current.path;
   const compaction=options['--compact-summary']?manager.snapshot().contextEntries.find(e=>e.type==='compaction')??null:null;
   await owner.close();

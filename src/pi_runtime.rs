@@ -10,6 +10,7 @@ pub struct PiRuntime {
     lifecycle_phase: u8,
     run_entry_start: usize,
     agent_ended: bool,
+    session_continuation: bool,
     end_retained: bool,
     turn_message: Value,
     turn_results: Vec<Value>,
@@ -169,6 +170,14 @@ impl PiRuntime {
             if self.lifecycle_phase == 4 {
                 self.lifecycle_phase = 0;
                 self.agent_ended = true;
+                if self.session_continuation && !self.end_retained && request["cancelled"] != true && !self.user_messages.is_empty() {
+                    let mut continuation = request.clone();
+                    continuation["event"] = json!("advance_queued");
+                    continuation["runStart"] = json!(true);
+                    continuation["parallel"] = json!(self.parallel);
+                    let admitted = self.step(store, &continuation)?;
+                    return Ok(admitted["action"].clone());
+                }
                 return Ok(json!({"type":"settled","retained":self.end_retained,"message":self.turn_message}));
             }
             if self.lifecycle_phase == 3 {
@@ -400,7 +409,7 @@ impl PiRuntime {
             if !unresolved.is_empty() {
                 bail!("unresolved persisted tool calls; explicit recovery required");
             }
-            if request["driveStart"] == true {
+            if request["driveStart"] == true || request["runStart"] == true {
                 self.run_entry_start = store.snapshot()?["entries"].as_array().unwrap().len();
                 self.agent_ended = false;
             }
@@ -431,12 +440,13 @@ impl PiRuntime {
             }
             self.parallel = request["parallel"].as_bool().unwrap_or(false);
             if request["driveStart"] == true {
+                self.session_continuation = request["sessionContinuation"] == true;
                 self.lifecycle_enabled = request["lifecycle"] == true || request["initialLifecyclePrototype"] == true;
-                self.turn_index = 0;
             }
-            self.poll_steer = request["driveStart"] == true;
+            if request["driveStart"] == true || request["runStart"] == true { self.turn_index = 0; }
+            self.poll_steer = request["driveStart"] == true || request["runStart"] == true;
             self.turn_ready = false;
-            if self.lifecycle_enabled && request["driveStart"] == true {
+            if self.lifecycle_enabled && (request["driveStart"] == true || request["runStart"] == true) {
                 self.sequence += 1;
                 self.lifecycle_phase = 1;
                 let id = format!("lifecycle-{}-agent",self.sequence);
