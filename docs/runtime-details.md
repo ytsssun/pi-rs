@@ -138,4 +138,4 @@ Provider stream creation, iteration and result exceptions now report a provider_
 
 ## OpenAI-compatible request envelope
 
-Native streaming requests include `stream_options.include_usage=true` and `store=false`, matching the pinned OpenAI completions adapter for standard providers. Provider-specific max token field selection and reasoning formats remain model compatibility metadata, not global defaults.
+Native streaming requests already include `stream_options.include_usage=true`; non-streaming requests omit it. `store` remains unset until provider compatibility is explicitly supplied. Provider-specific max token field selection and reasoning formats remain model compatibility metadata, not global defaults.

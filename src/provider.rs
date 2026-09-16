@@ -89,7 +89,7 @@ fn chat_request(model: &str, messages: &[Value], tools: &Value, reasoning_effort
         }
         m.clone()
     }).collect();
-    let mut request = json!({"model": model, "messages": openai_messages, "tools": openai_tools, "stream_options":{"include_usage":true}, "store":false});
+    let mut request = json!({"model": model, "messages": openai_messages, "tools": openai_tools});
     if let Some(effort) = reasoning_effort { request["reasoning_effort"] = json!(effort); }
     request
 }
@@ -172,6 +172,13 @@ mod tests {
         for case in cases.as_array().unwrap() {
             assert_eq!(super::chat_request("fixture",case["input"].as_array().unwrap(),&serde_json::json!([]),None)["messages"],case["expected"]);
         }
+    }
+
+    #[test]
+    fn common_request_does_not_force_stream_or_provider_capabilities() {
+        let request=super::chat_request("fixture", &[], &serde_json::json!([]), None);
+        assert!(request.get("stream_options").is_none());
+        assert!(request.get("store").is_none());
     }
 
 }
