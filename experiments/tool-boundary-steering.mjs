@@ -15,11 +15,11 @@ try {
  for(const toolCount of [1,2]) for(const mode of ["one-at-a-time","all"]) {
  const pair=[];
  for(const native of [false,true]) {
-  const contexts=[],events=[],signals=[];let calls=0,toolRuns=0,enqueue,manager;
+  const contexts=[],events=[],signals=[];let calls=0,toolRuns=0,enqueue,manager,active=0,maxActive=0;
   const tool={name:'work',label:'Work',description:'one tool',parameters:{type:'object',properties:{}},execute:async(_id,_args,signal)=>{
-   toolRuns++;events.push('body_enter');signals.push(signal?.aborted);
+   toolRuns++;active++;maxActive=Math.max(maxActive,active);events.push('body_enter');signals.push(signal?.aborted);
    if(toolRuns===1){enqueue('during-tool','steer');enqueue('second-steer','steer');enqueue('follow-tool','followUp');}
-   await Promise.resolve();signals.push(signal?.aborted);events.push('body_return');
+   await Promise.resolve();active--;signals.push(signal?.aborted);events.push('body_return');
    return {content:[{type:'text',text:'done'}],details:{}};
   }};
   const stream=async(_m,c)=>{
@@ -41,7 +41,7 @@ try {
     await agent.prompt(user('initial'));
     pair.push({native,contexts,events,signals,toolRuns});
    }
-   assert.equal(toolRuns,toolCount);assert.deepEqual(signals,Array(toolCount*2).fill(false));
+   assert.equal(maxActive,1);assert.equal(toolRuns,toolCount);assert.deepEqual(signals,Array(toolCount*2).fill(false));
   }finally{manager?.close();}
  }
  assert.deepEqual(pair[1].contexts,pair[0].contexts);
