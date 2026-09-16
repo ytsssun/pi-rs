@@ -8,6 +8,9 @@ pub struct PiRuntime {
     waiting: Option<(String, String)>,
     user_messages: VecDeque<Value>,
     lifecycle_phase: u8,
+    run_entry_start: usize,
+    agent_ended: bool,
+    end_retained: bool,
     turn_message: Value,
     turn_results: Vec<Value>,
     end_continuation: Option<Value>,
@@ -48,6 +51,18 @@ impl PiRuntime {
         entry["id"] = json!(format!("rt-{n}"));
         entry["timestamp"] = json!(timestamp);
         store.append(entry)
+    }
+    fn finish_agent(&mut self, store: &PiSessionStore, retained: bool) -> Result<Value> {
+        if !self.lifecycle_enabled || self.agent_ended {return Ok(json!({"type":if retained {"retained"} else {"empty"}}));}
+        self.sequence += 1;
+        self.lifecycle_phase = 4;
+        self.end_retained = retained;
+        let id = format!("lifecycle-{}-agent-end",self.sequence);
+        self.waiting = Some(("lifecycle".into(),id.clone()));
+        let snapshot=store.snapshot()?;
+        let messages:Vec<Value> = snapshot["entries"].as_array().unwrap().iter().skip(self.run_entry_start)
+            .filter(|entry|entry["type"]=="message").map(|entry|entry["message"].clone()).collect();
+        Ok(json!({"type":"ending","action":{"type":"lifecycle","requestId":id,"event":{"type":"agent_end","messages":messages}}}))
     }
     fn finish_turn(&mut self, store: &mut PiSessionStore, request: &Value, done: Option<Value>) -> Result<Value> {
         if !self.lifecycle_enabled { return match done { Some(action)=>Ok(action),None=>self.after_tools(store,request) }; }
@@ -151,6 +166,11 @@ impl PiRuntime {
             if expected.0 != "lifecycle" || request["requestId"] != expected.1 {bail!("stale lifecycle acknowledgement");}
             self.waiting = None;
             if self.lifecycle_phase == 1 { return self.next(store); }
+            if self.lifecycle_phase == 4 {
+                self.lifecycle_phase = 0;
+                self.agent_ended = true;
+                return Ok(json!({"type":"settled","retained":self.end_retained,"message":self.turn_message}));
+            }
             if self.lifecycle_phase == 3 {
                 self.lifecycle_phase = 0;
                 return match self.end_continuation.take() {Some(action)=>Ok(action),None=>self.after_tools(store,request)};
@@ -226,7 +246,7 @@ impl PiRuntime {
                 bail!("runtime already awaiting completion");
             }
             if self.terminal_failure || request["cancelled"] == true {
-                return Ok(json!({"type":"retained"}));
+                return self.finish_agent(store,true);
             }
             let index = self
                 .user_messages
@@ -234,7 +254,7 @@ impl PiRuntime {
                 .position(|q| q["options"]["deliverAs"] == "steer")
                 .or_else(|| (!self.user_messages.is_empty()).then_some(0));
             let Some(index) = index else {
-                return Ok(json!({"type":"empty"}));
+                return self.finish_agent(store,false);
             };
             let queued = self.user_messages[index].clone();
             let all = if queued["options"]["deliverAs"] == "steer" { self.steering_all } else { self.followup_all };
@@ -379,6 +399,10 @@ impl PiRuntime {
             }
             if !unresolved.is_empty() {
                 bail!("unresolved persisted tool calls; explicit recovery required");
+            }
+            if request["driveStart"] == true {
+                self.run_entry_start = store.snapshot()?["entries"].as_array().unwrap().len();
+                self.agent_ended = false;
             }
             Self::append(
                 store,

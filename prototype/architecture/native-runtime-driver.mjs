@@ -36,8 +36,10 @@ async function driveActive({manager,host,prompt,stream,trace=[],onToolUpdate=()=
       action=step({event:'lifecycle_ack',requestId:action.requestId,cancelled:signal.aborted});
       continue;
     }
-    if(action.type==='done') {
-      const scheduled = step({event:'advance_queued',parallel,cancelled:signal.aborted});
+    if(action.type==='done'||action.type==='settled') {
+      const scheduled = action.type==='settled' ? {type:action.retained?'retained':'empty'} : step({event:'advance_queued',parallel,cancelled:signal.aborted});
+      if(scheduled.type==='ending'){action=scheduled.action;continue;}
+      if(action.type==='settled') action={...action,type:'done'};
       if (scheduled.type === 'retained') {
         trace.push({type:'turn_end',consumedMessages:0});
         return {action,trace,consumedMessages};
