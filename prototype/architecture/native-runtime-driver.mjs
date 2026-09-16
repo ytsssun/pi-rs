@@ -96,7 +96,7 @@ async function driveActive({manager,host,prompt,stream,trace=[],onToolUpdate=()=
       trace.push({type:"context_usage", ...estimateContextTokens(messages), serializedBytes:Buffer.byteLength(JSON.stringify(messages), "utf8"), estimator:"pinned-pi"});
       let message;
       try {
-        const output=await stream({provider:'fixture'}, {systemPrompt:preparedPrompt.systemPrompt,messages,tools:host.requestTools()}, {signal});
+        const output=await stream(host.contextActions.getModel?.()??{provider:'fixture'}, {systemPrompt:preparedPrompt.systemPrompt,messages,tools:host.requestTools()}, {signal});
         for await(const _event of output){} // Consume the provider effect.
         message=await output.result();
       } catch(error) {

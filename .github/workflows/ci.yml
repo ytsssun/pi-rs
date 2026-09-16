@@ -40,6 +40,7 @@ jobs:
           node --experimental-strip-types experiments/cli-lifecycle.mjs
           node --experimental-strip-types experiments/cli-agent-start.mjs
           node --experimental-strip-types experiments/tool-prompt-contributions.mjs
+          node --experimental-strip-types experiments/provider-message-role.mjs
           node --experimental-strip-types experiments/native-start-lifecycle.mjs
           node --experimental-strip-types experiments/turn-end-lifecycle.mjs
           node --experimental-strip-types experiments/upstream-agent-end.mjs
