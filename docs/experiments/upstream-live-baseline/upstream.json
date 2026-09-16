@@ -1,0 +1,190 @@
+{
+  "sourceCommit": "160c80e388deff901a5a64c87206fb23c273cf0b",
+  "model": "gpt-5.4-mini",
+  "contextEditing": false,
+  "manualSteering": 0,
+  "harnessSha256": "dc7581eb69c45ce3a3bb2bdbf5a978fd1b72525c0a34bbd6ed872de57978869c",
+  "runs": [
+    {
+      "stage": 0,
+      "passed": true,
+      "exit": 0,
+      "externalExit": 0,
+      "integrity": {
+        "AGENTS.md": true,
+        "test_maths.py": true
+      },
+      "historyPrefixPreserved": true,
+      "ranRepositoryTests": true,
+      "elapsedSeconds": 9.54384225,
+      "usage": [
+        {
+          "input": 1264,
+          "output": 144,
+          "cacheRead": 0,
+          "cacheWrite": 0,
+          "reasoning": 0,
+          "totalTokens": 1408,
+          "cost": {
+            "input": 0,
+            "output": 0,
+            "cacheRead": 0,
+            "cacheWrite": 0,
+            "total": 0
+          }
+        },
+        {
+          "input": 356,
+          "output": 91,
+          "cacheRead": 1152,
+          "cacheWrite": 0,
+          "reasoning": 0,
+          "totalTokens": 1599,
+          "cost": {
+            "input": 0,
+            "output": 0,
+            "cacheRead": 0,
+            "cacheWrite": 0,
+            "total": 0
+          }
+        },
+        {
+          "input": 491,
+          "output": 52,
+          "cacheRead": 1152,
+          "cacheWrite": 0,
+          "reasoning": 0,
+          "totalTokens": 1695,
+          "cost": {
+            "input": 0,
+            "output": 0,
+            "cacheRead": 0,
+            "cacheWrite": 0,
+            "total": 0
+          }
+        },
+        {
+          "input": 249,
+          "output": 73,
+          "cacheRead": 1664,
+          "cacheWrite": 0,
+          "reasoning": 0,
+          "totalTokens": 1986,
+          "cost": {
+            "input": 0,
+            "output": 0,
+            "cacheRead": 0,
+            "cacheWrite": 0,
+            "total": 0
+          }
+        },
+        {
+          "input": 343,
+          "output": 26,
+          "cacheRead": 1664,
+          "cacheWrite": 0,
+          "reasoning": 0,
+          "totalTokens": 2033,
+          "cost": {
+            "input": 0,
+            "output": 0,
+            "cacheRead": 0,
+            "cacheWrite": 0,
+            "total": 0
+          }
+        },
+        {
+          "input": 382,
+          "output": 57,
+          "cacheRead": 1664,
+          "cacheWrite": 0,
+          "reasoning": 0,
+          "totalTokens": 2103,
+          "cost": {
+            "input": 0,
+            "output": 0,
+            "cacheRead": 0,
+            "cacheWrite": 0,
+            "total": 0
+          }
+        }
+      ]
+    },
+    {
+      "stage": 1,
+      "passed": true,
+      "exit": 0,
+      "externalExit": 0,
+      "integrity": {
+        "AGENTS.md": true,
+        "test_maths.py": true
+      },
+      "historyPrefixPreserved": true,
+      "ranRepositoryTests": true,
+      "elapsedSeconds": 5.389899042,
+      "usage": [
+        {
+          "input": 473,
+          "output": 26,
+          "cacheRead": 1664,
+          "cacheWrite": 0,
+          "reasoning": 0,
+          "totalTokens": 2163,
+          "cost": {
+            "input": 0,
+            "output": 0,
+            "cacheRead": 0,
+            "cacheWrite": 0,
+            "total": 0
+          }
+        },
+        {
+          "input": 530,
+          "output": 117,
+          "cacheRead": 1664,
+          "cacheWrite": 0,
+          "reasoning": 0,
+          "totalTokens": 2311,
+          "cost": {
+            "input": 0,
+            "output": 0,
+            "cacheRead": 0,
+            "cacheWrite": 0,
+            "total": 0
+          }
+        },
+        {
+          "input": 156,
+          "output": 26,
+          "cacheRead": 2176,
+          "cacheWrite": 0,
+          "reasoning": 0,
+          "totalTokens": 2358,
+          "cost": {
+            "input": 0,
+            "output": 0,
+            "cacheRead": 0,
+            "cacheWrite": 0,
+            "total": 0
+          }
+        },
+        {
+          "input": 195,
+          "output": 51,
+          "cacheRead": 2176,
+          "cacheWrite": 0,
+          "reasoning": 0,
+          "totalTokens": 2422,
+          "cost": {
+            "input": 0,
+            "output": 0,
+            "cacheRead": 0,
+            "cacheWrite": 0,
+            "total": 0
+          }
+        }
+      ]
+    }
+  ],
+  "rawArtifactRoot": "/tmp/pi-upstream-live-baseline-160c80e"
+}
