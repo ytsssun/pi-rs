@@ -40,6 +40,7 @@ jobs:
           node --experimental-strip-types experiments/cli-lifecycle.mjs
           node --experimental-strip-types experiments/cli-agent-start.mjs
           node --experimental-strip-types experiments/native-start-lifecycle.mjs
+          node --experimental-strip-types experiments/turn-end-lifecycle.mjs
       - name: Verify startup measurement executes actual CLI
         run: |
           cargo build --locked --bin pi-rs
