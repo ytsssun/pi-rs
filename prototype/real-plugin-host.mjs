@@ -35,9 +35,17 @@ export async function createHost(backend, { factories = [], cwd = process.cwd(),
   let currentSystemPrompt = "";
   let currentPromptOptions = {cwd};
   const preparePrompt = async (prompt) => {
-    const snippets=Object.fromEntries(toolDefinitions.filter(t=>backend.getActiveTools().includes(t.name)&&t.promptSnippet).map(t=>[t.name,t.promptSnippet]));
-    const guidelines=toolDefinitions.filter(t=>backend.getActiveTools().includes(t.name)).flatMap(t=>t.promptGuidelines??[]);
-    currentPromptOptions = {cwd, selectedTools: backend.getActiveTools(), toolSnippets:snippets, promptGuidelines:guidelines, contextFiles, ...promptResources};
+    const definitions=new Map(toolDefinitions.map(t=>[t.name,t]));
+    for(const {definition} of runner.getAllRegisteredTools()) definitions.set(definition.name,definition);
+    const selectedTools=backend.getActiveTools().filter(name=>definitions.has(name));
+    const snippets={},guidelines=[];
+    for(const name of selectedTools) {
+      const definition=definitions.get(name);
+      const snippet=definition.promptSnippet?.replace(/[\r\n]+/g,' ').replace(/\s+/g,' ').trim();
+      if(snippet) snippets[name]=snippet;
+      guidelines.push(...new Set((definition.promptGuidelines??[]).map(text=>text.trim()).filter(Boolean)));
+    }
+    currentPromptOptions = {cwd, selectedTools, toolSnippets:snippets, promptGuidelines:guidelines, contextFiles, ...promptResources};
     const base = buildSystemPrompt(currentPromptOptions);
     currentSystemPrompt = base;
     const text = typeof prompt === "string" ? prompt : prompt.filter(p => p.type === "text").map(p => p.text).join("\n");
