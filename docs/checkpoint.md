@@ -13,3 +13,7 @@ Review lesson: execution-mode assertions are required. Earlier audit omitted nat
 ## History
 
 [Archived handoffs](checkpoint-history.md) and [board](board.jsonl) retain failures and corrections. Unrelated rustfmt-only changes remain preserved in a named stash.
+
+## Lifecycle experiment in progress
+
+`784337c` independently reproduces a Rust action/ack pause before model selection and an unchanged extension status effect. It remains outside main and manually drives callbacks. Worker is wiring the real driver/CLI and adding initial-context, follow-up and failure-cleanup assertions. The original formal CLI acceptance is unchanged; prototype success is not completion.
