@@ -13,3 +13,5 @@ Rust owns execution policy: state transitions, message admission and queues, tur
 This is the target boundary, not a claim that migration is complete. The current JS driver still owns parts of scheduling and failure handling. When changing these behaviors, read [the architecture map](docs/architecture.md), trace the active CLI path, and move the relevant decision into Rust with an upstream-backed regression test. Keep JS additions focused on ecosystem adapters; document any temporary policy in JS, its necessity, and its migration task on the board. Preserve existing upstream implementations instead of rewriting them for language purity.
 
 Judge progress by Rust's control of runtime behavior and reproducible Pi compatibility, not Rust/JS line counts. Update the architecture map when ownership changes. See [checkpoint](docs/checkpoint.md) for the current migration acceptance criteria.
+
+For milestone selection, delegation, CI integration, or recovery after a worker failure, follow [the coordinator contract](docs/coordinator.md).
