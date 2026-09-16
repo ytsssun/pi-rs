@@ -89,7 +89,7 @@ fn chat_request(model: &str, messages: &[Value], tools: &Value, reasoning_effort
         }
         m.clone()
     }).collect();
-    let mut request = json!({"model": model, "messages": openai_messages, "tools": openai_tools});
+    let mut request = json!({"model": model, "messages": openai_messages, "tools": openai_tools, "stream_options":{"include_usage":true}, "store":false});
     if let Some(effort) = reasoning_effort { request["reasoning_effort"] = json!(effort); }
     request
 }

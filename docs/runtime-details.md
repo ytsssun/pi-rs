@@ -135,3 +135,7 @@ The formal native driver now consumes Rust lifecycle actions for `agent_start` o
 ## Provider exception lifecycle
 
 Provider stream creation, iteration and result exceptions now report a provider_failure effect to Rust. Rust persists a zero-usage failure assistant, marks the turn terminal and emits acknowledged turn_end/agent_end; the end payload contains the failure message alone, matching pinned Agent.handleRunFailure. The drive resolves with an error assistant rather than rejecting for provider exceptions. Context-hook and delivery exceptions remain errors. Existing idle, pending-followUp and fresh-drive recovery assertions are retained; their provider rejection expectations were explicitly replaced with error-message assertions. Full Session retry/compaction, partial streamed event accounting and external abort parity remain outside this evidence.
+
+## OpenAI-compatible request envelope
+
+Native streaming requests include `stream_options.include_usage=true` and `store=false`, matching the pinned OpenAI completions adapter for standard providers. Provider-specific max token field selection and reasoning formats remain model compatibility metadata, not global defaults.
