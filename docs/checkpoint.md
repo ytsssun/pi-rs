@@ -6,9 +6,11 @@ Live-model evidence remains **0/3 complete protected-test workflows**. No new li
 
 ## Current critical path
 
-Provider exception lifecycle: branch `codex/provider-failure-lifecycle`, worktree `/tmp/pi-provider-failure-lifecycle`, contains intentionally failing `experiments/provider-failure-lifecycle.mjs`. Executed comparison shows upstream emits turn_end and agent_end with one failure assistant message and resolves; native emits only start events and rejects. This red experiment is outside main/CI until implemented. Run with `node --experimental-strip-types experiments/provider-failure-lifecycle.mjs` after building native addon.
+PR #51, branch `codex/provider-failure-lifecycle`, worktree `/tmp/pi-provider-failure-lifecycle`, head `038f21b`: implements provider_failure in Rust. The previously failing upstream comparison now passes stream creation/iteration/result failures, model metadata, zero usage and end-event payload/order. Drive returns an error assistant instead of rejecting provider exceptions, matching pinned Agent. Native-start, command-idle, queued-followUp and CLI lifecycle recovery assertions were retained and pass; provider rejection assertions explicitly changed. Full Cargo tests and clippy pass locally.
 
-Next: Rust handles a provider-failure action, persists a correctly shaped failure assistant and decides end events/recovery. Node reports provider exceptions as effects. Trace existing native-start/command-idle failure tests: they currently require rejection, so document the upstream-backed contract change and preserve their cleanup/recovery assertions rather than silently deleting them. Cover stream creation, iteration and result failures; keep context-hook/tool errors distinct. Validate failure payload, exactly-once end, pending queues and next successful drive before integrating. Full Session retry/compaction is outside this bounded slice.
+Independent checkout and complete CI remain required before merge. Review must inspect other provider failure assertions and keep hook/delivery failures distinct. If CI fails, preserve evidence and repair against the existing criterion. No full Session retry/compaction, live model or external abort claim. Implementation and evidence are on the PR branch; main remains prior verified behavior.
+
+Next after integration: inspect the largest remaining user-visible runtime gap against the parity matrix, including exception recovery/resume and real-model workflow validation, rather than adding lifecycle details without a coding-agent use case.
 
 ## Recovery and history
 
