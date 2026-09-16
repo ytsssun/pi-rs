@@ -1469,3 +1469,26 @@ PR #43 required repairs for omitted display normalization, Rust-backed nextTurn 
 ## History
 
 [Archived handoffs](checkpoint-history.md) and [board](board.jsonl) preserve evidence and corrections. The named coordinator rustfmt stash preserves nine unrelated formatting-only files; no worker ownership is inferred.
+
+
+## Archived checkpoint before PR #48 integration (2026-09-16)
+
+# Current checkpoint
+
+Main `054d246` includes Rust user/nextTurn queue ownership, both user queue modes, and steering admission after sequential tools or parallel batches. PR #46 head `ee02bc481fd9ce25a5cf2aa69787d02276711123` passed CI 35044688424 and 35044691491. Executed pinned-upstream/native fixtures explicitly assert sequential concurrency=1 and parallel concurrency=2, context order and complete tool-result pairing. Budget exhaustion and batch termination retain unadmitted steering. Parallel external cancellation, full lifecycle/stream events and complete Pi compatibility remain open.
+
+Live-model evidence remains 0/3 complete protected-test workflows; [results](experiments/integrated-live-1adafc1/README.md). Queue changes used deterministic fixtures only. No new live success or speed claim. The 37-group inventory is not an exhaustive parity percentage.
+
+## Current critical path
+
+Initial lifecycle bridge is merged in PR #47 (`5924a16`): agent_start and turn_start actions are driver-consumed with unchanged extension/formal CLI coverage. Current task is an actual Rust turn_end lifecycle action. Independent fixture fceb6af fails because turn_end is only a JS trace entry; no callback fires. The worker claim that turn_end/agent_end already existed is rejected. Acceptance: Rust pauses before the next action, Node invokes the unchanged callback, callback-enqueued messages affect the next context, and provider failure/abort leave the runtime recoverable. Agent_end, tool-result payloads, streaming and interactive UI remain open.
+
+Review lesson: execution-mode assertions are required. Earlier audit omitted native parallel mode and overstated success; earlier upstream sequential label overlooked its parallel default. Both are superseded in the board. Avoid expanding scheduling experiments without a user-visible compatibility target.
+
+## History
+
+[Archived handoffs](checkpoint-history.md) and [board](board.jsonl) retain failures and corrections. Unrelated rustfmt-only changes remain preserved in a named stash.
+
+## Lifecycle experiment in progress
+
+`784337c` independently reproduces a Rust action/ack pause before model selection and an unchanged extension status effect. It remains outside main and manually drives callbacks. Worker is wiring the real driver/CLI and adding initial-context, follow-up and failure-cleanup assertions. The original formal CLI acceptance is unchanged; prototype success is not completion.

@@ -14,21 +14,19 @@ This file is the portable control plane for pi-rs. A new task or process can res
 1. Read this contract, checkpoint, architecture, and the newest relevant board records.
 2. Inspect `git status`, branch and remote before touching files. Preserve unrelated work.
 3. Pick one critical-path task whose dependency is satisfied. Prefer removing a blocker to adding surface area.
-4. Assign a bounded worker only for independent work with a named artifact; otherwise implement directly. At most four concurrent workers including the coordinator.
+4. Assign a bounded worker only for independent work with a named artifact; otherwise implement directly. At most three workers plus the coordinator, within the available execution slots.
 5. Require commands, inputs, outputs, and limitations from every worker. Treat worker claims as proposed until independently reproduced.
 6. Integrate only after independent tests and source review. Run the narrow test first, then the relevant regression suite.
-7. Append evidence and supersessions to the board, update checkpoint, commit and push to `origin/main` when the work is reviewable.
+7. Append evidence and supersessions to the board, update checkpoint, commit and push the reviewable work branch; merge only after successful exact-head CI.
 8. Leave a precise next action and recovery command in the checkpoint. If no useful work is executable, stop rather than spin.
 
-## Current priority order
+## Priority selection and runtime boundary
 
-1. Preserve and simplify the single model → tool → result loop.
-2. Validate installed and remote installation paths from a clean directory.
-3. Replace placeholder session and prompt metadata with user-visible configuration.
-4. Extend provider compatibility through the existing Node boundary, with deterministic fixtures before live calls.
-5. Expand the parity matrix only when a capability has an executable acceptance case.
+Use the current checkpoint and executed parity gaps to choose the largest unblocked obstacle to replacing upstream Pi core. Rust owns execution policy; Node preserves unchanged ecosystem implementations and executes effects requested by Rust. Keep providers, plugin loading and callbacks in Node where required for compatibility. Migrate scheduling or recovery decisions into Rust with upstream-backed regression evidence; record any temporary Node policy and its migration task.
 
-Do not claim a parity percentage without a documented denominator. Do not add a second runtime, orchestration platform, or plugin ABI to solve an unmeasured problem. Keep the upstream Pi checkout pinned and unchanged.
+Select a user-visible acceptance case before adding a runtime mechanism. Measure progress by behavior controlled by Rust and reproducible compatibility, rather than language line counts. Keep the simple model → tool → result loop central. Whole-ecosystem compatibility remains the goal; finite fixtures establish only their tested scope. Preserve the pinned upstream checkout unchanged.
+
+After completing a milestone, update the checkpoint and begin the next valuable unblocked task. A worker capacity failure calls for inspection of preserved artifacts and local continuation or bounded reassignment. Repeated capacity failures are environment evidence, not a reason to repeat an unchanged dispatch indefinitely.
 
 ## Recovery
 
