@@ -548,6 +548,21 @@ impl PiRuntime {
             )?;
             return Ok(json!({"type":"resolved"}));
         }
+        if op == "provider_failure" {
+            let expected = self.waiting.as_ref().context("no pending action")?;
+            if expected.0 != "model" || request["requestId"] != expected.1 { bail!("stale or mismatched completion"); }
+            let mut result = request.clone();
+            result["event"] = json!("model_result");
+            result["message"] = json!({"role":"assistant","content":[{"type":"text","text":""}],
+                "api":request["model"]["api"],"provider":request["model"]["provider"],"model":request["model"]["id"],
+                "usage":{"input":0,"output":0,"cacheRead":0,"cacheWrite":0,"totalTokens":0,
+                    "cost":{"input":0,"output":0,"cacheRead":0,"cacheWrite":0,"total":0}},
+                "stopReason":if request["cancelled"] == true {"aborted"} else {"error"},
+                "errorMessage":request["error"],"timestamp":request["messageTimestamp"].as_u64().unwrap_or(0)});
+            // Upstream handleRunFailure reports only the synthesized failure in agent_end.
+            self.run_entry_start = store.snapshot()?["entries"].as_array().unwrap().len();
+            return self.step(store, &result);
+        }
         let expected_kind = if op == "model_result" {
             "model"
         } else if op == "tool_result" {

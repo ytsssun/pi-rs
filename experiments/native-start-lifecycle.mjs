@@ -11,7 +11,7 @@ try{for(const phase of ['agent_start','turn_start']){
  await drive({manager,host,prompt:'initial',stream});
  assert.deepEqual(contexts,[['initial','callback'],['initial','callback','follow']]);assert.equal(calls,2);
  assert.deepEqual(events,[{type:'agent_start',index:undefined},{type:'turn_start',index:0},{type:'turn_start',index:1}]);
- await assert.rejects(drive({manager,host,prompt:'failure',stream:async()=>{throw Error('provider failed');}}),/provider failed/);
+ const failure=await drive({manager,host,prompt:'failure',stream:async()=>{throw Error('provider failed');}});assert.equal(failure.action.message.stopReason,'error');assert.match(failure.action.message.errorMessage,/provider failed/);
  assert.equal(host.contextActions.isIdle(),true);
  assert.throws(()=>request({op:'runtime',handle:manager.handle,event:'lifecycle_ack',requestId:'stale'}),/no lifecycle/);
  await drive({manager,host,prompt:'recover',stream});

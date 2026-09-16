@@ -48,7 +48,7 @@ try {
     await run();assert.equal(calls,5);assert.equal(readFileSync(file,'utf8'),'changed');
     assert.equal(host.pendingMessages.length,0);
    } else if(mode==='failure') {
-    await assert.rejects(run,/controlled provider failure/);
+    const failure=await run();assert.equal(failure.action.message.stopReason,'error');assert.match(failure.action.message.errorMessage,/controlled provider failure/);
     assert.equal(host.pendingMessages.length,1);
     assert.equal(host.pendingMessages[0].message,'follow two');
     assert.equal(trace.filter(e=>e.type==='followup_admitted').length,1);
