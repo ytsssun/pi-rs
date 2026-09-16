@@ -18,7 +18,7 @@ export async function drive(options) {
     finish();
   }
 }
-async function driveActive({manager,host,prompt,stream,trace=[],onToolUpdate=()=>{},onMessage,onSessionEvent,propagateUpdateErrors=false,parallel=false,signal}) {
+async function driveActive({manager,host,prompt,stream,trace=[],onToolUpdate=()=>{},onMessage,onSessionEvent,propagateUpdateErrors=false,parallel=false,sessionContinuation=false,signal}) {
   const step=payload=>{ const now=Date.now(); return request({op:'runtime',handle:manager.handle,timestamp:new Date(now).toISOString(),messageTimestamp:now,...payload}); };
   // Reject unsupported legacy user delivery before admitting a prompt.
   for (const queued of host.peekNextTurnMessages?.() ?? []) {
@@ -27,7 +27,7 @@ async function driveActive({manager,host,prompt,stream,trace=[],onToolUpdate=()=
   const nextTurnMessages = [];
   const preparedPrompt = await host.preparePrompt(prompt);
   nextTurnMessages.push(...preparedPrompt.messages.map(message => ({...message, content: message.content ?? []})));
-  let action=step({event:'begin',prompt,parallel,nextTurnMessages,driveStart:true,maxActions:32,lifecycle:true});
+  let action=step({event:'begin',prompt,parallel,nextTurnMessages,driveStart:true,maxActions:32,lifecycle:true,sessionContinuation});
   const consumedMessages = [];
   trace.push({type:'turn_start'});
   for(let count=0;;count++) {
