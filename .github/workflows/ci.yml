@@ -71,6 +71,7 @@ jobs:
         run: |
           node --experimental-strip-types experiments/tool-boundary-steering.mjs
           node --experimental-strip-types experiments/tool-steer-cancel.mjs
+          node --experimental-strip-types experiments/parallel-batch-steering.mjs
       - name: Native user steer boundary
         run: node --experimental-strip-types experiments/user-steer-execution.mjs
       - name: Registered provider CLI

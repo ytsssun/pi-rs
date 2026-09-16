@@ -12,36 +12,40 @@ const texts=ms=>ms.filter(m=>m.role==='user').map(m=>typeof m.content==='string'
 const dir=mkdtempSync(join(tmpdir(),'pi-tool-steer-'));
 const reports=[];
 try {
- for(const toolCount of [1,2]) for(const mode of ["one-at-a-time","all"]) {
+ for(const toolCount of [2]) for(const mode of ["one-at-a-time","all"]) {
  const pair=[];
  for(const native of [false,true]) {
-  const contexts=[],events=[],signals=[];let calls=0,toolRuns=0,enqueue,manager,active=0,maxActive=0;
+  const contexts=[],events=[],signals=[];let calls=0,toolRuns=0,enqueue,manager,active=0,maxActive=0,release;
+  const barrier=new Promise(resolve=>{release=resolve;});
   const tool={name:'work',label:'Work',description:'one tool',parameters:{type:'object',properties:{}},execute:async(_id,_args,signal)=>{
    toolRuns++;active++;maxActive=Math.max(maxActive,active);events.push('body_enter');signals.push(signal?.aborted);
-   if(toolRuns===1){enqueue('during-tool','steer');enqueue('second-steer','steer');enqueue('follow-tool','followUp');}
-   await Promise.resolve();active--;signals.push(signal?.aborted);events.push('body_return');
+   enqueue('steer-'+_id,'steer');enqueue('follow-'+_id,'followUp');
+   if(active===2)release();
+   let timer;try {await Promise.race([barrier,new Promise((_,reject)=>{timer=setTimeout(()=>reject(Error('two-tool concurrency barrier timeout')),3000);})]);}finally{clearTimeout(timer);}
+   active--;signals.push(signal?.aborted);events.push('body_return');
    return {content:[{type:'text',text:'done'}],details:{}};
   }};
   const stream=async(_m,c)=>{
+   if(calls>0){assert.equal(active,0);assert.equal(c.messages.filter(m=>m.role==='toolResult').length,2,'both results must pair before next model');}
    contexts.push(texts(c.messages));events.push('model_request');const i=calls++;
-   const message={role:'assistant',content:i===0?Array.from({length:toolCount},(_,j)=>({type:'toolCall',name:'work',id:'w'+j,arguments:{}})):[],stopReason:i===0?'toolUse':'stop',timestamp:1};
+   const message={role:'assistant',content:i===0?Array.from({length:toolCount},(_,j)=>({type:'toolCall',name:'work'+j,id:'w'+j,arguments:{}})):[],stopReason:i===0?'toolUse':'stop',timestamp:1};
    return {async *[Symbol.asyncIterator](){yield {type:'done',message};},async result(){return message;}};
   };
   try {
    if(native){
     manager=await createBackend({path:join(dir,`native-${toolCount}-${mode}.jsonl`)});
     manager.setQueueModes({steeringMode:mode});
-    const host=await createHost(tsBackend(['work']),{sessionManager:manager,extensionPaths:[],factories:[pi=>pi.registerTool(tool)]});
+    const host=await createHost(tsBackend(['work0','work1']),{sessionManager:manager,extensionPaths:[],factories:[pi=>{for(let j=0;j<2;j++)pi.registerTool({...tool,name:"work"+j});}]});
     enqueue=(text,mode)=>host.actions.sendUserMessage(text,{deliverAs:mode});
-    const trace=[];await drive({manager,host,prompt:'initial',stream,trace});
-    pair.push({native,contexts,events,signals,toolRuns,trace:trace.map(e=>e.type)});
+    const trace=[];await drive({manager,host,prompt:'initial',stream,trace,parallel:true});
+    pair.push({native,contexts,events,signals,toolRuns,maxActive,trace:trace.map(e=>e.type)});
    }else{
-    const agent=new Agent({initialState:{model:{id:'x',provider:'x',api:'x'},tools:[tool]},streamFn:stream,steeringMode:mode,toolExecution:'sequential'});
+    const agent=new Agent({initialState:{model:{id:'x',provider:'x',api:'x'},tools:[{...tool,name:"work0"},{...tool,name:"work1"}]},streamFn:stream,steeringMode:mode,toolExecution:'parallel'});
     enqueue=(text,mode)=>agent[mode](user(text));agent.subscribe(e=>events.push(e.type));
     await agent.prompt(user('initial'));
-    pair.push({native,contexts,events,signals,toolRuns});
+    pair.push({native,contexts,events,signals,toolRuns,maxActive});
    }
-   assert.equal(maxActive,1);assert.equal(toolRuns,toolCount);assert.deepEqual(signals,Array(toolCount*2).fill(false));
+   assert.equal(maxActive,2);assert.equal(toolRuns,toolCount);assert.deepEqual(signals,Array(toolCount*2).fill(false));
   }finally{manager?.close();}
  }
  assert.deepEqual(pair[1].contexts,pair[0].contexts);
