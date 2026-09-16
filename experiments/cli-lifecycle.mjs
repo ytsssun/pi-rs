@@ -59,7 +59,7 @@ try {
  writeFileSync(failFixture,JSON.stringify([assistant([{type:'toolCall',id:'write-fail',name:'write',arguments:{path:'failure.txt',content:'saved'}}])]));
  const failedSession=join(dir,'failed.jsonl');
  result=run(failedSession,['--input','fail','--fixture',failFixture],{LIFECYCLE_THROW:'1'});
- assert.notEqual(result.status,0); assert.match(result.stderr,/fixture exhausted/); pair(result);
+ assert.equal(result.status,0,result.stderr); assert.match(JSON.parse(result.stdout).result.action.message.errorMessage,/fixture exhausted/); pair(result);
  assert.ok(readFileSync(failedSession,'utf8').includes('lifecycle.shutdown'));
  result=run(failedSession,['--resume','--input','/probe']); assert.equal(result.status,0,result.stderr); pair(result);
  const firstKept=readFileSync(session,'utf8').trim().split('\n').map(JSON.parse).find(e=>e.type==='message').id;

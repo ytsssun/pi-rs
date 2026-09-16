@@ -85,7 +85,8 @@ try {
       }
       const result = await completion;
       if(outcome === 'success') assert.equal(result.value.action.type,'done');
-      else assert.match(result.error?.message ?? '',/fixture (provider|delivery) failure/);
+      else if(outcome === 'provider failure') {assert.equal(result.value.action.message.stopReason,'error');assert.match(result.value.action.message.errorMessage,/fixture provider failure/);}
+      else assert.match(result.error?.message ?? '',/fixture delivery failure/);
       assert.equal(await command,true);
       assert.equal(commandFinished,true);
       assert.equal(ctx.isIdle(),true);

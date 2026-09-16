@@ -94,9 +94,16 @@ async function driveActive({manager,host,prompt,stream,trace=[],onToolUpdate=()=
       trace.push({type:"context_projection",canonicalMessages:canonicalMessages.length,projectedMessages:projected.length,projectedTextBytes:JSON.stringify(projected).length,projected:projected});
       const messages=await host.runner.emitContext(projected);
       trace.push({type:"context_usage", ...estimateContextTokens(messages), serializedBytes:Buffer.byteLength(JSON.stringify(messages), "utf8"), estimator:"pinned-pi"});
-      const output=await stream({provider:'fixture'}, {systemPrompt:preparedPrompt.systemPrompt,messages,tools:host.requestTools()}, {signal});
-      for await(const _event of output){} // Stream transport consumption, no turn decisions.
-      const message=await output.result();
+      let message;
+      try {
+        const output=await stream({provider:'fixture'}, {systemPrompt:preparedPrompt.systemPrompt,messages,tools:host.requestTools()}, {signal});
+        for await(const _event of output){} // Consume the provider effect.
+        message=await output.result();
+      } catch(error) {
+        action=step({event:'provider_failure',requestId,error:error instanceof Error?error.message:String(error),cancelled:signal.aborted,model:host.contextActions.getModel?.()??{}});
+        trace.push({type:'provider_failure',requestId});
+        continue;
+      }
       action=step({event:'model_result',requestId,message});
       trace.push({type:'model_result',requestId});
     } else if(action.type==='tool') {
