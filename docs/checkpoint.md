@@ -6,11 +6,13 @@ Live evidence remains **0/3 complete protected-test workflows**; [results](exper
 
 ## Current critical path
 
-Implement Rust-owned `agent_end` with a pinned-upstream oracle. Worker worktree `/tmp/pi-rust-agent-end`, branch `codex/rust-agent-end`, starts from `5f09b7a`. A capacity failure interrupted investigation; preserved work is being resumed. Investigate the distinction between core Agent retaining callback-enqueued messages and AgentSession continuing them before selecting formal CLI behavior.
+PR #49 (`codex/rust-agent-end`, current head `378f147`) adds the core Rust agent_end action/ack. Worktree `/tmp/pi-rust-agent-end`; independent checkout `/tmp/pi-agent-end-verify`. Coordinator took over after two worker capacity failures. Stop/error/aborted upstream comparisons, unchanged CLI extension reaction, run isolation and stale/double ack tests pass. Full Cargo tests/clippy passed in the independent checkout at 64ea78e; later changes are confined to JS completion normalization and evidence.
 
-Acceptance: executed upstream/native comparison of message payload, event order and exactly-once end delivery for tool/follow-up, assistant error/abort, and end-callback enqueue cases. Rust decides completion and acknowledgement; Node dispatches unchanged callbacks. Explicitly scope thrown-provider failures and AgentSession continuation. Add regression to CI; independently reproduce before merge. Do not broaden this task into streaming or UI.
+Initial CI 35077670461 failed: internal settled action leaked through the driver instead of existing done result. Acceptance was preserved; corrected head 378f147 passes the failing case in the independent checkout. Exact-head CI 35089102870 and full local Node regression remain pending. Do not merge until successful terminal CI and review. Main 7cd763d CI35074671962 passed; prior merge run was cancelled by the later push.
 
-Recovery: inspect worktree status and artifacts, execute the oracle, then implement the missing Rust action. Check PR #48 merge CI for `fe53f03` separately from its passing head CI. Preserve all failures and report any scope not exercised.
+The broader lifecycle milestone remains incomplete: AgentSession automatically continues messages queued by end callbacks, while the implemented core Agent contract leaves them pending. Thrown provider exceptions also differ: executed upstream produces a failure message and turn_end/agent_end, native currently propagates after cleanup. Next work is an executed Session continuation oracle and Rust-owned continuation; preserve distinct core and formal CLI behavior. No new live validation.
+
+Recovery: inspect PR #49 exact head and CI, read `/tmp/pi-agent-end-all-node.log`, reproduce any failed existing assertion without lowering it, then integrate. Keep both remaining gaps explicit and continue with the Session oracle.
 
 ## History
 
