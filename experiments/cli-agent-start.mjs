@@ -23,6 +23,7 @@ writeFileSync(ext,`export default pi=>{
  api:'acceptance-api',baseUrl:'http://127.0.0.1:1',apiKey:'deterministic-test-token',
  models:[{id:'tiny',name:'Tiny',reasoning:false,input:['text'],cost:{input:0,output:0,cacheRead:0,cacheWrite:0},contextWindow:8192,maxTokens:512}],
  streamSimple(model,context,options){
+  if(!context.systemPrompt.includes('- read: Read file contents')||!context.systemPrompt.includes('Use edit for precise changes'))throw Error('missing original tool prompt contributions');
   if(!context.systemPrompt.endsWith('CHAIN_MARKER SECOND_MARKER'))throw Error('hook not called');
   const resumed=context.messages.some(m=>JSON.stringify(m).includes('continue'));
 

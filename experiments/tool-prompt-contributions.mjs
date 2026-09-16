@@ -1,8 +1,8 @@
 import assert from 'node:assert/strict';
 import {createHost,tsBackend} from '../prototype/real-plugin-host.mjs';
-import {createCodingTools} from '../vendor/pi-mono/packages/coding-agent/src/core/tools/index.ts';
+import {createCodingToolDefinitions} from '../vendor/pi-mono/packages/coding-agent/src/core/tools/index.ts';
 import {buildSystemPrompt} from '../vendor/pi-mono/packages/coding-agent/src/core/system-prompt.ts';
-const cwd=process.cwd(),tools=createCodingTools(cwd),backend=tsBackend(tools.map(t=>t.name));
+const cwd=process.cwd(),tools=createCodingToolDefinitions(cwd),backend=tsBackend(tools.map(t=>t.name));
 const host=await createHost(backend,{cwd,extensionPaths:[],toolDefinitions:tools,factories:[pi=>{for(const tool of tools)pi.registerTool(tool);}]});
 const expected=buildSystemPrompt({cwd,selectedTools:tools.map(t=>t.name),toolSnippets:Object.fromEntries(tools.map(t=>[t.name,t.promptSnippet])),promptGuidelines:tools.flatMap(t=>t.promptGuidelines??[])});
 assert.equal((await host.preparePrompt('work')).systemPrompt,expected);

@@ -36,13 +36,14 @@ const {createBackend}=await import('../prototype/architecture/native-store-backe
 const {createHost,tsBackend}=await import('../prototype/real-plugin-host.mjs');
 const {drive}=await import('../prototype/architecture/native-runtime-driver.mjs');
 const {nativeProviderStream}=await import('../prototype/architecture/native-provider-stream.mjs');
-const {createCodingTools}=await import('../vendor/pi-mono/packages/coding-agent/src/core/tools/index.ts');
+const {createCodingTools,createCodingToolDefinitions}=await import('../vendor/pi-mono/packages/coding-agent/src/core/tools/index.ts');
 const {openAITransportModel,savedBranchModel}=await import('../prototype/architecture/model-transport.mjs');
 const {loadProjectContextFiles}=await import('../vendor/pi-mono/packages/coding-agent/src/core/resource-loader.ts');
 const {loadPromptResources}=await import('../prototype/prompt-resources.mjs');
 const {getAgentDir}=await import('../vendor/pi-mono/packages/coding-agent/src/config.ts');
 const {ModelRuntime}=await import('../vendor/pi-mono/packages/coding-agent/src/core/model-runtime.ts');
-const tools=createCodingTools(cwd);
+const definitions=new Map(createCodingToolDefinitions(cwd).map(t=>[t.name,t]));
+const tools=createCodingTools(cwd).map(tool=>({...tool,promptSnippet:definitions.get(tool.name)?.promptSnippet,promptGuidelines:definitions.get(tool.name)?.promptGuidelines}));
 const {createSessionOwner}=await import('../prototype/architecture/session-owner.mjs');
 const owner=await createSessionOwner({path,cwd,mode:options['--resume']?'open':'create',
   makeHost:async manager=>createHost(tsBackend(tools.map(t=>t.name)),{cwd,promptResources:loadPromptResources({cwd,agentDir:getAgentDir(),projectTrusted:true}),contextFiles:loadProjectContextFiles({cwd,agentDir:getAgentDir()}),modelRuntime:await ModelRuntime.create({modelsPath:null,refreshOnCreate:false,allowModelNetwork:false}),sessionManager:manager,toolDefinitions:tools,extensionPaths:extensions,factories:[pi=>{for(const tool of tools) pi.registerTool(tool);}]})});
