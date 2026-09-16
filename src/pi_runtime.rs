@@ -8,6 +8,9 @@ pub struct PiRuntime {
     waiting: Option<(String, String)>,
     user_messages: VecDeque<Value>,
     lifecycle_phase: u8,
+    turn_message: Value,
+    turn_results: Vec<Value>,
+    end_continuation: Option<Value>,
     lifecycle_enabled: bool,
     turn_ready: bool,
     turn_index: u64,
@@ -45,6 +48,15 @@ impl PiRuntime {
         entry["id"] = json!(format!("rt-{n}"));
         entry["timestamp"] = json!(timestamp);
         store.append(entry)
+    }
+    fn finish_turn(&mut self, store: &mut PiSessionStore, request: &Value, done: Option<Value>) -> Result<Value> {
+        if !self.lifecycle_enabled { return match done { Some(action)=>Ok(action),None=>self.after_tools(store,request) }; }
+        self.sequence += 1;
+        self.lifecycle_phase = 3;
+        self.end_continuation = done;
+        let id = format!("lifecycle-{}-end",self.sequence);
+        self.waiting = Some(("lifecycle".into(),id.clone()));
+        Ok(json!({"type":"lifecycle","requestId":id,"event":{"type":"turn_end","turnIndex":self.turn_index.saturating_sub(1),"message":self.turn_message,"toolResults":self.turn_results}}))
     }
     fn after_tools(&mut self, store: &mut PiSessionStore, request: &Value) -> Result<Value> {
         if self.lifecycle_enabled && !self.turn_ready && self.tools.is_empty() { self.poll_steer = true; return self.next(store); }
@@ -139,6 +151,10 @@ impl PiRuntime {
             if expected.0 != "lifecycle" || request["requestId"] != expected.1 {bail!("stale lifecycle acknowledgement");}
             self.waiting = None;
             if self.lifecycle_phase == 1 { return self.next(store); }
+            if self.lifecycle_phase == 3 {
+                self.lifecycle_phase = 0;
+                return match self.end_continuation.take() {Some(action)=>Ok(action),None=>self.after_tools(store,request)};
+            }
             self.lifecycle_phase = 0;
             self.turn_ready = true;
             return if self.poll_steer {self.after_tools(store, request)} else {self.next(store)};
@@ -442,9 +458,10 @@ impl PiRuntime {
                 }
                 Self::append(
                     store,
-                    json!({"type":"message","message":message}),
+                    json!({"type":"message","message":message.clone()}),
                     timestamp,
                 )?;
+                self.turn_results.push(message);
             }
             if !by_id.is_empty() {
                 bail!("unknown batch result requestId");
@@ -452,9 +469,9 @@ impl PiRuntime {
             self.waiting = None;
             self.batch = None;
             if all_terminate {
-                return Ok(json!({"type":"done","reason":"all_tools_terminated"}));
+                return self.finish_turn(store,request,Some(json!({"type":"done","reason":"all_tools_terminated"})));
             }
-            return self.after_tools(store, request);
+            return self.finish_turn(store, request, None);
         }
         if op == "tool_update" {
             let call = self.active_tool.as_ref().context("no active tool")?;
@@ -538,12 +555,14 @@ impl PiRuntime {
                 json!({"type":"message","message":message}),
                 timestamp,
             )?;
+            self.turn_message = message.clone();
+            self.turn_results.clear();
             self.terminal_failure =
                 message["stopReason"] == "error" || message["stopReason"] == "aborted";
             self.waiting = None;
             self.tools = calls;
             if self.tools.is_empty() {
-                return Ok(json!({"type":"done","message":message}));
+                return self.finish_turn(store,request,Some(json!({"type":"done","message":message})));
             }
         } else {
             let call = self.active_tool.as_ref().context("missing active tool")?;
@@ -558,6 +577,7 @@ impl PiRuntime {
             if let Some(added) = result.get("addedToolNames") {
                 message["addedToolNames"] = added.clone();
             }
+            self.turn_results.push(message.clone());
             Self::append(
                 store,
                 json!({"type":"message","message":message}),
@@ -572,6 +592,6 @@ impl PiRuntime {
             self.active_tool = None;
             self.tool_updates.clear();
         }
-        if op == "tool_result" { self.after_tools(store, request) } else { self.next(store) }
+        if op == "tool_result" && self.tools.is_empty() { self.finish_turn(store, request, None) } else { self.next(store) }
     }
 }
