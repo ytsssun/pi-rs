@@ -104,7 +104,7 @@ if (options['--compact-summary']) await manager.appendCompaction(options['--comp
   const activePath=owner.current.path;
   const compaction=options['--compact-summary']?manager.snapshot().contextEntries.find(e=>e.type==='compaction')??null:null;
   await owner.close();
-  const report={result,command:commandResult,slashHandled,compaction,session:activePath,fixture:Boolean(fixture),extensionErrors:owner.errors};
+  const report={statusUpdates:host.statusUpdates,result,command:commandResult,slashHandled,compaction,session:activePath,fixture:Boolean(fixture),extensionErrors:owner.errors};
   if(options['--trace-file']) writeFileSync(resolve(options['--trace-file']),JSON.stringify(report,null,2)+'\n');
   console.log(JSON.stringify(report));
 } finally {

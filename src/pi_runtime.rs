@@ -7,6 +7,11 @@ use std::collections::VecDeque;
 pub struct PiRuntime {
     waiting: Option<(String, String)>,
     user_messages: VecDeque<Value>,
+    lifecycle_phase: u8,
+    lifecycle_enabled: bool,
+    turn_ready: bool,
+    turn_index: u64,
+    poll_steer: bool,
     custom_messages: VecDeque<Value>,
     terminal_failure: bool,
     steering_all: bool,
@@ -42,6 +47,7 @@ impl PiRuntime {
         store.append(entry)
     }
     fn after_tools(&mut self, store: &mut PiSessionStore, request: &Value) -> Result<Value> {
+        if self.lifecycle_enabled && !self.turn_ready && self.tools.is_empty() { self.poll_steer = true; return self.next(store); }
         if self.tools.is_empty() && request["cancelled"] != true {
             let indices: Vec<usize> = self.user_messages.iter().enumerate()
                 .filter(|(_, q)|q["options"]["deliverAs"] == "steer")
@@ -72,6 +78,13 @@ impl PiRuntime {
         };
         if self.action_count >= max {
             bail!("bounded fixture action limit exceeded");
+        }
+        if self.lifecycle_enabled && self.tools.is_empty() && !self.turn_ready {
+            self.sequence += 1;
+            self.lifecycle_phase = 2;
+            let id = format!("lifecycle-{}-turn",self.sequence);
+            self.waiting = Some(("lifecycle".into(),id.clone()));
+            return Ok(json!({"type":"lifecycle","requestId":id,"event":{"type":"turn_start","turnIndex":self.turn_index}}));
         }
         self.action_count += 1;
         self.sequence = self
@@ -106,6 +119,8 @@ impl PiRuntime {
             self.active_tool = Some(call.clone());
             Ok(json!({"type":"tool","requestId":id,"call":call}))
         } else {
+            self.turn_ready = false;
+            self.turn_index += 1;
             self.waiting = Some(("model".into(), id.clone()));
             Ok(
                 json!({"type":"model","requestId":id,"contextEntries":store.snapshot()?["contextEntries"]}),
@@ -119,6 +134,22 @@ impl PiRuntime {
         let timestamp = request["timestamp"]
             .as_str()
             .unwrap_or("2026-01-01T00:00:00.000Z");
+        if op == "lifecycle_ack" {
+            let expected = self.waiting.as_ref().context("no lifecycle awaiting acknowledgement")?;
+            if expected.0 != "lifecycle" || request["requestId"] != expected.1 {bail!("stale lifecycle acknowledgement");}
+            self.waiting = None;
+            if self.lifecycle_phase == 1 { return self.next(store); }
+            self.lifecycle_phase = 0;
+            self.turn_ready = true;
+            return if self.poll_steer {self.after_tools(store, request)} else {self.next(store)};
+        }
+        if op == "abandon_waiting" {
+            self.waiting = None;
+            self.lifecycle_phase = 0;
+            self.turn_ready = false;
+            self.terminal_failure = true;
+            return Ok(Value::Null);
+        }
         if op == "enqueue_user" {
             let queued = request["queued"].clone();
             if queued["kind"] != "user"
@@ -359,6 +390,19 @@ impl PiRuntime {
                 self.max_actions = request["maxActions"].as_u64().unwrap_or(32) as u32;
             }
             self.parallel = request["parallel"].as_bool().unwrap_or(false);
+            if request["driveStart"] == true {
+                self.lifecycle_enabled = request["lifecycle"] == true || request["initialLifecyclePrototype"] == true;
+                self.turn_index = 0;
+            }
+            self.poll_steer = request["driveStart"] == true;
+            self.turn_ready = false;
+            if self.lifecycle_enabled && request["driveStart"] == true {
+                self.sequence += 1;
+                self.lifecycle_phase = 1;
+                let id = format!("lifecycle-{}-agent",self.sequence);
+                self.waiting = Some(("lifecycle".into(),id.clone()));
+                return Ok(json!({"type":"lifecycle","requestId":id,"event":{"type":"agent_start"}}));
+            }
             return self.next(store);
         }
         if op == "batch_result" {

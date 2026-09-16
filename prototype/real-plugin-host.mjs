@@ -62,7 +62,11 @@ export async function createHost(backend, { factories = [], cwd = process.cwd(),
       return models.find(model => String(model?.id ?? model?.modelId ?? '') === String(modelId));
     },
   };
-  const runner = new ExtensionRunner(loaded.extensions, loaded.runtime, cwd, sessionManager, modelRegistry);
+  // Status capture is a headless output sink, not an interactive UI capability.
+  class HeadlessRunner extends ExtensionRunner { hasUI() { return false; } }
+  const runner = new HeadlessRunner(loaded.extensions, loaded.runtime, cwd, sessionManager, modelRegistry);
+  const statusUpdates = [];
+  runner.setUIContext({...runner.getUIContext(),setStatus:(key,text)=>statusUpdates.push({key,text})});
   const errors = [];
   let lifecycleAbort = new AbortController();
   runner.onError(({ event, error }) => errors.push({ event, error }));
@@ -158,7 +162,7 @@ export async function createHost(backend, { factories = [], cwd = process.cwd(),
     assert.ok(definition, `unregistered tool: ${name}`);
     return { name, description: definition.description, parameters: definition.parameters };
   });
-  return { preparePrompt, modelRuntime, beginDrive, waitForIdle, runner, eventBus, errors, providers, modelRegistry, contextActions, execute, requestTools, runtime: loaded.runtime, actions, get pendingMessages() { return typeof sessionManager?.handle === 'string' ? [...pendingMessages,...sessionManager.pendingUsers(),...sessionManager.pendingCustom().map(q=>({kind:"agent",message:q.message,options:{deliverAs:"nextTurn"}}))] : pendingMessages; }, peekNextTurnMessages: () => { const local = pendingMessages.filter(q => q.options?.deliverAs === 'nextTurn'); return typeof sessionManager?.handle === 'string' ? [...local, ...sessionManager.pendingCustom().map(q=>({kind:"agent",message:q.message,options:{deliverAs:"nextTurn"}}))] : local; },
+  return { statusUpdates, preparePrompt, modelRuntime, beginDrive, waitForIdle, runner, eventBus, errors, providers, modelRegistry, contextActions, execute, requestTools, runtime: loaded.runtime, actions, get pendingMessages() { return typeof sessionManager?.handle === 'string' ? [...pendingMessages,...sessionManager.pendingUsers(),...sessionManager.pendingCustom().map(q=>({kind:"agent",message:q.message,options:{deliverAs:"nextTurn"}}))] : pendingMessages; }, peekNextTurnMessages: () => { const local = pendingMessages.filter(q => q.options?.deliverAs === 'nextTurn'); return typeof sessionManager?.handle === 'string' ? [...local, ...sessionManager.pendingCustom().map(q=>({kind:"agent",message:q.message,options:{deliverAs:"nextTurn"}}))] : local; },
     acknowledgeNextTurnMessages: messages => { for (const message of messages) { const index = pendingMessages.indexOf(message); if (index >= 0) pendingMessages.splice(index, 1); } },
     restoreMessages: messages => pendingMessages.unshift(...messages),
     drainMessages: () => { const ready = pendingMessages.filter(q => q.options?.deliverAs !== 'nextTurn'); for (const message of ready) pendingMessages.splice(pendingMessages.indexOf(message), 1); return ready; } };
