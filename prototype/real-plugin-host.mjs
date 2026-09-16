@@ -25,7 +25,7 @@ export function tsBackend(initial = []) {
   };
 }
 
-export async function createHost(backend, { factories = [], cwd = process.cwd(), extensionPaths = [pluginPath], sessionManager = guardedObject('sessionManager'), modelRuntime, contextFiles = [], promptResources = {} }  = {}) {
+export async function createHost(backend, { factories = [], cwd = process.cwd(), extensionPaths = [pluginPath], sessionManager = guardedObject('sessionManager'), modelRuntime, contextFiles = [], promptResources = {}, toolDefinitions = [] }  = {}) {
   const eventBus = createEventBus();
   const loaded = await loadExtensions(extensionPaths, cwd, eventBus);
   assert.deepEqual(loaded.errors, [], 'unchanged upstream extension must load');
@@ -35,7 +35,9 @@ export async function createHost(backend, { factories = [], cwd = process.cwd(),
   let currentSystemPrompt = "";
   let currentPromptOptions = {cwd};
   const preparePrompt = async (prompt) => {
-    currentPromptOptions = {cwd, selectedTools: backend.getActiveTools(), contextFiles, ...promptResources};
+    const snippets=Object.fromEntries(toolDefinitions.filter(t=>backend.getActiveTools().includes(t.name)&&t.promptSnippet).map(t=>[t.name,t.promptSnippet]));
+    const guidelines=toolDefinitions.filter(t=>backend.getActiveTools().includes(t.name)).flatMap(t=>t.promptGuidelines??[]);
+    currentPromptOptions = {cwd, selectedTools: backend.getActiveTools(), toolSnippets:snippets, promptGuidelines:guidelines, contextFiles, ...promptResources};
     const base = buildSystemPrompt(currentPromptOptions);
     currentSystemPrompt = base;
     const text = typeof prompt === "string" ? prompt : prompt.filter(p => p.type === "text").map(p => p.text).join("\n");

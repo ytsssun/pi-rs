@@ -45,7 +45,7 @@ const {ModelRuntime}=await import('../vendor/pi-mono/packages/coding-agent/src/c
 const tools=createCodingTools(cwd);
 const {createSessionOwner}=await import('../prototype/architecture/session-owner.mjs');
 const owner=await createSessionOwner({path,cwd,mode:options['--resume']?'open':'create',
-  makeHost:async manager=>createHost(tsBackend(tools.map(t=>t.name)),{cwd,promptResources:loadPromptResources({cwd,agentDir:getAgentDir(),projectTrusted:true}),contextFiles:loadProjectContextFiles({cwd,agentDir:getAgentDir()}),modelRuntime:await ModelRuntime.create({modelsPath:null,refreshOnCreate:false,allowModelNetwork:false}),sessionManager:manager,extensionPaths:extensions,factories:[pi=>{for(const tool of tools) pi.registerTool(tool);}]})});
+  makeHost:async manager=>createHost(tsBackend(tools.map(t=>t.name)),{cwd,promptResources:loadPromptResources({cwd,agentDir:getAgentDir(),projectTrusted:true}),contextFiles:loadProjectContextFiles({cwd,agentDir:getAgentDir()}),modelRuntime:await ModelRuntime.create({modelsPath:null,refreshOnCreate:false,allowModelNetwork:false}),sessionManager:manager,toolDefinitions:tools,extensionPaths:extensions,factories:[pi=>{for(const tool of tools) pi.registerTool(tool);}]})});
 let {manager,host}=owner.current;
 try {
 if (options['--branch']) await manager.branch(options['--branch']);
