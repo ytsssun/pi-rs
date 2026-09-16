@@ -1,0 +1,196 @@
+{
+  "sourceCommit": "1c1d2305b41b1c85b406fe8bdfc6fc6bf42396fd",
+  "model": "gpt-5.4-mini",
+  "provider": "OpenAI chat completions via parent-held loopback relay",
+  "contextEditing": false,
+  "fixture": false,
+  "manualSteering": 0,
+  "binarySha256": "3ae19988160095a78222d50889b67d69fd3d13b8f70c947f8056082ea73b0856",
+  "addonSha256": "09756c6b6079f8f731e2c4527a0b133c6c39e21934df844aff762b245280f966",
+  "harnessSha256": "49df2917afec3455ecc1231c69fce75c2fac2e06abd477925ecebb0a92baf274",
+  "runs": [
+    {
+      "stage": 0,
+      "prompt": "Fix the arithmetic bug in this repository and verify the result. Follow the repository instructions.",
+      "passed": true,
+      "exit": 0,
+      "externalExit": 0,
+      "integrity": {
+        "AGENTS.md": true,
+        "test_maths.py": true
+      },
+      "historyPrefixPreserved": true,
+      "ranRepositoryTests": true,
+      "elapsedSeconds": 10.409694708,
+      "usage": [
+        {
+          "completion_tokens": 22,
+          "completion_tokens_details": {
+            "accepted_prediction_tokens": 0,
+            "audio_tokens": 0,
+            "reasoning_tokens": 0,
+            "rejected_prediction_tokens": 0
+          },
+          "prompt_tokens": 1058,
+          "prompt_tokens_details": {
+            "audio_tokens": 0,
+            "cached_tokens": 0
+          },
+          "total_tokens": 1080
+        },
+        {
+          "completion_tokens": 22,
+          "completion_tokens_details": {
+            "accepted_prediction_tokens": 0,
+            "audio_tokens": 0,
+            "reasoning_tokens": 0,
+            "rejected_prediction_tokens": 0
+          },
+          "prompt_tokens": 1127,
+          "prompt_tokens_details": {
+            "audio_tokens": 0,
+            "cached_tokens": 0
+          },
+          "total_tokens": 1149
+        },
+        {
+          "completion_tokens": 74,
+          "completion_tokens_details": {
+            "accepted_prediction_tokens": 0,
+            "audio_tokens": 0,
+            "reasoning_tokens": 0,
+            "rejected_prediction_tokens": 0
+          },
+          "prompt_tokens": 1171,
+          "prompt_tokens_details": {
+            "audio_tokens": 0,
+            "cached_tokens": 0
+          },
+          "total_tokens": 1245
+        },
+        {
+          "completion_tokens": 26,
+          "completion_tokens_details": {
+            "accepted_prediction_tokens": 0,
+            "audio_tokens": 0,
+            "reasoning_tokens": 0,
+            "rejected_prediction_tokens": 0
+          },
+          "prompt_tokens": 1266,
+          "prompt_tokens_details": {
+            "audio_tokens": 0,
+            "cached_tokens": 1152
+          },
+          "total_tokens": 1292
+        },
+        {
+          "completion_tokens": 42,
+          "completion_tokens_details": {
+            "accepted_prediction_tokens": 0,
+            "audio_tokens": 0,
+            "reasoning_tokens": 0,
+            "rejected_prediction_tokens": 0
+          },
+          "prompt_tokens": 1305,
+          "prompt_tokens_details": {
+            "audio_tokens": 0,
+            "cached_tokens": 1152
+          },
+          "total_tokens": 1347
+        }
+      ]
+    },
+    {
+      "stage": 1,
+      "prompt": "Continue the prior task. Add subtract(a,b), preserving addition, and verify subtraction with positive and negative arguments. Follow the repository instructions.",
+      "passed": false,
+      "exit": 0,
+      "externalExit": 0,
+      "integrity": {
+        "AGENTS.md": true,
+        "test_maths.py": false
+      },
+      "historyPrefixPreserved": true,
+      "ranRepositoryTests": true,
+      "elapsedSeconds": 7.126848416,
+      "usage": [
+        {
+          "completion_tokens": 58,
+          "completion_tokens_details": {
+            "accepted_prediction_tokens": 0,
+            "audio_tokens": 0,
+            "reasoning_tokens": 0,
+            "rejected_prediction_tokens": 0
+          },
+          "prompt_tokens": 1381,
+          "prompt_tokens_details": {
+            "audio_tokens": 0,
+            "cached_tokens": 1152
+          },
+          "total_tokens": 1439
+        },
+        {
+          "completion_tokens": 120,
+          "completion_tokens_details": {
+            "accepted_prediction_tokens": 0,
+            "audio_tokens": 0,
+            "reasoning_tokens": 0,
+            "rejected_prediction_tokens": 0
+          },
+          "prompt_tokens": 1514,
+          "prompt_tokens_details": {
+            "audio_tokens": 0,
+            "cached_tokens": 1152
+          },
+          "total_tokens": 1634
+        },
+        {
+          "completion_tokens": 77,
+          "completion_tokens_details": {
+            "accepted_prediction_tokens": 0,
+            "audio_tokens": 0,
+            "reasoning_tokens": 0,
+            "rejected_prediction_tokens": 0
+          },
+          "prompt_tokens": 1655,
+          "prompt_tokens_details": {
+            "audio_tokens": 0,
+            "cached_tokens": 1152
+          },
+          "total_tokens": 1732
+        },
+        {
+          "completion_tokens": 26,
+          "completion_tokens_details": {
+            "accepted_prediction_tokens": 0,
+            "audio_tokens": 0,
+            "reasoning_tokens": 0,
+            "rejected_prediction_tokens": 0
+          },
+          "prompt_tokens": 1749,
+          "prompt_tokens_details": {
+            "audio_tokens": 0,
+            "cached_tokens": 1152
+          },
+          "total_tokens": 1775
+        },
+        {
+          "completion_tokens": 73,
+          "completion_tokens_details": {
+            "accepted_prediction_tokens": 0,
+            "audio_tokens": 0,
+            "reasoning_tokens": 0,
+            "rejected_prediction_tokens": 0
+          },
+          "prompt_tokens": 1788,
+          "prompt_tokens_details": {
+            "audio_tokens": 0,
+            "cached_tokens": 1664
+          },
+          "total_tokens": 1861
+        }
+      ]
+    }
+  ],
+  "rawArtifactRoot": "/tmp/pi-live-1c1d230-smoke"
+}

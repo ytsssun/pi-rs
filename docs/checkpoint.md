@@ -6,11 +6,11 @@ Live-model evidence remains **0/3 complete protected-test workflows**. No new li
 
 ## Current critical path
 
-PR #51, branch `codex/provider-failure-lifecycle`, worktree `/tmp/pi-provider-failure-lifecycle`, head `038f21b`: implements provider_failure in Rust. The previously failing upstream comparison now passes stream creation/iteration/result failures, model metadata, zero usage and end-event payload/order. Drive returns an error assistant instead of rejecting provider exceptions, matching pinned Agent. Native-start, command-idle, queued-followUp and CLI lifecycle recovery assertions were retained and pass; provider rejection assertions explicitly changed. Full Cargo tests and clippy pass locally.
+PR #51 merged at `1c1d2305b41b1c85b406fe8bdfc6fc6bf42396fd` after exact-head CI35122543048/35122538539 and independent checkout verification. Rust now handles provider stream creation/iteration/result exceptions as persisted failure assistants and acknowledged end events. Full Session retry/compaction and external abort remain unverified.
 
-Independent checkout and complete CI remain required before merge. Review must inspect other provider failure assertions and keep hook/delivery failures distinct. If CI fails, preserve evidence and repair against the existing criterion. No full Session retry/compaction, live model or external abort claim. Implementation and evidence are on the PR branch; main remains prior verified behavior.
+New unchanged live smoke on 1c1d230: **0/1 complete workflows**, 1 accepted bugfix stage and 1 rejected resumed feature stage, zero manual steering. Both process exits, arithmetic assertions, test execution and history prefixes passed; resumed model modified protected test_maths.py. See [compact evidence](experiments/live-1c1d230-smoke/README.md). Historical 0/3 results remain separate. Repeated unchanged failure stops further identical repetitions.
 
-Next after integration: inspect the largest remaining user-visible runtime gap against the parity matrix, including exception recovery/resume and real-model workflow validation, rather than adding lifecycle details without a coding-agent use case.
+Next: establish pinned upstream Pi baseline with the same gpt-5.4-mini, prompts, disposable workspace and parent-held acceptance. Verify AGENTS reaches both resumed model contexts, compare protected-file behavior, then decide a targeted fix. Do not change prompts/acceptance or impose a runtime guardrail before this evidence. No additional UI/provider surface work is prioritized over this daily-use failure.
 
 ## Recovery and history
 
