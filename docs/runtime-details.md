@@ -126,3 +126,8 @@ The native store's `setQueueModes({steeringMode, followUpMode})` / `getQueueMode
 ## Tool boundary steering
 
 At the sequential tool boundary, Rust now admits queued steering only after all current tool results are persisted, before the next model request. Follow-up remains deferred until the normal completed response boundary. This preserves pinned Agent contexts for one and sequential multi-tool fixtures and never aborts a running tool. Parallel batch steering now uses the same post-result admission: the two-tool barrier fixture compares both steering modes against explicit upstream parallel execution. External-signal parallel cancellation remains unsupported. All-terminated batches preserve the existing done result; budget exhaustion preserves tool results and unadmitted steering.
+
+
+## Native initial lifecycle bridge
+
+The formal native driver now consumes Rust lifecycle actions for `agent_start` once per drive and `turn_start` before each model boundary, invokes unchanged ExtensionRunner callbacks, and acknowledges before selecting the next action. Callback-enqueued messages are visible in the following model context. Formal CLI coverage uses unchanged `system-prompt-header.ts` with a headless status sink and `ctx.hasUI === false`; provider failure, abort recovery and stale acknowledgements are tested. `turn_end`, `agent_end` payload parity, tool-result events, streaming and interactive UI remain open.

@@ -10,6 +10,9 @@ export async function drive(options) {
   const finish = options.host.beginDrive();
   try {
     return await driveActive({...options, signal: AbortSignal.any([options.host.contextActions.getSignal(), ...(options.signal ? [options.signal] : [])])});
+  } catch (error) {
+    request({op:"runtime",handle:options.manager.handle,event:"abandon_waiting"});
+    throw error;
   } finally {
     // Includes provider, tool, persistence, and queued-message delivery failures.
     finish();
@@ -24,10 +27,15 @@ async function driveActive({manager,host,prompt,stream,trace=[],onToolUpdate=()=
   const nextTurnMessages = [];
   const preparedPrompt = await host.preparePrompt(prompt);
   nextTurnMessages.push(...preparedPrompt.messages.map(message => ({...message, content: message.content ?? []})));
-  let action=step({event:'begin',prompt,parallel,nextTurnMessages,driveStart:true,maxActions:32});
+  let action=step({event:'begin',prompt,parallel,nextTurnMessages,driveStart:true,maxActions:32,lifecycle:true});
   const consumedMessages = [];
   trace.push({type:'turn_start'});
   for(let count=0;;count++) {
+    if(action.type==='lifecycle') {
+      await host.runner.emit({...action.event,timestamp:Date.now()});
+      action=step({event:'lifecycle_ack',requestId:action.requestId,cancelled:signal.aborted});
+      continue;
+    }
     if(action.type==='done') {
       const scheduled = step({event:'advance_queued',parallel,cancelled:signal.aborted});
       if (scheduled.type === 'retained') {

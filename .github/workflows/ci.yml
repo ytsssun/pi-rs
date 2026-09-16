@@ -36,7 +36,10 @@ jobs:
           node experiments/native-preflight-results.mjs
           node experiments/native-batch-input-mutation.mjs
       - name: Verify formal CLI lifecycle
-        run: node --experimental-strip-types experiments/cli-lifecycle.mjs
+        run: |
+          node --experimental-strip-types experiments/cli-lifecycle.mjs
+          node --experimental-strip-types experiments/cli-agent-start.mjs
+          node --experimental-strip-types experiments/native-start-lifecycle.mjs
       - name: Verify startup measurement executes actual CLI
         run: |
           cargo build --locked --bin pi-rs
