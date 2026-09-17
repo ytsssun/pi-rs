@@ -36,6 +36,7 @@ export class RustAgentAdapter {
     const inputs=Array.isArray(messages)?messages:[messages];
     if(inputs.length!==1||inputs[0].role!=='user'||inputs[0].content.some(c=>c.type!=='text'))throw Error('Unsupported: non-single-text prompt');
     if(this.seen===0){for(const message of this.state.messages)this.store.appendMessage(message);this.seen=this.state.messages.length;}
+    this.controller=new AbortController();this.state.errorMessage=undefined;
     this.state.isStreaming=true;
     this.store.setQueueModes({steeringMode:this.steeringMode,followUpMode:this.followUpMode});
     try{
@@ -43,6 +44,7 @@ export class RustAgentAdapter {
       while(true){
         if(action.type==='lifecycle'){
           if(action.event.type!=='agent_start'&&action.event.type!=='turn_start')await this.syncMessages();
+          if(action.event.type==='turn_end'&&action.event.message?.errorMessage)this.state.errorMessage=action.event.message.errorMessage;
           await this.emit(action.event);action=this.step({event:'lifecycle_ack',requestId:action.requestId});continue;
         }
         await this.syncMessages();
@@ -52,6 +54,8 @@ export class RustAgentAdapter {
           if(next.type==='ending'||next.type==='admitted'){action=next.action;continue;}break;
         }
         if(action.type==='model'){
+          const messageCount=this.state.messages.length;
+          try{
           const context={systemPrompt:this.state.systemPrompt,messages:action.contextEntries.flatMap(sessionEntryToContextMessages),tools:this.state.tools};
           const refreshed=await (this.prepareNextTurnWithContext?this.prepareNextTurnWithContext({context,turnIndex:0},this.signal):this.prepareNextTurn?.(this.signal));
           // Reject unsupported compaction instead of silently diverging from Rust history.
@@ -65,17 +69,23 @@ export class RustAgentAdapter {
           for await(const event of output){
             if(event.type==='start'){
               partial=true;this.startedAssistant=true;
-              this.state.streamMessage=event.partial;this.state.messages.push(event.partial);
+              this.state.streamingMessage=event.partial;this.state.streamMessage=event.partial;this.state.messages.push(event.partial);
               await this.emit({type:'message_start',message:{...event.partial}});
             }else if(partial&&['text_start','text_delta','text_end','thinking_start','thinking_delta','thinking_end','toolcall_start','toolcall_delta','toolcall_end'].includes(event.type)){
-              this.state.streamMessage=event.partial;this.state.messages[this.state.messages.length-1]=event.partial;
+              this.state.streamingMessage=event.partial;this.state.streamMessage=event.partial;this.state.messages[this.state.messages.length-1]=event.partial;
               await this.emit({type:'message_update',assistantMessageEvent:event,message:{...event.partial}});
             }
           }
           // Partial state is transient. Rust admits/persists the final message once.
           if(partial)this.state.messages.pop();
-          this.state.streamMessage=null;
-          action=this.step({event:'model_result',requestId:action.requestId,message:await output.result()});continue;
+          this.state.streamingMessage=undefined;this.state.streamMessage=null;
+          action=this.step({event:'model_result',requestId:action.requestId,message:await output.result()});
+          }catch(error){
+            this.state.messages.length=messageCount;this.startedAssistant=false;
+            this.state.streamingMessage=undefined;this.state.streamMessage=null;
+            action=this.step({event:'provider_failure',requestId:action.requestId,model:this.state.model,error:error instanceof Error?error.message:String(error),cancelled:this.signal.aborted});
+          }
+          continue;
         }
         if(action.type==='tool'){
           let toolCall=action.call,args=toolCall.arguments;let result,isError=false;
