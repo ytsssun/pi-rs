@@ -34,6 +34,11 @@ jobs:
           node --experimental-strip-types experiments/agent-session-rust-probe.mjs
       - name: Verify original CLI with experimental Rust Agent substitution
         run: node --experimental-strip-types experiments/upstream-cli-rust-probe.mjs
+      - name: Verify original provider stack and SDK option forwarding
+        run: |
+          node --experimental-strip-types experiments/agent-adapter-options.mjs
+          node --experimental-strip-types experiments/upstream-cli-provider-probe.mjs --upstream
+          node --experimental-strip-types experiments/upstream-cli-provider-probe.mjs
       - name: Verify native session identity and timestamps
         run: node experiments/session-identity.mjs
       - name: Verify native CLI command acceptance

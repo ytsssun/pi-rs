@@ -3,7 +3,8 @@ import {createRequire} from 'node:module';
 import {randomUUID} from 'node:crypto';
 const binding=createRequire(import.meta.url)('../../target/native-session.node');
 export const request=payload=>{const response=JSON.parse(binding.request(JSON.stringify(payload)));if(response.error)throw Error(response.error);return response.result;};
-export async function createBackend({path,cwd=process.cwd(),mode='create',parentSession}) {
+export async function createBackend(options) { return createBackendSync(options); }
+export function createBackendSync({path,cwd=process.cwd(),mode='create',parentSession}) {
   const handle=request({op:mode,path,header:{type:'session',version:3,id:randomUUID(),cwd,timestamp:new Date().toISOString(),...(parentSession === undefined ? {} : {parentSession})}});
   const call=payload=>request({...payload,handle});
   const snapshot=()=>call({op:'snapshot'});

@@ -1,17 +1,19 @@
 // Experimental SDK seam, never an upstream Agent loop. Rust disk state is scratch only.
 import {validateToolArguments} from '../vendor/pi-mono/packages/ai/src/utils/validation.ts';
-import {createBackend,request} from '../prototype/architecture/native-store-backend.mjs';
+import {createBackendSync,request} from '../prototype/architecture/native-store-backend.mjs';
 import {sessionEntryToContextMessages} from '../vendor/pi-mono/packages/coding-agent/src/core/session-manager.ts';
 export class RustAgentAdapter {
   static async create({scratchPath,cwd,model,streamFunction,initialMessages=[]}) {
-    const agent=new RustAgentAdapter();
-    agent.store=await createBackend({path:scratchPath,cwd});
-    agent.state={model,systemPrompt:'',tools:[],messages:[],thinkingLevel:'off',isStreaming:false,streamMessage:null,pendingToolCalls:new Set(),error:undefined};
-    // The upstream SessionManager remains canonical. Seed only a fresh scratch journal.
-    const history=structuredClone(initialMessages);
-    for(const message of history)agent.store.appendMessage(message);
-    agent.state.messages=history;agent.seen=history.length;
-    agent.streamFunction=streamFunction;return agent;
+    return new RustAgentAdapter({scratchPath,cwd,initialState:{model,messages:initialMessages},streamFn:streamFunction});
+  }
+  constructor(options) {
+    this.store=createBackendSync({path:options.scratchPath,cwd:options.cwd});
+    this.state={systemPrompt:'',tools:[],messages:[],thinkingLevel:'off',isStreaming:false,streamMessage:null,pendingToolCalls:new Set(),error:undefined,...options.initialState};
+    this.state.messages=structuredClone(this.state.messages);
+    this.streamFunction=options.streamFn;
+    this.convertToLlm=options.convertToLlm??(messages=>messages.filter(m=>['user','assistant','toolResult'].includes(m.role)));
+    for(const key of ['transformContext','getApiKey','onPayload','onResponse','sessionId','transport','thinkingBudgets','maxRetryDelayMs','beforeToolCall','afterToolCall','prepareNextTurn','prepareNextTurnWithContext'])this[key]=options[key];
+    this.steeringMode=options.steeringMode??'one-at-a-time';this.followUpMode=options.followUpMode??'one-at-a-time';
   }
   listeners=new Set();trace=[];controller=new AbortController();seen=0;
   steeringMode='one-at-a-time';followUpMode='one-at-a-time';
@@ -33,6 +35,7 @@ export class RustAgentAdapter {
     if(this.state.isStreaming)throw Error('Already running');
     const inputs=Array.isArray(messages)?messages:[messages];
     if(inputs.length!==1||inputs[0].role!=='user'||inputs[0].content.some(c=>c.type!=='text'))throw Error('Unsupported: non-single-text prompt');
+    if(this.seen===0){for(const message of this.state.messages)this.store.appendMessage(message);this.seen=this.state.messages.length;}
     this.state.isStreaming=true;
     this.store.setQueueModes({steeringMode:this.steeringMode,followUpMode:this.followUpMode});
     try{
@@ -50,10 +53,14 @@ export class RustAgentAdapter {
         }
         if(action.type==='model'){
           const context={systemPrompt:this.state.systemPrompt,messages:action.contextEntries.flatMap(sessionEntryToContextMessages),tools:this.state.tools};
-          const refreshed=await this.prepareNextTurnWithContext?.({context,turnIndex:0},this.signal);
+          const refreshed=await (this.prepareNextTurnWithContext?this.prepareNextTurnWithContext({context,turnIndex:0},this.signal):this.prepareNextTurn?.(this.signal));
           // Reject unsupported compaction instead of silently diverging from Rust history.
           if(JSON.stringify(refreshed?.context?.messages??context.messages)!==JSON.stringify(context.messages))throw Error('Unsupported: context history replacement');
-          const output=await this.streamFunction(refreshed?.model??this.state.model,refreshed?.context??context,{signal:this.signal});
+          const nextContext=refreshed?.context??context, model=refreshed?.model??this.state.model;
+          const transformed=this.transformContext?await this.transformContext(structuredClone(nextContext.messages),this.signal):nextContext.messages;
+          const llmContext={...nextContext,messages:await this.convertToLlm(transformed)};
+          const thinking=refreshed?.thinkingLevel??this.state.thinkingLevel;
+          const output=await this.streamFunction(model,llmContext,{signal:this.signal,apiKey:await this.getApiKey?.(model.provider),reasoning:thinking==='off'?undefined:thinking,sessionId:this.sessionId,transport:this.transport,thinkingBudgets:this.thinkingBudgets,maxRetryDelayMs:this.maxRetryDelayMs,onPayload:this.onPayload,onResponse:this.onResponse});
           for await(const ignored of output){}
           action=this.step({event:'model_result',requestId:action.requestId,message:await output.result()});continue;
         }
