@@ -65,6 +65,14 @@ try {
   writeFileSync(join(dir, `process-${stage}.json`), JSON.stringify(result,null,2));
   assert.equal(result.code, 0, `${result.stderr}\nArtifacts: ${dir}`);
   assert.equal(stageCalls, 2, 'Must use the real HTTP provider stack twice per process');
+  const events=result.stdout.trim().split('\n').map(JSON.parse);
+  assert.deepEqual(events.map(e=>e.type==='message_update'?e.assistantMessageEvent.type:e.type),[
+   'session','agent_start','turn_start','message_start','message_end','message_start',
+   'toolcall_start','toolcall_delta','toolcall_end','message_end','tool_execution_start','tool_execution_end',
+   'message_start','message_end','turn_end','turn_start','message_start','text_start','text_delta','text_end',
+   'message_end','turn_end','agent_end','agent_settled']);
+  assert.equal(events.find(e=>e.assistantMessageEvent?.type==='text_delta').assistantMessageEvent.delta,'fixture complete');
+  assert.equal(events.filter(e=>e.type==='message_end').length,4,'Partials must not duplicate final messages');
   assert.equal(readFileSync(join(dir,'subject.txt'),'utf8'), stage?'resumed\n':'after\n');
   const bytes = readFileSync(session,'utf8');
   const messages = bytes.trim().split('\n').map(JSON.parse).filter(e=>e.type==='message').map(e=>e.message);
