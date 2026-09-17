@@ -1,0 +1,27 @@
+{
+  "model": "gpt-5.4-2026-03-05",
+  "upstreamOne": {
+    "workflows": 1,
+    "stages": 2,
+    "tokens": 14201
+  },
+  "rustOne": {
+    "workflows": 1,
+    "stages": 2,
+    "tokens": 16453
+  },
+  "rustThree": {
+    "workflows": 3,
+    "stages": 6,
+    "tokens": 44465,
+    "seconds": 35.972266917,
+    "manualSteering": 0,
+    "sourceDirty": false
+  },
+  "limits": [
+    "One fixed model/task cohort",
+    "Context editing off",
+    "Host-user tools and parent-held relay",
+    "Not full Pi compatibility or reliability claim"
+  ]
+}
