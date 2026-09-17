@@ -2,7 +2,7 @@
 
 ## Conclusion
 
-Current pi-rs is a separate headless CLI using selected unchanged Pi components and a Rust runtime. It is **not** an unchanged upstream Pi CLI with its core swapped out. No successful drop-in core integration has been demonstrated. The desired product remains a Rust core under the Pi ecosystem; a second complete CLI implementation is not necessary to that goal.
+Current pi-rs is a separate headless CLI using selected unchanged Pi components and a Rust runtime. It is **not** an unchanged upstream Pi CLI with its core swapped out. The experimental AgentSession seam below now passes a deterministic slice; the original CLI is still not integrated. The desired product remains a Rust core under the Pi ecosystem; a second complete CLI implementation is not necessary to that goal.
 
 Current path:
 
@@ -58,3 +58,21 @@ Two integration constraints are now source-confirmed:
 - AgentSession installs prepareNextTurnWithContext (around lines 561–583) to refresh compaction context, prompt, tools, model and thinking level. Call it at each model boundary; copying initial state only cannot preserve this behavior.
 
 Worker prototype must instrument native actions, exercise real Session listeners, and surface unsupported APIs. Its output is not accepted until independently executed.
+
+## Executed adapter slice
+
+`experiments/agent-shaped-adapter.mjs` now supplies an experimental Agent interface to unchanged upstream AgentSession. Run:
+
+```sh
+python3 scripts/build-native-session.py
+node --experimental-strip-types experiments/agent-session-rust-probe.mjs --upstream
+node --experimental-strip-types experiments/agent-session-rust-probe.mjs
+```
+
+Both paths pass the same file-content, event-order, follow-up, idle/settlement and six-message canonical-history assertions. A child process opens the actual upstream session file and checks its messages. The native path additionally asserts Rust model/tool actions (three model requests and one original edit tool). The fixture provider chooses fixed calls; this is not live-model evidence.
+
+Worker artifacts were recovered after a capacity interruption. Independent execution initially failed: its queue lacked the `message` field; after fixing that, legacy edit arguments failed because the adapter skipped the original tool's `prepareArguments`. Calling that upstream normalizer and validator fixed the tool result. String user content was changed to preserve upstream content arrays. These failures are retained on the board.
+
+Limits: this is an experiment, not a supported CLI mode. Native history is a separate scratch journal; only upstream SessionManager owns the canonical file. New-process *reading* passes; reopening an adapter and continuing work does not yet. Streaming updates are consumed without forwarding; cancellation, failure recovery, hook context, queue clearing, non-text prompts, compaction/history replacement and the full Agent API remain incomplete. Follow-up runs within the same invocation, not through `continue()`. Identical events here do not establish general lifecycle compatibility.
+
+Next critical path: import canonical upstream history into fresh Rust state and continue through a new AgentSession/adapter process, then wire the actual CLI construction seam with an explicit package adapter. Keep this separate from replacing upstream Session policy in Rust; that larger ownership goal remains open.

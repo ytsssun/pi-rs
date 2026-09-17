@@ -1,16 +1,18 @@
 # Current checkpoint
 
-Current software is our custom headless CLI plus Rust runtime, reusing selected original Pi components. It is **not an unchanged upstream CLI with core swapped out**. Executed negative injection probe fails at missing Agent.subscribe. [Review and next acceptance](core-replacement-review.md) supersede earlier ambiguous claims.
+Current software is our custom headless CLI plus Rust runtime, reusing selected original Pi components. It is **not an unchanged upstream CLI with core swapped out**. Direct module injection fails at missing Agent.subscribe, but the new experimental Agent-shaped adapter passes the scoped SDK probe. [Review and next acceptance](core-replacement-review.md) supersede earlier ambiguous claims.
 
 PR55 selected-model binding merged as 8b46fa3 after head 3f82d14 passed CI35171053480/35171049960. Earlier Rust lifecycle and provider text conversions remain integrated. Live protected-test workflows remain unsuccessful for pi-rs; upstream single baseline passed but requests differ. No full compatibility or daily-use reliability claim.
 
 ## Current critical path
 
-Build an Agent-compatible Rust adapter under unchanged upstream AgentSession. Worker `/root/upstream_agent_adapter` owns an isolated prototype from 4f39af7, not main. Coordinator independently audited required direct methods/state in the review. Upstream Session persists message_end itself and installs prepareNextTurnWithContext; avoid double durable writes and honor per-turn refresh.
+Experimental adapter now runs under unchanged upstream AgentSession. Both upstream Agent and Rust adapter pass the same deterministic edit + queued follow-up, exact event sequence, canonical six-message history and fresh-process read assertions. Native trace proves Rust selected model/tool actions. Commands: `node --experimental-strip-types experiments/agent-session-rust-probe.mjs` and the same with `--upstream` (build native addon first).
 
-Frozen acceptance: upstream AgentSession executes deterministic tool edit, awaited message/tool/lifecycle events, queued follow-up, settlement and process reopen; external result checks; instrument Rust action ownership to exclude accidentally running upstream Agent loop. First artifact may establish only construction/one prompt; record remaining criteria rather than declaring milestone complete. No TUI/live/provider expansion until this seam is proven.
+Not verified: original CLI injection, fresh-process continuation, streaming updates, cancellation/recovery, full Agent API, or live model with this adapter. The scratch Rust journal is temporary; upstream SessionManager is canonical. No full compatibility claim.
 
-Recovery: inspect worker worktree/commits, or continue locally after capacity failure. Read only relevant review/board records. The old custom CLI remains runnable while integration is experimental. Merge-run CI for PR55 and this docs update still needs inspection.
+Next frozen acceptance: fresh process opens the upstream canonical session, initializes Rust context from that history, executes a second independent edit through unchanged AgentSession, and verifies old history was neither lost nor duplicated. Then test the original CLI startup seam. No TUI/provider expansion.
+
+Worker capacity failure was handled locally; artifacts and initial queue/edit failures are recorded in the review/board. Current branch CI must pass before integration. Recovery: inspect Git status and exact-head GitHub checks, run the two probe commands, then extend fresh-process continuation. Preserve `/tmp/pi-rs-agent-adapter` until integration.
 
 ## History
 
