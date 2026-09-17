@@ -14,7 +14,27 @@ import {createModelRegistry,getModelRuntime} from '../vendor/pi-mono/packages/co
 if(process.argv[2]==='reopen'){
  const manager=SessionManager.open(process.argv[3]);const messages=manager.buildSessionContext().messages;
  assert.equal(messages.length,6);assert.deepEqual(messages.filter(m=>m.role==='user').map(m=>m.content[0].text),['edit fixture','follow up']);
- console.log('fresh-process canonical upstream reopen PASS');process.exit(0);
+ const cwd=manager.getCwd(),model={...messages.find(m=>m.role==='assistant'),id:'fixture',contextWindow:200000,maxTokens:1000,reasoning:false,input:['text'],cost:{input:0,output:0,cacheRead:0,cacheWrite:0}};
+ let count=0;
+ const streamFunction=async(_model,context)=>{
+   if(count===0)assert.deepEqual(context.messages.slice(0,6),messages);
+   count++;
+   const message={...messages.find(m=>m.role==='assistant'),timestamp:Date.now(),content:count===1?[{type:'toolCall',id:'resume-edit',name:'edit',arguments:{path:'subject.txt',edits:[{oldText:'after',newText:'resumed'}]}}]:[{type:'text',text:'resumed'}],stopReason:count===1?'toolUse':'stop'};
+   return {async *[Symbol.asyncIterator](){yield {type:'done',message};},async result(){return message;}};
+ };
+ const upstream=process.argv.includes('--upstream');
+ const agent=upstream?new Agent({initialState:{model,messages:structuredClone(messages)},streamFn:streamFunction}):await RustAgentAdapter.create({scratchPath:join(cwd,'resume-scratch.jsonl'),cwd,model,streamFunction,initialMessages:messages});
+ const registry=await createModelRegistry(AuthStorage.inMemory({anthropic:{type:'api_key',key:'fixture-only'}}));
+ const session=new AgentSession({agent,sessionManager:manager,settingsManager:SettingsManager.inMemory({compaction:{enabled:false},retry:{enabled:false}}),cwd,modelRuntime:getModelRuntime(registry),resourceLoader:createTestResourceLoader(),initialActiveToolNames:['edit']});
+ await session.prompt('continue after restart');
+ assert.equal(count,2);assert.equal(readFileSync(join(cwd,'subject.txt'),'utf8'),'resumed\n');
+ const restored=SessionManager.open(process.argv[3]).buildSessionContext().messages;
+ assert.deepEqual(restored.slice(0,6),messages);assert.equal(restored.length,10);// JSON persistence omits optional undefined fields on upstream tool messages.
+ assert.deepEqual(restored,JSON.parse(JSON.stringify(agent.state.messages)));
+ assert.equal(session.isIdle,true);
+ if(!upstream)assert.ok(agent.trace.some(t=>t.output==='tool'));
+ agent.store?.close();session.dispose();
+ console.log('fresh-process canonical upstream continuation PASS');process.exit(0);
 }
 const dir=mkdtempSync(join(tmpdir(),'pi-agent-seam-'));writeFileSync(join(dir,'subject.txt'),'before\n');
 const model={id:'fixture',provider:'anthropic',api:'anthropic-messages',contextWindow:200000,maxTokens:1000,reasoning:false,input:['text'],cost:{input:0,output:0,cacheRead:0,cacheWrite:0}};
@@ -40,6 +60,6 @@ if(!upstream){assert.ok(agent.trace.some(t=>t.output==='tool'));assert.equal(age
 assert.equal(manager.buildSessionContext().messages.length,6);
 assert.deepEqual(manager.buildSessionContext().messages,agent.state.messages);
 assert.deepEqual(events,['agent_start','turn_start','message_start','message_end','queue_update','message_start','message_end','tool_execution_start','tool_execution_end','message_start','message_end','turn_end','turn_start','message_start','message_end','turn_end','turn_start','queue_update','message_start','message_end','message_start','message_end','turn_end','agent_end','agent_settled']);
-const child=spawnSync(process.execPath,['--experimental-strip-types',import.meta.filename,'reopen',manager.getSessionFile()],{encoding:'utf8'});assert.equal(child.status,0,child.stderr);console.log(child.stdout.trim());
+const child=spawnSync(process.execPath,['--experimental-strip-types',import.meta.filename,'reopen',manager.getSessionFile(),...(upstream?['--upstream']:[])],{encoding:'utf8'});assert.equal(child.status,0,child.stderr);console.log(child.stdout.trim());
 writeFileSync(join(dir,'evidence.json'),JSON.stringify({events,trace:agent.trace,canonical:manager.getSessionFile()},null,2));
 console.log(JSON.stringify({status:'PASS',dir,events,trace:agent.trace}));agent.store?.close();session.dispose();
