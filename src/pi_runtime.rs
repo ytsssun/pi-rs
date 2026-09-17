@@ -285,6 +285,14 @@ impl PiRuntime {
             self.waiting = Some(("lifecycle".into(), id.clone()));
             return Ok(json!({"type":"admitted","action":{"type":"lifecycle","requestId":id,"event":{"type":"agent_start"}}}));
         }
+        if op == "clear_users" {
+            match request["queue"].as_str() {
+                Some("all") => self.user_messages.clear(),
+                Some(kind @ ("steer" | "followUp")) => self.user_messages.retain(|message|message["options"]["deliverAs"] != kind),
+                _ => bail!("queue must be all, steer or followUp"),
+            }
+            return Ok(Value::Null);
+        }
         if op == "pending_users" {
             return Ok(json!(self.user_messages));
         }
