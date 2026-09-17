@@ -28,6 +28,10 @@ jobs:
       - run: node --test experiments/custom-provider-stream.test.mjs
       - name: Build native Node-API addon
         run: python3 scripts/build-native-session.py
+      - name: Verify upstream AgentSession core seam
+        run: |
+          node --experimental-strip-types experiments/agent-session-rust-probe.mjs --upstream
+          node --experimental-strip-types experiments/agent-session-rust-probe.mjs
       - name: Verify native session identity and timestamps
         run: node experiments/session-identity.mjs
       - name: Verify native CLI command acceptance
