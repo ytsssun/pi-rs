@@ -21,7 +21,7 @@ export class RustAgentAdapter {
   subscribe(listener){this.listeners.add(listener);return ()=>this.listeners.delete(listener);}
   async emit(event){for(const listener of this.listeners)await listener(event);}
   step(payload){const action=request({op:'runtime',handle:this.store.handle,timestamp:new Date().toISOString(),messageTimestamp:Date.now(),...payload});this.trace.push({input:payload.event,output:action.type,requestId:action.requestId});return action;}
-  async syncMessages(){const all=this.store.getBranch().flatMap(sessionEntryToContextMessages);for(const message of all.slice(this.seen)){this.state.messages.push(message);await this.emit({type:'message_start',message});await this.emit({type:'message_end',message});}this.seen=all.length;}
+  async syncMessages(){const all=this.store.getBranch().flatMap(sessionEntryToContextMessages);for(const message of all.slice(this.seen)){this.state.messages.push(message);if(!(message.role==='assistant'&&this.startedAssistant))await this.emit({type:'message_start',message});if(message.role==='assistant')this.startedAssistant=false;await this.emit({type:'message_end',message});}this.seen=all.length;}
   hasQueuedMessages(){return this.store.pendingUsers().length>0;}
   followUp(message){this.enqueue(message,'followUp');}
   steer(message){this.enqueue(message,'steer');}
@@ -61,7 +61,20 @@ export class RustAgentAdapter {
           const llmContext={...nextContext,messages:await this.convertToLlm(transformed)};
           const thinking=refreshed?.thinkingLevel??this.state.thinkingLevel;
           const output=await this.streamFunction(model,llmContext,{signal:this.signal,apiKey:await this.getApiKey?.(model.provider),reasoning:thinking==='off'?undefined:thinking,sessionId:this.sessionId,transport:this.transport,thinkingBudgets:this.thinkingBudgets,maxRetryDelayMs:this.maxRetryDelayMs,onPayload:this.onPayload,onResponse:this.onResponse});
-          for await(const ignored of output){}
+          let partial=false;
+          for await(const event of output){
+            if(event.type==='start'){
+              partial=true;this.startedAssistant=true;
+              this.state.streamMessage=event.partial;this.state.messages.push(event.partial);
+              await this.emit({type:'message_start',message:{...event.partial}});
+            }else if(partial&&['text_start','text_delta','text_end','thinking_start','thinking_delta','thinking_end','toolcall_start','toolcall_delta','toolcall_end'].includes(event.type)){
+              this.state.streamMessage=event.partial;this.state.messages[this.state.messages.length-1]=event.partial;
+              await this.emit({type:'message_update',assistantMessageEvent:event,message:{...event.partial}});
+            }
+          }
+          // Partial state is transient. Rust admits/persists the final message once.
+          if(partial)this.state.messages.pop();
+          this.state.streamMessage=null;
           action=this.step({event:'model_result',requestId:action.requestId,message:await output.result()});continue;
         }
         if(action.type==='tool'){
