@@ -1,32 +1,25 @@
 # Current checkpoint
 
-The installed pi-rs still uses our custom headless CLI. A separate experimental Agent adapter now runs the **unchanged upstream CLI and AgentSession**, using Rust model/tool scheduling and the original provider/tool stack. It is not yet the production entry point or a complete Pi replacement.
+## Current verified status
 
-## Verified scope and current work
+The installed CLI is still the custom pi-rs path. The experimental Agent adapter runs unchanged upstream CLI/AgentSession with Rust scheduling and original providers/tools; it is not a complete replacement or the installed default.
 
-- Original CLI new/resume succeeds against a local HTTP/SSE fixture: two processes, four requests, preserved eight-message canonical history. Streaming text/tool event order matches upstream. Run `node --experimental-strip-types experiments/upstream-cli-provider-probe.mjs` (also `--upstream`).
-- Provider exceptions at creation/iteration/result, with and without abort, match upstream and allow same-Agent reuse. PR61 merged as 6b659d8 after CI35227417972/35227398370 passed.
-- Current branch adds **Session-level returned errors and cooperative abort/wait**, with and without queued follow-up. Both compare against original Agent/Session, including canonical history and later reuse. Run `node --experimental-strip-types experiments/agent-session-cancel.mjs` and `--queue`.
-- Queue scenario initially failed because Agent.continue was unsupported. Rust now accepts `continue_queued` only after settlement with pending input; Rust chooses/consumes the queue and starts the new lifecycle. Targeted Rust guard test passes. PR62 merged as 275ec85 after CI35257021859/35247660542 passed.
+Latest live evidence at clean commit `1416178`, pinned upstream `9767ba2`, `gpt-5.4-mini`, context editing off, zero steering: original Pi completed **1/3** full workflows; Rust core completed **0/3**. All six initial bug fixes passed. Every failed resumed stage implemented correct arithmetic, ran tests and exited 0, but modified protected `test_maths.py`; strict external acceptance failed. No guard or task change was introduced. Both initial HTTP requests match after temporary workspace normalization. Small samples do not establish causality, equivalence or speed gains. [Evidence](experiments/live-parity-1416178/README.md).
 
-All above are deterministic tests, not new live-model success. Historical live protected-test workflows failed for the custom pi-rs path; the experimental upstream CLI path has not yet been live-tested.
+Deterministic fixtures pass original CLI new/resume, streaming event order, Session error/abort/wait/queued continuation and scoped automatic retry. PR63 merged as d8b77a2; PR64 merged as 1416178 and merge CI passed. Scratch journals remain per-process and disposable; upstream SessionManager remains canonical. The attempted persistent scratch reopen was reverted in PR64 before merge.
 
-## Limits and next critical path
+## Critical path and frozen next experiment
 
-No production installation switch, complete Agent API, compaction/history replacement, full plugin coverage or tool-cancellation claim. Canonical persistence remains upstream SessionManager; the native journal is scratch. `continue()` supports queued input and scoped last-error retry; arbitrary transcript continuation/compaction remains unsupported. `clearAllQueues` remains unsupported.
+The previous plan to change tasks was based on an incorrect claim: the existing task never requested protected-test modification. That plan is superseded. Keep its failure visible and do not add file-write guards to turn instruction-following failures into apparent passes.
 
-Automatic retry now passes locally against original Session: `node --experimental-strip-types experiments/agent-session-retry.mjs`. Rust validates that active context differs only by the last failed assistant, excludes that entry from model context without changing the journal, and starts a new model turn without adding a user. Five canonical versus four active messages after retry and later reuse; provider-context assertions exclude the error and duplicate user. Full Rust tests/clippy and CLI provider regression passed. Pending exact-head CI before integration. The pre-fix failure is preserved in the board and commit ad84c71.
+Next: audit resumed model requests against original Pi at the context and tool-contract level using recorded traces before more live spending. Verify user ordering, system/developer instructions, tool-result pairing and available tool schemas. If no integration discrepancy is found, choose one bounded stronger-model comparison with identical acceptance, reporting model/config as a new cohort. Do not mechanically repeat gpt-5.4-mini. Separately retain missing Agent API/compaction/tool-cancellation cases as implementation gaps.
 
-Scope: `continue()` supports queued inputs and this validated last-error retry, not arbitrary transcript replacement or compaction. Retry projection is process-local to the scratch runtime; upstream canonical persistence is unchanged.
+## Limits and recovery
 
-Controlled live run now has an exact source commit `6597de1` and explicit `rust-core` engine. `gpt-5.4-mini`, upstream `9767ba2`, one repetition, no manual steering, context editing off. Stage 0 passed in 8.31s: real model fixed `maths.add`, ran the repository test, and preserved protected files. Stage 1 exited 0 in 7.06s and ran tests, but modified protected `test_maths.py`; the repetition failed external acceptance. Every request included the repository instruction, so this is a model/task-following failure, not missing-context evidence. Usage total: 18,178 tokens. Artifacts: `/tmp/pi-live-rust-core-corrected-20260917`; summary copied to `docs/experiments/rust-core-live-20260917/summary.json`. Earlier `/tmp/pi-live-adapter-20260917c,d` runs are historical and explicitly marked as mislabeled/non-controlled.
+No personal daily-use readiness claim. No complete plugin compatibility, general context replacement, tool cancellation or production integration mode. `clearAllQueues` is unsupported; transcript continuation only accepts queues or validated last-error retry. Retry projection is process-local to the scratch runtime.
 
-Next acceptance: use a task that does not ask the model to modify a protected test file, while keeping external tests protected, then run three clean repetitions of new/resume coding. This distinguishes model instruction adherence from runtime resume. Keep the current failure and exact artifacts; do not alter acceptance to make it pass. No context-editing expansion until live resume succeeds.
-
-## Recovery
-
-Inspect Git status and exact-head PR checks before integration. Build with `python3 scripts/build-native-session.py`; run Session cancellation cases and provider CLI probe. Run Rust tests/clippy for runtime changes. Coordinator owns CI through terminal status. Worker capacity failures are handled locally; do not redispatch unchanged work indefinitely.
+Read AGENTS.md and coordinator.md, inspect branch/CI before integration. Latest evidence branch is `codex/live-parity-audit`. Reproduce live harness with `python3 experiments/integrated-live.py --engine rust-core --env-file .env --output NEW_DIRECTORY --model gpt-5.4-mini --repetitions 3`; this documents the command, not an instruction to repeat unchanged failures. Raw artifacts remain under `/tmp/pi-{upstream,rust}-parity-1416178`; durable summaries, diffs, native traces and request hashes are in the evidence directory. Never print credentials.
 
 ## History
 
-[Historical checkpoints](checkpoint-history.md), [board](board.jsonl), and [core integration review](core-replacement-review.md) preserve earlier scope and failures. Existing push/merge authorization does not authorize releases or new external communications.
+[Checkpoint history](checkpoint-history.md), [append-only board](board.jsonl), and [architecture review](core-replacement-review.md) retain superseded findings and failures.

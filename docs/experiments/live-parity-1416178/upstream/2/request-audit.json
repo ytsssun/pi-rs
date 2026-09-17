@@ -1,0 +1,52 @@
+[
+  {
+    "file": "/tmp/pi-upstream-parity-1416178/2/transport/request-001.json",
+    "sha256": "618a8cf648ae0a1a20b64db2cda8fe8af9d8ac87a9db51f88e20b0b11d576a6c",
+    "instructionInSystemOrDeveloper": true
+  },
+  {
+    "file": "/tmp/pi-upstream-parity-1416178/2/transport/request-002.json",
+    "sha256": "28d23423abfb546e9dcf1a34743f6782fa7c15a193f1154ff286481b8a349dde",
+    "instructionInSystemOrDeveloper": true
+  },
+  {
+    "file": "/tmp/pi-upstream-parity-1416178/2/transport/request-003.json",
+    "sha256": "1a0e86975fc87e58930c9f86b7211de68c59b34a3c25b6871c68fe1a2f25d8fe",
+    "instructionInSystemOrDeveloper": true
+  },
+  {
+    "file": "/tmp/pi-upstream-parity-1416178/2/transport/request-004.json",
+    "sha256": "842af64145c819e98583eb049f04efe0690fdbc9c74d2906d8fb3d45fc74bb97",
+    "instructionInSystemOrDeveloper": true
+  },
+  {
+    "file": "/tmp/pi-upstream-parity-1416178/2/transport/request-005.json",
+    "sha256": "6d6b9a71e284807c8b74e8a2f3f233aa954d1e33a702f19a9b095822a9ead336",
+    "instructionInSystemOrDeveloper": true
+  },
+  {
+    "file": "/tmp/pi-upstream-parity-1416178/2/transport/request-006.json",
+    "sha256": "f32309d26802e44f19296bf07ed63d7af3e150852ed89b285e195567164c859f",
+    "instructionInSystemOrDeveloper": true
+  },
+  {
+    "file": "/tmp/pi-upstream-parity-1416178/2/transport/request-007.json",
+    "sha256": "6c5d3afd2dc5a03ac5db53907bc6e15b6b616583ebe512350a673c786c297ccb",
+    "instructionInSystemOrDeveloper": true
+  },
+  {
+    "file": "/tmp/pi-upstream-parity-1416178/2/transport/request-008.json",
+    "sha256": "f33b42781bcadc143395ebf226bb5024a52a2728495ca95208aa52270a744c74",
+    "instructionInSystemOrDeveloper": true
+  },
+  {
+    "file": "/tmp/pi-upstream-parity-1416178/2/transport/request-009.json",
+    "sha256": "a9613b5e33f7816beb34d489551f09ba1a722553a605c6e8cce7b10f68d7063f",
+    "instructionInSystemOrDeveloper": true
+  },
+  {
+    "file": "/tmp/pi-upstream-parity-1416178/2/transport/request-010.json",
+    "sha256": "e63ff88f902678844aebce87ca874543e7ff5443877a30932c8fa07b8728da89",
+    "instructionInSystemOrDeveloper": true
+  }
+]

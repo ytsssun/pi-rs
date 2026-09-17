@@ -1,0 +1,77 @@
+{
+  "upstream": {
+    "completeWorkflows": 1,
+    "failedWorkflows": 2,
+    "passedStages": 4,
+    "failedStages": 2,
+    "totalTokens": 55572,
+    "elapsedSeconds": 33.34400712399999,
+    "manualSteering": 0,
+    "sourceDirty": false,
+    "failures": [
+      {
+        "repeat": 0,
+        "stage": 1,
+        "exit": 0,
+        "externalExit": 0,
+        "integrity": {
+          "AGENTS.md": true,
+          "test_maths.py": false
+        }
+      },
+      {
+        "repeat": 2,
+        "stage": 1,
+        "exit": 0,
+        "externalExit": 0,
+        "integrity": {
+          "AGENTS.md": true,
+          "test_maths.py": false
+        }
+      }
+    ]
+  },
+  "rust": {
+    "completeWorkflows": 0,
+    "failedWorkflows": 3,
+    "passedStages": 3,
+    "failedStages": 3,
+    "totalTokens": 57077,
+    "elapsedSeconds": 30.864674959000002,
+    "manualSteering": 0,
+    "sourceDirty": false,
+    "failures": [
+      {
+        "repeat": 0,
+        "stage": 1,
+        "exit": 0,
+        "externalExit": 0,
+        "integrity": {
+          "AGENTS.md": true,
+          "test_maths.py": false
+        }
+      },
+      {
+        "repeat": 1,
+        "stage": 1,
+        "exit": 0,
+        "externalExit": 0,
+        "integrity": {
+          "AGENTS.md": true,
+          "test_maths.py": false
+        }
+      },
+      {
+        "repeat": 2,
+        "stage": 1,
+        "exit": 0,
+        "externalExit": 0,
+        "integrity": {
+          "AGENTS.md": true,
+          "test_maths.py": false
+        }
+      }
+    ]
+  },
+  "firstRequestMatchesAfterWorkspaceNormalization": true
+}
