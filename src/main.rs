@@ -6,7 +6,8 @@ fn main() -> Result<()> {
     // This is deliberately a source-checkout installation, not a standalone binary.
     // Absolute assets let callers run in their own repository without changing cwd.
     let root = Path::new(env!("CARGO_MANIFEST_DIR"));
-    let entry = root.join("bin/pi-rs.mjs");
+    let upstream = env::args_os().skip(1).any(|arg| arg == "--experimental-upstream-core");
+    let entry = if upstream { root.join("bin/pi-rs-upstream.mjs") } else { root.join("bin/pi-rs.mjs") };
     let loader = root.join("vendor/pi-mono/node_modules/tsx/dist/loader.mjs");
     for asset in [&entry, &loader] {
         if !asset.is_file() {
@@ -16,7 +17,7 @@ fn main() -> Result<()> {
             );
         }
     }
-    let args: Vec<_> = env::args_os().skip(1).collect();
+    let args: Vec<_> = env::args_os().skip(1).filter(|arg| arg != "--experimental-upstream-core").collect();
     let mut command = Command::new("node");
     command.arg("--import").arg(loader).arg(entry);
     if args.is_empty() {

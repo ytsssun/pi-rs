@@ -44,6 +44,11 @@ jobs:
           node --experimental-strip-types experiments/agent-session-retry.mjs
           node --experimental-strip-types experiments/upstream-cli-provider-probe.mjs --upstream
           node --experimental-strip-types experiments/upstream-cli-provider-probe.mjs
+      - name: Verify experimental installed upstream entry
+        run: |
+          cargo build --locked --bin pi-rs
+          python3 scripts/build-native-session.py
+          ./target/debug/pi-rs --experimental-upstream-core --help
       - name: Verify native session identity and timestamps
         run: node experiments/session-identity.mjs
       - name: Verify native CLI command acceptance

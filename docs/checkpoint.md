@@ -18,7 +18,9 @@ Resume request audit passes for all 63 saved requests across both engines: uncha
 
 Current branch implements queue clearing in Rust and exposes all/steering/follow-up Agent methods. Original Session.clearQueue comparison passes with active queued messages, abort/wait and later reuse; pending messages are returned to the caller and never executed. Rust selector/invalid-input tests pass. Full Rust tests/clippy passed before the additional selector test, which also passes. Await exact-head CI.
 
-Next frozen milestone: expose the validated upstream CLI/Rust path through an explicitly experimental installed pi-rs option, allocating per-process scratch state automatically. Verify new/resume via installed binary without manually setting loader/scratch environment variables. Keep the existing default until plugin, session-control and cancellation gaps are characterized; no full replacement claim. No new TUI or provider implementation.
+Experimental installed entry now exists as `pi-rs --experimental-upstream-core`: it invokes the unchanged upstream CLI with the Rust Agent adapter, derives scratch state beside `--session`, and hides loader/scratch environment details. `./target/debug/pi-rs --experimental-upstream-core --help` passes locally; full installed live new/resume remains next. The default command is unchanged. This is source-checkout-only and experimental, not a stable distribution or full replacement.
+
+Next frozen milestone: run the existing local HTTP provider fixture through this installed entry, then one controlled live new/resume task. Keep plugin/session limitations explicit; no TUI/provider expansion.
 
 ## Limits and recovery
 

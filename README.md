@@ -78,3 +78,15 @@ It uses scripted model responses and actual tools; it is not a live-model test. 
 pi-rs builds on [Pi](https://github.com/badlogic/pi-mono). The upstream reference is pinned for reproducible compatibility checks; see [upstream provenance](docs/upstream.md) and [NOTICE](NOTICE).
 
 Both pi-rs and the referenced Pi source are MIT licensed. See [LICENSE](LICENSE).
+
+
+## Experimental upstream core
+
+The default `pi-rs` command is the stable custom headless runtime. To try the Rust Agent beneath the unchanged upstream Pi CLI from a source checkout, build the native addon and run:
+
+```sh
+python3 scripts/build-native-session.py
+./target/debug/pi-rs --experimental-upstream-core --help
+```
+
+Pass the normal upstream CLI options, including `--session`; the experimental wrapper derives per-session Rust scratch state automatically. This path has deterministic and bounded live evidence, but it is not yet a complete Pi replacement.
