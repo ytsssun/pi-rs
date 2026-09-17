@@ -19,7 +19,9 @@ Automatic retry now passes locally against original Session: `node --experimenta
 
 Scope: `continue()` supports queued inputs and this validated last-error retry, not arbitrary transcript replacement or compaction. Retry projection is process-local to the scratch runtime; upstream canonical persistence is unchanged.
 
-Next acceptance: after CI/integration, run one controlled live-model small-repo edit + new-process continuation through the unchanged CLI/Rust adapter using existing authorized credentials via the parent-held relay. Preserve external tests, request/trace/diff/usage/timing and failures. Fix any integration blocker before repetitions; no new provider/TUI scope. If access fails, retain exact access evidence and continue independent missing-interface tests.
+Controlled live run now has an exact source commit `6597de1` and explicit `rust-core` engine. `gpt-5.4-mini`, upstream `9767ba2`, one repetition, no manual steering, context editing off. Stage 0 passed in 8.31s: real model fixed `maths.add`, ran the repository test, and preserved protected files. Stage 1 exited 0 in 7.06s and ran tests, but modified protected `test_maths.py`; the repetition failed external acceptance. Every request included the repository instruction, so this is a model/task-following failure, not missing-context evidence. Usage total: 18,178 tokens. Artifacts: `/tmp/pi-live-rust-core-corrected-20260917`; summary copied to `docs/experiments/rust-core-live-20260917/summary.json`. Earlier `/tmp/pi-live-adapter-20260917c,d` runs are historical and explicitly marked as mislabeled/non-controlled.
+
+Next acceptance: use a task that does not ask the model to modify a protected test file, while keeping external tests protected, then run three clean repetitions of new/resume coding. This distinguishes model instruction adherence from runtime resume. Keep the current failure and exact artifacts; do not alter acceptance to make it pass. No context-editing expansion until live resume succeeds.
 
 ## Recovery
 

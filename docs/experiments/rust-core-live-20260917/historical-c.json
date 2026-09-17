@@ -1,0 +1,201 @@
+{
+  "engine": "upstream",
+  "upstreamCommit": "9767ba275f3e9a5ee0f5c5342249b629ab1b2282",
+  "sourceCommit": "275ec858e00dff2f96641a5a7b56a53031937d11",
+  "model": "gpt-5.4-mini",
+  "provider": "OpenAI chat completions via parent-held loopback relay",
+  "contextEditing": false,
+  "fixture": false,
+  "manualSteering": 0,
+  "binarySha256": "f7dae86d1081e53cfd3c8f81354f9b0b88f8fb4ba83ec49704cc3033c59b23dc",
+  "addonSha256": "a71bb4ab09bf17bba3db032b1bd0a93e5e60edf74af3bfc01bca07968f2714b9",
+  "harnessSha256": "2a9f99a2238e0beccdc5fb2bdbb94672e3ebd9f4a04ad79c05683a65bee6783e",
+  "runs": [
+    {
+      "repeat": 0,
+      "stage": 0,
+      "prompt": "Fix the arithmetic bug in this repository and verify the result. Follow the repository instructions.",
+      "exit": 0,
+      "elapsedSeconds": 12.591823,
+      "externalExit": 0,
+      "testsAndInstructionsUnchanged": true,
+      "integrity": {
+        "AGENTS.md": true,
+        "test_maths.py": true
+      },
+      "historyPrefixPreserved": true,
+      "ranRepositoryTests": true,
+      "toolCalls": [
+        {
+          "arguments": {
+            "limit": 200,
+            "offset": 1,
+            "path": "/private/tmp/pi-live-adapter-20260917c/0/repo/AGENTS.md"
+          },
+          "id": "call_JSWmfvRtl2OsOrSYJEY5mDIe",
+          "name": "read",
+          "type": "toolCall"
+        },
+        {
+          "arguments": {
+            "command": "find . -maxdepth 2 -type f | sort",
+            "timeout": 10
+          },
+          "id": "call_ZfUWCnOv8yD3OoV77rjWj03S",
+          "name": "bash",
+          "type": "toolCall"
+        },
+        {
+          "arguments": {
+            "limit": 200,
+            "offset": 1,
+            "path": "/private/tmp/pi-live-adapter-20260917c/0/repo/maths.py"
+          },
+          "id": "call_OUDm2C3jEfwWCffG7TmU35NR",
+          "name": "read",
+          "type": "toolCall"
+        },
+        {
+          "arguments": {
+            "edits": [
+              {
+                "newText": "def add(a, b):\n    \"\"\"Return the sum of two numbers.\"\"\"\n    return a + b\n",
+                "oldText": "def add(a, b):\n    return a - b\n"
+              }
+            ],
+            "path": "/private/tmp/pi-live-adapter-20260917c/0/repo/maths.py"
+          },
+          "id": "call_gsIopYEYdg0NhYO2NgjgSk0e",
+          "name": "edit",
+          "type": "toolCall"
+        },
+        {
+          "arguments": {
+            "command": "python3 test_maths.py",
+            "timeout": 10
+          },
+          "id": "call_xvbPyVD2DhPMhbB1vCvxY4xf",
+          "name": "bash",
+          "type": "toolCall"
+        }
+      ],
+      "usage": [
+        {
+          "cacheRead": 0,
+          "cacheWrite": 0,
+          "cost": {
+            "cacheRead": 0,
+            "cacheWrite": 0,
+            "input": 0,
+            "output": 0,
+            "total": 0
+          },
+          "input": 1260,
+          "output": 43,
+          "reasoning": 0,
+          "totalTokens": 1303
+        },
+        {
+          "cacheRead": 1152,
+          "cacheWrite": 0,
+          "cost": {
+            "cacheRead": 0,
+            "cacheWrite": 0,
+            "input": 0,
+            "output": 0,
+            "total": 0
+          },
+          "input": 198,
+          "output": 32,
+          "reasoning": 0,
+          "totalTokens": 1382
+        },
+        {
+          "cacheRead": 1152,
+          "cacheWrite": 0,
+          "cost": {
+            "cacheRead": 0,
+            "cacheWrite": 0,
+            "input": 0,
+            "output": 0,
+            "total": 0
+          },
+          "input": 287,
+          "output": 42,
+          "reasoning": 0,
+          "totalTokens": 1481
+        },
+        {
+          "cacheRead": 1152,
+          "cacheWrite": 0,
+          "cost": {
+            "cacheRead": 0,
+            "cacheWrite": 0,
+            "input": 0,
+            "output": 0,
+            "total": 0
+          },
+          "input": 351,
+          "output": 89,
+          "reasoning": 0,
+          "totalTokens": 1592
+        },
+        {
+          "cacheRead": 1152,
+          "cacheWrite": 0,
+          "cost": {
+            "cacheRead": 0,
+            "cacheWrite": 0,
+            "input": 0,
+            "output": 0,
+            "total": 0
+          },
+          "input": 478,
+          "output": 26,
+          "reasoning": 0,
+          "totalTokens": 1656
+        },
+        {
+          "cacheRead": 1152,
+          "cacheWrite": 0,
+          "cost": {
+            "cacheRead": 0,
+            "cacheWrite": 0,
+            "input": 0,
+            "output": 0,
+            "total": 0
+          },
+          "input": 517,
+          "output": 52,
+          "reasoning": 0,
+          "totalTokens": 1721
+        }
+      ],
+      "passed": true
+    },
+    {
+      "repeat": 0,
+      "stage": 1,
+      "prompt": "Continue the prior task. Add subtract(a,b), preserving addition, and verify subtraction with positive and negative arguments. Follow the repository instructions.",
+      "exit": 1,
+      "elapsedSeconds": 0.8446432089999991,
+      "externalExit": 1,
+      "testsAndInstructionsUnchanged": true,
+      "integrity": {
+        "AGENTS.md": true,
+        "test_maths.py": true
+      },
+      "historyPrefixPreserved": true,
+      "ranRepositoryTests": false,
+      "toolCalls": [],
+      "usage": [],
+      "passed": false
+    }
+  ],
+  "limits": [
+    "Host-user tools, not security sandbox",
+    "Two small tasks per repetition; no fork/switch claim",
+    "Acceptance owned by parent and not exposed in workspace; malicious host access not prevented"
+  ],
+  "auditNote": "Historical run mislabeled upstream; actually used Rust adapter with uncommitted harness and source changes on 275ec85, plus native addon from later retry work. Not an exact-commit controlled comparison."
+}
