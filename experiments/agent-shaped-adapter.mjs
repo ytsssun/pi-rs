@@ -40,7 +40,7 @@ export class RustAgentAdapter {
     this.state.isStreaming=true;
     this.store.setQueueModes({steeringMode:this.steeringMode,followUpMode:this.followUpMode});
     try{
-      let action=queuedContinuation?this.step({event:'continue_queued'}).action:this.step({event:'begin',prompt:inputs[0].content,driveStart:true,maxActions:32,lifecycle:true});
+      let action=queuedContinuation?this.step({event:'continue_context',messages:this.state.messages}).action:this.step({event:'begin',prompt:inputs[0].content,driveStart:true,maxActions:32,lifecycle:true});
       while(true){
         if(action.type==='lifecycle'){
           if(action.event.type!=='agent_start'&&action.event.type!=='turn_start')await this.syncMessages();

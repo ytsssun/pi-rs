@@ -13,11 +13,13 @@ All above are deterministic tests, not new live-model success. Historical live p
 
 ## Limits and next critical path
 
-No production installation switch, complete Agent API, compaction/history replacement, full plugin coverage or tool-cancellation claim. Canonical persistence remains upstream SessionManager; the native journal is scratch. `continue()` currently supports queued input after an assistant, not general transcript continuation after retry/compaction. `clearAllQueues` remains unsupported.
+No production installation switch, complete Agent API, compaction/history replacement, full plugin coverage or tool-cancellation claim. Canonical persistence remains upstream SessionManager; the native journal is scratch. `continue()` supports queued input and scoped last-error retry; arbitrary transcript continuation/compaction remains unsupported. `clearAllQueues` remains unsupported.
 
-Current reproducible gap: `node --experimental-strip-types experiments/agent-session-retry.mjs --upstream-only` passes, while the same command without that flag fails with `queued continuation requires a settled run and queued input`. This intentionally failing native probe is not included in the green compatibility suite yet; it freezes the pending acceptance, not a completed feature.
+Automatic retry now passes locally against original Session: `node --experimental-strip-types experiments/agent-session-retry.mjs`. Rust validates that active context differs only by the last failed assistant, excludes that entry from model context without changing the journal, and starts a new model turn without adding a user. Five canonical versus four active messages after retry and later reuse; provider-context assertions exclude the error and duplicate user. Full Rust tests/clippy and CLI provider regression passed. Pending exact-head CI before integration. The pre-fix failure is preserved in the board and commit ad84c71.
 
-Upstream `_prepareRetry` removes the failed assistant from Agent state but retains it in canonical history. Acceptance: retry without duplicating the original user, preserve failed attempt in canonical history, exclude it from model context, finish successfully and accept a later prompt. The fixture expects five canonical messages versus four active Agent messages after recovery. Implement Rust transcript continuation/context selection with validation, preserving queue guard semantics. Do not erase the canonical failure or route this through another prompt.
+Scope: `continue()` supports queued inputs and this validated last-error retry, not arbitrary transcript replacement or compaction. Retry projection is process-local to the scratch runtime; upstream canonical persistence is unchanged.
+
+Next acceptance: after CI/integration, run one controlled live-model small-repo edit + new-process continuation through the unchanged CLI/Rust adapter using existing authorized credentials via the parent-held relay. Preserve external tests, request/trace/diff/usage/timing and failures. Fix any integration blocker before repetitions; no new provider/TUI scope. If access fails, retain exact access evidence and continue independent missing-interface tests.
 
 ## Recovery
 

@@ -18,6 +18,8 @@ async function run(native,cancel){
  const ready=new Promise(r=>started=r),events=[];
  const streamFn=async(_model,_context,{signal})=>{
   const first=++calls===1;
+  assert.ok(_context.messages.every(m=>m.stopReason!=='error'),'Failed attempt leaked into provider context');
+  assert.equal(_context.messages.filter(m=>m.role==='user').length,calls<=2?1:2,'Retry duplicated user input');
   const message={role:'assistant',api:model.api,provider:model.provider,model:model.id,timestamp:Date.now(),content:[{type:'text',text:first?'partial':'recovered'}],stopReason:'stop',usage:{input:1,output:1,cacheRead:0,cacheWrite:0,totalTokens:2,cost:{input:0,output:0,cacheRead:0,cacheWrite:0,total:0}}};
   return {async *[Symbol.asyncIterator](){
    yield {type:'start',partial:message};

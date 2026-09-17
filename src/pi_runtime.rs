@@ -31,6 +31,7 @@ pub struct PiRuntime {
     batch: Option<(String, Vec<Value>)>,
     action_count: u32,
     max_actions: u32,
+    retry_excluded: Vec<Value>,
 }
 impl PiRuntime {
     pub fn is_waiting(&self) -> bool {
@@ -151,7 +152,7 @@ impl PiRuntime {
             self.turn_index += 1;
             self.waiting = Some(("model".into(), id.clone()));
             Ok(
-                json!({"type":"model","requestId":id,"contextEntries":store.snapshot()?["contextEntries"]}),
+                json!({"type":"model","requestId":id,"contextEntries":store.snapshot()?["contextEntries"].as_array().context("missing context entries")?.iter().filter(|entry|!self.retry_excluded.contains(&entry["id"])).cloned().collect::<Vec<_>>()}),
             )
         }
     }
@@ -246,6 +247,43 @@ impl PiRuntime {
             if request.get("steeringMode").is_some() { self.steering_all = request["steeringMode"] == "all"; }
             if request.get("followUpMode").is_some() { self.followup_all = request["followUpMode"] == "all"; }
             return Ok(json!({"steeringMode":if self.steering_all {"all"} else {"one-at-a-time"},"followUpMode":if self.followup_all {"all"} else {"one-at-a-time"}}));
+        }
+        if op == "continue_context" {
+            if self.waiting.is_some() || !self.agent_ended {
+                bail!("transcript continuation requires a settled run");
+            }
+            let messages = request["messages"].as_array().context("continuation messages required")?;
+            if messages.last().map(|m|m["role"] == "assistant").unwrap_or(false) {
+                let mut queued = request.clone();
+                queued["event"] = json!("continue_queued");
+                return self.step(store, &queued);
+            }
+            let snapshot = store.snapshot()?;
+            let entries: Vec<&Value> = snapshot["contextEntries"].as_array().context("missing context entries")?.iter()
+                .filter(|entry|entry["type"] == "message" && !self.retry_excluded.contains(&entry["id"])).collect();
+            let failed = entries.last().context("no failed message to retry")?;
+            if failed["message"]["role"] != "assistant" || failed["message"]["stopReason"] != "error" {
+                bail!("only removal of the last failed assistant is supported");
+            }
+            let expected: Vec<Value> = entries[..entries.len()-1].iter().map(|entry|entry["message"].clone()).collect();
+            if expected != *messages || !matches!(messages.last().and_then(|m|m["role"].as_str()),Some("user" | "toolResult")) {
+                bail!("retry transcript differs from preserved history");
+            }
+            // Keep canonical history unchanged; omit only the validated failed attempt from model context.
+            self.retry_excluded.push(failed["id"].clone());
+            self.run_entry_start = snapshot["entries"].as_array().context("missing entries")?.len();
+            self.agent_ended = false;
+            self.terminal_failure = false;
+            self.action_count = 0;
+            self.turn_index = 0;
+            self.turn_ready = false;
+            self.turn_results.clear();
+            self.turn_message = Value::Null;
+            self.sequence += 1;
+            self.lifecycle_phase = 1;
+            let id = format!("lifecycle-{}-agent", self.sequence);
+            self.waiting = Some(("lifecycle".into(), id.clone()));
+            return Ok(json!({"type":"admitted","action":{"type":"lifecycle","requestId":id,"event":{"type":"agent_start"}}}));
         }
         if op == "pending_users" {
             return Ok(json!(self.user_messages));
