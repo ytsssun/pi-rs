@@ -8,13 +8,15 @@ PR55 selected-model binding merged as 8b46fa3 after head 3f82d14 passed CI351710
 
 Experimental adapter now runs under unchanged upstream AgentSession. Both upstream Agent and Rust adapter pass the same deterministic edit + queued follow-up, exact event sequence, canonical six-message history and fresh-process read and continuation assertions. Native trace proves Rust selected model/tool actions. Commands: `node --experimental-strip-types experiments/agent-session-rust-probe.mjs` and the same with `--upstream` (build native addon first).
 
-Not verified: original CLI injection, streaming updates, cancellation/recovery, full Agent API, or live model with this adapter. The scratch Rust journal is temporary; upstream SessionManager is canonical. No full compatibility claim.
+Not verified: production CLI replacement, streaming updates, cancellation/recovery, full Agent API, or live model with this adapter. The scratch Rust journal is temporary; upstream SessionManager is canonical. No full compatibility claim.
 
 Fresh-process continuation now passes locally: upstream canonical history seeds a new scratch runtime; second edit succeeds and canonical history grows from 6 to 10 messages with the original prefix unchanged. PR56 merged as fd12f42 after both exact-head checks passed.
 
-Next frozen acceptance: launch the original upstream CLI with an explicit Agent replacement, execute a fixture tool turn and resume in another CLI process without modifying vendored sources. Verify native action ownership and external file/history results. First inspect module loading and factory constraints; record any compatibility shim. No TUI/provider expansion.
+Original upstream CLI now passes a two-process fixture probe with an explicit ESM package substitution and no vendored file edits: `node --experimental-strip-types experiments/upstream-cli-rust-probe.mjs`. Both processes execute original edit tools via Rust actions; canonical history grows from 4 to 8 messages with its original prefix preserved. This test-only facade preallocates one Agent and replaces the model stream with a fixed fixture; SDK options are not fully forwarded. It is not a production integration mode. PR57 merged as 1f985bb after exact-head CI passed.
 
-Worker capacity failure was handled locally; artifacts and initial queue/edit failures are recorded in the review/board. Current branch CI must pass before integration. Recovery: inspect Git status and exact-head GitHub checks, run the two probe commands, then extend fresh-process continuation. Preserve `/tmp/pi-rs-agent-adapter` until integration.
+Next frozen acceptance: replace the test-only singleton facade with a reusable synchronous Agent constructor, preserve SDK stream/conversion/context options, and repeat original CLI new/resume acceptance with a local deterministic provider through the original provider stack. Keep network credentials out of fixture children. No live success or broad compatibility claim until separately exercised.
+
+Worker capacity failure was handled locally; artifacts and initial queue/edit failures are recorded in the review/board. Current branch CI must pass before integration. Recovery: inspect Git status and exact-head GitHub checks, run the two probe commands, then implement the reusable Agent constructor and original-provider fixture. Preserve `/tmp/pi-rs-agent-adapter` until integration.
 
 ## History
 

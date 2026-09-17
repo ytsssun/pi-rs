@@ -80,3 +80,9 @@ Next critical path: import canonical upstream history into fresh Rust state and 
 ### Continuation follow-up
 
 The same probe now starts a fresh child process, opens the upstream session, seeds a new native scratch journal from canonical context, and executes another edit. Both upstream and native paths pass; the canonical log has exactly ten messages and preserves the first six. Optional `undefined` fields in upstream in-memory tool messages are normalized through JSON for the persisted-history comparison; the first assertion failed on `usage: undefined`, not lost persisted data. No other history fields are excluded. This supersedes the read-only limitation above for this fixture only. Branching, compaction, interrupted calls and arbitrary session migration remain unverified.
+
+### Original CLI entry-point experiment
+
+Run `node --experimental-strip-types experiments/upstream-cli-rust-probe.mjs`. A Node ESM loader substitutes only the root `@earendil-works/pi-agent-core` import with a facade exporting the original package plus an experimental Rust-backed Agent. The unchanged built upstream CLI performs a file edit, exits, reopens the same canonical session and performs another edit. External assertions check file contents, four/eight persisted messages, preserved prefix, and two Rust model actions plus a tool action in each process. Child environment contains only temporary HOME, PATH, fixture identifiers and a dummy API key.
+
+This is a test seam, not a distribution design: the facade preallocates one Agent, overrides the model stream with fixed responses and does not forward the complete SDK option contract. Streaming/provider integration and arbitrary session replacement remain open. No upstream source files are changed; the package still reexports upstream helpers. Next remove the singleton/stream bypass while keeping the original CLI acceptance.
