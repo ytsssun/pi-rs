@@ -19,3 +19,7 @@ python3 experiments/integrated-live.py --engine rust-core --env-file .env --outp
 `audit.json` aggregates results. Engine JSON files include prompts, per-stage conditions, elapsed time, tool calls, usage, source/addon/harness hashes. Subdirectories preserve diffs, external acceptance stderr, native action traces and request hashes/instruction checks. Full HTTP payloads and CLI output remain in the listed temporary directories. This is real-model evidence, not fixture output, and does not establish daily-use reliability.
 
 Correction: earlier checkpoint wording implied the task asked to edit the protected test. It did not. No task replacement or write guard was introduced for these runs.
+
+## Resume request audit
+
+`resume-audit.json` records executed checks across all 63 requests. `experiments/audit-live-resume.py` verifies stable system/developer content, tool schemas, exact user ordering, unique/fully paired tool calls, and the first resumed request preserving the previous request prefix plus final assistant/new user. Normalized wire options and tool schemas match across six runs. This is a structural audit, not a claim that later stochastic transcripts match each other or that all runtime behavior is equivalent. Raw inputs remain in the documented temporary directories.
