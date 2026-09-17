@@ -1,0 +1,67 @@
+{
+  "scope": "Recorded request structure and restored prefix, not full behavioral parity",
+  "runs": [
+    {
+      "engine": "upstream",
+      "repeat": 0,
+      "requests": 11,
+      "firstResumeRequest": 7,
+      "unchangedInstructionsAndTools": true,
+      "userOrdering": true,
+      "toolPairing": true,
+      "restoredPrefix": true
+    },
+    {
+      "engine": "upstream",
+      "repeat": 1,
+      "requests": 10,
+      "firstResumeRequest": 7,
+      "unchangedInstructionsAndTools": true,
+      "userOrdering": true,
+      "toolPairing": true,
+      "restoredPrefix": true
+    },
+    {
+      "engine": "upstream",
+      "repeat": 2,
+      "requests": 10,
+      "firstResumeRequest": 6,
+      "unchangedInstructionsAndTools": true,
+      "userOrdering": true,
+      "toolPairing": true,
+      "restoredPrefix": true
+    },
+    {
+      "engine": "rust",
+      "repeat": 0,
+      "requests": 10,
+      "firstResumeRequest": 6,
+      "unchangedInstructionsAndTools": true,
+      "userOrdering": true,
+      "toolPairing": true,
+      "restoredPrefix": true
+    },
+    {
+      "engine": "rust",
+      "repeat": 1,
+      "requests": 11,
+      "firstResumeRequest": 6,
+      "unchangedInstructionsAndTools": true,
+      "userOrdering": true,
+      "toolPairing": true,
+      "restoredPrefix": true
+    },
+    {
+      "engine": "rust",
+      "repeat": 2,
+      "requests": 11,
+      "firstResumeRequest": 7,
+      "unchangedInstructionsAndTools": true,
+      "userOrdering": true,
+      "toolPairing": true,
+      "restoredPrefix": true
+    }
+  ],
+  "normalizedWireOptionsAndToolSchemasEqual": true,
+  "status": "PASS"
+}

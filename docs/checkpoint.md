@@ -12,7 +12,9 @@ Deterministic fixtures pass original CLI new/resume, streaming event order, Sess
 
 The previous plan to change tasks was based on an incorrect claim: the existing task never requested protected-test modification. That plan is superseded. Keep its failure visible and do not add file-write guards to turn instruction-following failures into apparent passes.
 
-Next: audit resumed model requests against original Pi at the context and tool-contract level using recorded traces before more live spending. Verify user ordering, system/developer instructions, tool-result pairing and available tool schemas. If no integration discrepancy is found, choose one bounded stronger-model comparison with identical acceptance, reporting model/config as a new cohort. Do not mechanically repeat gpt-5.4-mini. Separately retain missing Agent API/compaction/tool-cancellation cases as implementation gaps.
+Resume request audit passes for all 63 saved requests across both engines: unchanged system/developer instruction and tools within each run, exact two-user ordering, complete tool-call/result pairing, and restored previous-request prefix plus final assistant/new user. Normalized wire options/tool schemas match across all six runs. This rules out those specific missing-context/contract errors, not all runtime differences. Reproduce with `python3 experiments/audit-live-resume.py /tmp/pi-upstream-parity-1416178 /tmp/pi-rust-parity-1416178 --output NEW_JSON`.
+
+Next: select an available stronger model using the existing authorized API, preserve prompts/acceptance/config otherwise, and run one bounded upstream/Rust comparison before committing to repetitions. Record changed model as a separate cohort; do not pool with mini results. Continue missing Agent API/compaction/tool-cancellation work if model access is blocked. PR65 merged as b2a3722 after both exact-head CI runs passed.
 
 ## Limits and recovery
 
