@@ -250,11 +250,15 @@ impl PiRuntime {
         if op == "pending_users" {
             return Ok(json!(self.user_messages));
         }
-        if op == "advance_queued" {
+        if op == "advance_queued" || op == "continue_queued" {
             if self.waiting.is_some() {
                 bail!("runtime already awaiting completion");
             }
-            if self.terminal_failure || request["cancelled"] == true {
+            let new_run = op == "continue_queued";
+            if new_run && (!self.agent_ended || self.user_messages.is_empty()) {
+                bail!("queued continuation requires a settled run and queued input");
+            }
+            if !new_run && (self.terminal_failure || request["cancelled"] == true) {
                 return self.finish_agent(store,true);
             }
             let index = self
@@ -279,6 +283,10 @@ impl PiRuntime {
             }
             let mut begin = request.clone();
             begin["event"] = json!("begin");
+            if new_run {
+                begin["driveStart"] = json!(true);
+                begin["lifecycle"] = json!(self.lifecycle_enabled);
+            }
             begin["prompt"] = contents[0].clone();
             begin["additionalUsers"] = json!(&contents[1..]);
             let action = self.step(store, &begin)?;
