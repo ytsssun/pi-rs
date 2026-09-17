@@ -1,0 +1,12 @@
+diff --git a/maths.py b/maths.py
+index 12ee743..504e5b4 100644
+--- a/maths.py
++++ b/maths.py
+@@ -1,2 +1,7 @@
+ def add(a, b):
++    return a + b
++
++
++def subtract(a, b):
++    """Return the difference of a and b."""
+     return a - b
