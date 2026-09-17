@@ -14,9 +14,11 @@ Fresh-process continuation now passes locally: upstream canonical history seeds 
 
 Original upstream CLI now passes a two-process fixture probe with an explicit ESM package substitution and no vendored file edits: `node --experimental-strip-types experiments/upstream-cli-rust-probe.mjs`. Both processes execute original edit tools via Rust actions; canonical history grows from 4 to 8 messages with its original prefix preserved. This test-only facade preallocates one Agent and replaces the model stream with a fixed fixture; SDK options are not fully forwarded. It is not a production integration mode. PR57 merged as 1f985bb after exact-head CI passed.
 
-Next frozen acceptance: replace the test-only singleton facade with a reusable synchronous Agent constructor, preserve SDK stream/conversion/context options, and repeat original CLI new/resume acceptance with a local deterministic provider through the original provider stack. Keep network credentials out of fixture children. No live success or broad compatibility claim until separately exercised.
+Reusable synchronous Agent construction and SDK stream/context option forwarding now pass local tests. `node --experimental-strip-types experiments/upstream-cli-provider-probe.mjs` (also `--upstream`) runs the unchanged CLI through its original HTTP provider stack against a local SSE fixture: 4 requests, two processes, 8 canonical messages with original prefix and restored provider context intact. `experiments/agent-adapter-options.mjs` checks transform-before-convert ordering, option identity and independent instances. PR58 merged as 4e75671; merge CI passed. This work awaits exact-head CI; not live-model validation.
 
-Worker capacity failure was handled locally; artifacts and initial queue/edit failures are recorded in the review/board. Current branch CI must pass before integration. Recovery: inspect Git status and exact-head GitHub checks, run the two probe commands, then implement the reusable Agent constructor and original-provider fixture. Preserve `/tmp/pi-rs-agent-adapter` until integration.
+Next frozen acceptance: original CLI streams partial text/tool events through the adapter in upstream order without duplicating canonical messages; cancellation and provider failures must then settle and permit a later prompt. Keep each unsupported hook/behavior explicit. No full compatibility or production installation claim.
+
+Worker capacity failure was handled locally; artifacts and initial queue/edit failures are recorded in the review/board. Current branch CI must pass before integration. Recovery: inspect Git status and exact-head GitHub checks, run the two probe commands, then verify streaming event delivery. Preserve `/tmp/pi-rs-agent-adapter` until integration.
 
 ## History
 

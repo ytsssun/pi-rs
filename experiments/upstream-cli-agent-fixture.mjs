@@ -19,12 +19,6 @@ export class Agent {
       const message={role:'assistant',api:model.api,provider:model.provider,model:model.id,timestamp:Date.now(),content:calls===1?[{type:'toolCall',id:resume?'edit-resume':'edit-first',name:'edit',arguments:{path:'subject.txt',edits:[{oldText:resume?'after':'before',newText:resume?'resumed':'after'}]}}]:[{type:'text',text:'fixture complete'}],stopReason:calls===1?'toolUse':'stop',usage:{input:1,output:1,cacheRead:0,cacheWrite:0,totalTokens:2,cost:{input:0,output:0,cacheRead:0,cacheWrite:0,total:0}}};
       return {async *[Symbol.asyncIterator](){yield {type:'done',message};},async result(){return message;}};
     };
-    const run=agent.run.bind(agent);
-    agent.run=async messages=>{
-      // SDK restores state.messages after construction, before the first prompt.
-      if(agent.seen===0) {for(const message of agent.state.messages)agent.store.appendMessage(message);agent.seen=agent.state.messages.length;}
-      return run(messages);
-    };
     process.on('exit',()=>{writeFileSync(process.env.PI_RS_PROBE_TRACE,JSON.stringify(agent.trace));agent.store.close();});
     return agent;
   }
