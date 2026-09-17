@@ -20,7 +20,7 @@ export class RustAgentAdapter {
   get signal(){return this.controller.signal;}
   subscribe(listener){this.listeners.add(listener);return ()=>this.listeners.delete(listener);}
   async emit(event){for(const listener of this.listeners)await listener(event);}
-  step(payload){const action=request({op:'runtime',handle:this.store.handle,timestamp:new Date().toISOString(),messageTimestamp:Date.now(),...payload});this.trace.push({input:payload.event,output:action.type,requestId:action.requestId});return action;}
+  step(payload){const action=request({op:'runtime',handle:this.store.handle,timestamp:new Date().toISOString(),messageTimestamp:Date.now(),...payload});this.trace.push({input:payload.event,output:action?.type??null,requestId:action?.requestId});return action;}
   async syncMessages(){const all=this.store.getBranch().flatMap(sessionEntryToContextMessages);for(const message of all.slice(this.seen)){this.state.messages.push(message);if(!(message.role==='assistant'&&this.startedAssistant))await this.emit({type:'message_start',message});if(message.role==='assistant')this.startedAssistant=false;await this.emit({type:'message_end',message});}this.seen=all.length;}
   hasQueuedMessages(){return this.store.pendingUsers().length>0;}
   followUp(message){this.enqueue(message,'followUp');}
@@ -29,7 +29,9 @@ export class RustAgentAdapter {
   waitForIdle(){return this.running??Promise.resolve();}
   abort(){this.controller.abort();}
   continue(){this.running=this.run(undefined,true);return this.running;}
-  clearAllQueues(){throw Error('Unsupported: clearAllQueues');}
+  clearSteeringQueue(){this.step({event:'clear_users',queue:'steer'});}
+  clearFollowUpQueue(){this.step({event:'clear_users',queue:'followUp'});}
+  clearAllQueues(){this.step({event:'clear_users',queue:'all'});}
   prompt(messages){this.running=this.run(messages);return this.running;}
   async run(messages,queuedContinuation=false){
     if(this.state.isStreaming)throw Error('Already running');
