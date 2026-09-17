@@ -37,6 +37,7 @@ jobs:
       - name: Verify original provider stack and SDK option forwarding
         run: |
           node --experimental-strip-types experiments/agent-adapter-options.mjs
+          node --experimental-strip-types experiments/agent-adapter-failure.mjs
           node --experimental-strip-types experiments/upstream-cli-provider-probe.mjs --upstream
           node --experimental-strip-types experiments/upstream-cli-provider-probe.mjs
       - name: Verify native session identity and timestamps

@@ -96,3 +96,9 @@ Worker supplied the HTTP harness before a capacity failure; coordinator correcte
 ### Stream observation follow-up
 
 The original-provider probe now checks exact CLI event sequence, including toolcall/text start/delta/end updates, the text delta payload, four final message events per process and unchanged canonical history counts. Both upstream and Rust pass. The adapter holds partial assistant state transiently and forwards original provider events; Rust still admits the final response. No latency/performance claim. This supersedes missing stream forwarding for the tested successful SSE path only. Throwing streams, cancellation, and observer failures remain the next acceptance; successful completion does not validate those cleanup paths.
+
+### Provider exception recovery
+
+`experiments/agent-adapter-failure.mjs` compares original Agent and Rust adapter at stream creation, partial iteration and final-result failure, both ordinary and abort-triggered. All six event signatures match; transient state clears and the same Agent succeeds on a second prompt with exactly four final history messages. The original adapter threw directly and stranded native waiting state. It now reports failure through the existing Rust `provider_failure` action and resets the AbortController for each run. CLI/provider success and Session resume regressions still pass.
+
+This does not establish full cancellation semantics: the fixture calls abort then throws. Provider-returned error/aborted messages, Session abort/wait, queued input retention, tool cancellation and observer failures require separate acceptance. No live model was used.
