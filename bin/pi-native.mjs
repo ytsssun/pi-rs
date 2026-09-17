@@ -94,6 +94,7 @@ if (!slashHandled && resolvedModel && !options['--fixture'] && options['--input'
     commandResult = {name: options['--command'], args: commandArgs, dispatched: true};
   }
 ({manager,host}=owner.current);
+if(resolvedModel) host.actions.setModel(resolvedModel);
 if (options['--compact-summary']) await manager.appendCompaction(options['--compact-summary'], options['--compact-first-kept'], Number(options['--compact-tokens-before']));
   if(options['--context-tool-chars']!==undefined) { const raw=options['--context-tool-chars']; manager.setContextPolicy(raw==='none'?null:Number(raw)); }
   let index=0;

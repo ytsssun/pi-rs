@@ -10,6 +10,7 @@ const ext=join(dir,'provider.ts'), session=join(dir,'session.jsonl');
 writeFileSync(ext,`export default pi=>{
  pi.on('agent_start',(_event,ctx)=>{if(ctx.hasUI!==false)throw Error('headless runner advertised UI');});
  pi.on('before_agent_start',(event,ctx)=>{
+  if(ctx.model?.id!=='tiny'||ctx.model?.provider!=='acceptance-provider')throw Error('selected model absent from formal host');
   if(event.systemPrompt!==ctx.getSystemPrompt())throw Error('getter mismatch');
   if(!event.systemPrompt.includes('Current working directory:'))throw Error('no upstream base');
   return {systemPrompt:event.systemPrompt+'\\nCHAIN_MARKER',message:{customType:'hook-proof',content:'hook '+event.prompt,display:false}};
