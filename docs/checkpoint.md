@@ -19,7 +19,9 @@ Automatic retry now passes locally against original Session: `node --experimenta
 
 Scope: `continue()` supports queued inputs and this validated last-error retry, not arbitrary transcript replacement or compaction. Retry projection is process-local to the scratch runtime; upstream canonical persistence is unchanged.
 
-Next acceptance: after CI/integration, run one controlled live-model small-repo edit + new-process continuation through the unchanged CLI/Rust adapter using existing authorized credentials via the parent-held relay. Preserve external tests, request/trace/diff/usage/timing and failures. Fix any integration blocker before repetitions; no new provider/TUI scope. If access fails, retain exact access evidence and continue independent missing-interface tests.
+Controlled live run through unchanged CLI + Rust adapter was attempted with `gpt-5.4-mini`, upstream commit `9767ba2`, one repetition, no manual steering, context editing off. Stage 0 passed: real model fixed `maths.add`, ran the repository test, preserved protected files; 12.59s and usage was recorded. Stage 1 exited 0 and ran tests, but the model modified protected `test_maths.py`, so the repetition failed external acceptance. This is a model/task-behavior failure, not evidence of full compatibility; artifacts: `/tmp/pi-live-adapter-20260917d`. The first retry attempt failed before execution because native scratch path existed on resume; adapter now opens existing scratch state, but this fix is not yet CI-integrated.
+
+Next acceptance: reproduce live stage-1 failure with the corrected adapter and add an independent protected-file guard in the harness before judging runtime recovery. Do not silently loosen acceptance. Then run two more clean repetitions only if the corrected resume path and guard are sound; retain failures, usage, timing and model/provider config. No context-editing or provider expansion yet.
 
 ## Recovery
 

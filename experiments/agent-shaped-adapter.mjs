@@ -7,9 +7,10 @@ export class RustAgentAdapter {
     return new RustAgentAdapter({scratchPath,cwd,initialState:{model,messages:initialMessages},streamFn:streamFunction});
   }
   constructor(options) {
-    this.store=createBackendSync({path:options.scratchPath,cwd:options.cwd});
+    this.store=createBackendSync({path:options.scratchPath,cwd:options.cwd,mode:options.mode??'create'});
     this.state={systemPrompt:'',tools:[],messages:[],thinkingLevel:'off',isStreaming:false,streamMessage:null,pendingToolCalls:new Set(),error:undefined,...options.initialState};
     this.state.messages=structuredClone(this.state.messages);
+    if(options.mode==='open'){this.state.messages=this.store.getBranch().flatMap(sessionEntryToContextMessages);this.seen=this.state.messages.length;}
     this.streamFunction=options.streamFn;
     this.convertToLlm=options.convertToLlm??(messages=>messages.filter(m=>['user','assistant','toolResult'].includes(m.role)));
     for(const key of ['transformContext','getApiKey','onPayload','onResponse','sessionId','transport','thinkingBudgets','maxRetryDelayMs','beforeToolCall','afterToolCall','prepareNextTurn','prepareNextTurnWithContext'])this[key]=options[key];
