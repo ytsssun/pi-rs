@@ -47,3 +47,14 @@ Build an experimental Agent-shaped adapter beneath unchanged upstream AgentSessi
 Acceptance: real upstream AgentSession executes one deterministic tool-edit turn, delivers normal message/tool/lifecycle events, queues one follow-up, settles, and can reopen its session in a new process. External assertions protect the edited result. Instrument the Rust boundary so a hidden upstream Agent loop cannot pass. First inventory required Agent methods/state/setters/hooks, then implement only this vertical slice. Report streaming, cancellation and unsupported methods explicitly. No TUI or unchanged CLI success claim until the original entry point actually runs with the adapter.
 
 After this SDK seam succeeds, choose a minimal, explicit CLI integration hook or package adapter. Do not patch vendored source silently, claim all plugins work, or replace more of AgentSession before evidence requires it.
+
+## AgentSession interface audit
+
+Direct `this.agent` member references in pinned agent-session.ts include state, subscribe, prompt, continue, abort, signal, steer, followUp, clearAllQueues, hasQueuedMessages, steeringMode, followUpMode, streamFunction, beforeToolCall, afterToolCall, prepareNextTurn and prepareNextTurnWithContext. This is a direct-access inventory, not complete interface coverage: aliases and CLI/UI consumers need separate inspection.
+
+Two integration constraints are now source-confirmed:
+
+- AgentSession persists every normal message_end after extension/subscriber dispatch (around lines 670–699). Keep upstream session manager canonical in the experiment; a Rust scratch state must not also append to that file.
+- AgentSession installs prepareNextTurnWithContext (around lines 561–583) to refresh compaction context, prompt, tools, model and thinking level. Call it at each model boundary; copying initial state only cannot preserve this behavior.
+
+Worker prototype must instrument native actions, exercise real Session listeners, and surface unsupported APIs. Its output is not accepted until independently executed.
