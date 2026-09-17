@@ -6,11 +6,13 @@ PR55 selected-model binding merged as 8b46fa3 after head 3f82d14 passed CI351710
 
 ## Current critical path
 
-Experimental adapter now runs under unchanged upstream AgentSession. Both upstream Agent and Rust adapter pass the same deterministic edit + queued follow-up, exact event sequence, canonical six-message history and fresh-process read assertions. Native trace proves Rust selected model/tool actions. Commands: `node --experimental-strip-types experiments/agent-session-rust-probe.mjs` and the same with `--upstream` (build native addon first).
+Experimental adapter now runs under unchanged upstream AgentSession. Both upstream Agent and Rust adapter pass the same deterministic edit + queued follow-up, exact event sequence, canonical six-message history and fresh-process read and continuation assertions. Native trace proves Rust selected model/tool actions. Commands: `node --experimental-strip-types experiments/agent-session-rust-probe.mjs` and the same with `--upstream` (build native addon first).
 
-Not verified: original CLI injection, fresh-process continuation, streaming updates, cancellation/recovery, full Agent API, or live model with this adapter. The scratch Rust journal is temporary; upstream SessionManager is canonical. No full compatibility claim.
+Not verified: original CLI injection, streaming updates, cancellation/recovery, full Agent API, or live model with this adapter. The scratch Rust journal is temporary; upstream SessionManager is canonical. No full compatibility claim.
 
-Next frozen acceptance: fresh process opens the upstream canonical session, initializes Rust context from that history, executes a second independent edit through unchanged AgentSession, and verifies old history was neither lost nor duplicated. Then test the original CLI startup seam. No TUI/provider expansion.
+Fresh-process continuation now passes locally: upstream canonical history seeds a new scratch runtime; second edit succeeds and canonical history grows from 6 to 10 messages with the original prefix unchanged. PR56 merged as fd12f42 after both exact-head checks passed.
+
+Next frozen acceptance: launch the original upstream CLI with an explicit Agent replacement, execute a fixture tool turn and resume in another CLI process without modifying vendored sources. Verify native action ownership and external file/history results. First inspect module loading and factory constraints; record any compatibility shim. No TUI/provider expansion.
 
 Worker capacity failure was handled locally; artifacts and initial queue/edit failures are recorded in the review/board. Current branch CI must pass before integration. Recovery: inspect Git status and exact-head GitHub checks, run the two probe commands, then extend fresh-process continuation. Preserve `/tmp/pi-rs-agent-adapter` until integration.
 

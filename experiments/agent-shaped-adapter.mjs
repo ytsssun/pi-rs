@@ -3,10 +3,14 @@ import {validateToolArguments} from '../vendor/pi-mono/packages/ai/src/utils/val
 import {createBackend,request} from '../prototype/architecture/native-store-backend.mjs';
 import {sessionEntryToContextMessages} from '../vendor/pi-mono/packages/coding-agent/src/core/session-manager.ts';
 export class RustAgentAdapter {
-  static async create({scratchPath,cwd,model,streamFunction}) {
+  static async create({scratchPath,cwd,model,streamFunction,initialMessages=[]}) {
     const agent=new RustAgentAdapter();
     agent.store=await createBackend({path:scratchPath,cwd});
     agent.state={model,systemPrompt:'',tools:[],messages:[],thinkingLevel:'off',isStreaming:false,streamMessage:null,pendingToolCalls:new Set(),error:undefined};
+    // The upstream SessionManager remains canonical. Seed only a fresh scratch journal.
+    const history=structuredClone(initialMessages);
+    for(const message of history)agent.store.appendMessage(message);
+    agent.state.messages=history;agent.seen=history.length;
     agent.streamFunction=streamFunction;return agent;
   }
   listeners=new Set();trace=[];controller=new AbortController();seen=0;
