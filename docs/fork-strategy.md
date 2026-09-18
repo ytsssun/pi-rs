@@ -4,7 +4,7 @@
 
 Maintain pi-rs as a fork-shaped distribution of Pi rather than as a separate product that happens to load vendored Pi. Keep the upstream Pi package layout and public package names where compatibility requires them, but replace the implementation of `packages/agent` with a Rust-backed implementation and keep a narrow Node bridge for extensions and providers.
 
-The fork should track a pinned upstream base and periodically rebase or merge upstream changes. The Rust core should live in a clearly owned Rust package/crate; the JavaScript package `@earendil-works/pi-agent-core` should become the compatibility facade that delegates runtime policy to Rust.
+The project tracks a pinned upstream base for provenance and compatibility checks. Syncing upstream is optional; pi-rs does not need to contribute changes back upstream to complete its product. The Rust core should live in a clearly owned Rust package/crate; the JavaScript package `@earendil-works/pi-agent-core` should become the compatibility facade that delegates runtime policy to Rust.
 
 ## Why this is cleaner
 
@@ -22,7 +22,7 @@ The fork should initially retain upstream `coding-agent`, `ai`, `tui`, protocol 
 
 ## Costs and controls
 
-A fork must actively manage upstream drift. Record the upstream base commit, merge/rebase date and any conflict in the project checkpoint. Keep vendored reference files unchanged when they are used as an oracle; fork-owned replacements must be clearly separated. Do not silently claim upstream parity after changing behavior.
+The project should manage upstream drift only when useful; it is not obligated to follow every upstream change. Record the upstream base commit, merge/rebase date and any conflict in the project checkpoint. Keep vendored reference files unchanged when they are used as an oracle; fork-owned replacements must be clearly separated. Do not silently claim upstream parity after changing behavior.
 
 Use a small compatibility patch surface:
 

@@ -6,7 +6,7 @@ The concrete staged plan is [docs/rust-core-migration-roadmap.md](rust-core-migr
 
 ## Product direction
 
-The preferred distribution strategy is now a Pi fork: preserve upstream package names and `coding-agent` entry points, replace `packages/agent` behind its public contract with Rust, and gradually replace other implementations behind compatibility tests. The current loader-based experimental path is migration scaffolding, not the desired released architecture. See [fork strategy](fork-strategy.md).
+The preferred distribution strategy is now a Pi fork: preserve upstream package names and `coding-agent` entry points, replace `packages/agent` behind its public contract with Rust, and gradually replace other implementations behind compatibility tests. The current loader-based experimental path is migration scaffolding, not the desired released architecture. See [fork strategy](fork-strategy.md). It is your standalone product repository: do not open PRs against `earendil-works/pi`; use upstream only as a pinned reference and optional sync source.
 
 ## Active review gate
 

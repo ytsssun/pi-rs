@@ -1,6 +1,6 @@
 # Rust core migration roadmap
 
-This roadmap turns the Pi fork strategy into mergeable slices. The fork keeps upstream `packages/coding-agent` and the public package contracts while replacing `packages/agent` behind those contracts. Every stage must pass the prior stage's tests; no stage changes the acceptance bar silently.
+This roadmap turns the Pi fork strategy into mergeable slices. The project is your own `ytsssun/pi-rs` product repository. It may copy and adapt upstream Pi code, but it does not need to submit pull requests to `earendil-works/pi`. The fork keeps the useful Pi package contracts while replacing `packages/agent` behind those contracts. Every stage must pass the prior stage's tests; no stage changes the acceptance bar silently.
 
 ## Stage 0 — Fork baseline and oracle
 
@@ -68,4 +68,4 @@ Only after the previous exits pass:
 
 ## Operating rules
 
-Each pull request owns one stage slice. A PR is not complete when local tests pass: exact-head CI must pass, an independent fixture must exercise the real fork entry point, and the checkpoint must record limits and the next dependency. If a stage exposes a contract conflict, stop that slice and record the conflict rather than changing the contract or calling it compatible.
+Each pi-rs pull request owns one stage slice. These are internal PRs in `ytsssun/pi-rs`; do not open PRs against the upstream Pi repository. A PR is not complete when local tests pass: exact-head CI must pass, an independent fixture must exercise the real fork entry point, and the checkpoint must record limits and the next dependency. If a stage exposes a contract conflict, stop that slice and record the conflict rather than changing the contract or calling it compatible.
