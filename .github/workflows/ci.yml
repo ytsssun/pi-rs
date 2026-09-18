@@ -53,6 +53,8 @@ jobs:
           node --experimental-strip-types experiments/upstream-cli-provider-probe.mjs --binary "$RUNNER_TEMP/pi-rs-install/bin/pi-rs"
           node --experimental-strip-types experiments/upstream-cli-provider-probe.mjs --todo --upstream
           node --experimental-strip-types experiments/upstream-cli-provider-probe.mjs --todo --binary "$RUNNER_TEMP/pi-rs-install/bin/pi-rs"
+          node --experimental-strip-types experiments/upstream-cli-provider-probe.mjs --custom-messages --upstream
+          node --experimental-strip-types experiments/upstream-cli-provider-probe.mjs --custom-messages --binary "$RUNNER_TEMP/pi-rs-install/bin/pi-rs"
       - name: Verify native session identity and timestamps
         run: node experiments/session-identity.mjs
       - name: Verify native CLI command acceptance

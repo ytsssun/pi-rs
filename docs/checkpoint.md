@@ -24,7 +24,9 @@ Installed entry acceptance is complete for wiring: isolated cargo install, two-p
 
 Unchanged vendored todo.ts now passes an installed-entry comparison against original Pi. The first process adds a todo; the second process reconstructs state through session_start and toggles the same item. External assertions verify persisted details, nextId, event sequence and native model/tool actions. Commands: `node --experimental-strip-types experiments/upstream-cli-provider-probe.mjs --todo --upstream` and `--todo --binary /tmp/pi-rs-installed-probe/bin/pi-rs` after cargo install. This is fixture evidence for one extension, not ecosystem-wide compatibility; /todos TUI, branching and session_tree are untested.
 
-Next frozen milestone: exercise extension-provided before_agent_start custom messages through unchanged Session and installed entry. The adapter currently only accepts a single text user prompt, so inspect upstream message-array delivery and add Rust admission support with exact ordering/persistence assertions before expanding extension claims.
+Custom message-array admission now passes installed-entry upstream comparison using a synthetic test extension. Session_start queues nextTurn custom input, before_agent_start returns another custom input; Rust admits user then custom messages, preserving content/display/details and canonical custom_message entries over two processes. Initial native run failed at single-text-only input; adapter now delegates custom validation/admission to existing Rust begin. Todo extension and Session retry regressions pass. PR69 merged as 24b5c53 after exact-head CI.
+
+Next frozen milestone: verify images in user input through the unchanged upstream CLI/provider boundary. The current adapter explicitly rejects non-text content, which blocks normal image attachments even though upstream handles provider conversion. Use fixed image fixture and captured HTTP payload, then preserve canonical image content on resume; do not claim visual reasoning without a separate live test.
 
 ## Limits and recovery
 
