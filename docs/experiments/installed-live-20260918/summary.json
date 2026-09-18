@@ -1,0 +1,309 @@
+{
+  "engine": "rust-core",
+  "installedBinary": "/private/tmp/pi-rs-installed-probe/bin/pi-rs",
+  "installedBinarySha256": "16144aa4ff4408fd45a73383a4d97c657675429d9e67ed0d9eeb1dff507fd4f3",
+  "upstreamCommit": "9767ba275f3e9a5ee0f5c5342249b629ab1b2282",
+  "sourceCommit": "a1a49ffbc49387a1882e45829778371fda2ee3bf",
+  "model": "gpt-5.4-2026-03-05",
+  "provider": "OpenAI chat completions via parent-held loopback relay",
+  "contextEditing": false,
+  "fixture": false,
+  "manualSteering": 0,
+  "binarySha256": "16144aa4ff4408fd45a73383a4d97c657675429d9e67ed0d9eeb1dff507fd4f3",
+  "addonSha256": "ccf3dd8f7bd17b1a554d393975154eb6b87f5ca44b8e1ec5ece463e805f0d0bc",
+  "harnessSha256": "0a548c57c73e82a4ef9f2b1bd38fae9ca45a49a771e2a321b0929f4d7a32efb4",
+  "sourceDirty": true,
+  "adapterSha256": "977aff42d26cdc7d10f631465af6fe277ef8b75671a1e3a0cd6fef470594a229",
+  "runs": [
+    {
+      "repeat": 0,
+      "stage": 0,
+      "prompt": "Fix the arithmetic bug in this repository and verify the result. Follow the repository instructions.",
+      "exit": 0,
+      "elapsedSeconds": 8.250796417,
+      "externalExit": 0,
+      "testsAndInstructionsUnchanged": true,
+      "integrity": {
+        "AGENTS.md": true,
+        "test_maths.py": true
+      },
+      "historyPrefixPreserved": true,
+      "ranRepositoryTests": true,
+      "toolCalls": [
+        {
+          "arguments": {
+            "limit": 200,
+            "offset": 1,
+            "path": "AGENTS.md"
+          },
+          "id": "call_3lD0KgoFR8PDaznpg3xyfAbM",
+          "name": "read",
+          "type": "toolCall"
+        },
+        {
+          "arguments": {
+            "limit": 400,
+            "offset": 1,
+            "path": "maths.py"
+          },
+          "id": "call_YCg595925w5EXiWWUZRJjvXe",
+          "name": "read",
+          "type": "toolCall"
+        },
+        {
+          "arguments": {
+            "limit": 400,
+            "offset": 1,
+            "path": "test_maths.py"
+          },
+          "id": "call_UsEaT4Ug9jmLLQgw17zXo4fY",
+          "name": "read",
+          "type": "toolCall"
+        },
+        {
+          "arguments": {
+            "edits": [
+              {
+                "newText": "def add(a, b):\n    \"\"\"Return the sum of two numbers.\"\"\"\n    return a + b\n",
+                "oldText": "def add(a, b):\n    return a - b\n"
+              }
+            ],
+            "path": "maths.py"
+          },
+          "id": "call_OQWNkMdBOBarfjSx93QNJsSZ",
+          "name": "edit",
+          "type": "toolCall"
+        },
+        {
+          "arguments": {
+            "command": "python3 test_maths.py",
+            "timeout": 30
+          },
+          "id": "call_nrlbIjlVdipuJXM8k1nT2p2v",
+          "name": "bash",
+          "type": "toolCall"
+        }
+      ],
+      "usage": [
+        {
+          "cacheRead": 0,
+          "cacheWrite": 0,
+          "cost": {
+            "cacheRead": 0,
+            "cacheWrite": 0,
+            "input": 0,
+            "output": 0,
+            "total": 0
+          },
+          "input": 1256,
+          "output": 89,
+          "reasoning": 0,
+          "totalTokens": 1345
+        },
+        {
+          "cacheRead": 0,
+          "cacheWrite": 0,
+          "cost": {
+            "cacheRead": 0,
+            "cacheWrite": 0,
+            "input": 0,
+            "output": 0,
+            "total": 0
+          },
+          "input": 1445,
+          "output": 73,
+          "reasoning": 0,
+          "totalTokens": 1518
+        },
+        {
+          "cacheRead": 0,
+          "cacheWrite": 0,
+          "cost": {
+            "cacheRead": 0,
+            "cacheWrite": 0,
+            "input": 0,
+            "output": 0,
+            "total": 0
+          },
+          "input": 1539,
+          "output": 26,
+          "reasoning": 0,
+          "totalTokens": 1565
+        },
+        {
+          "cacheRead": 0,
+          "cacheWrite": 0,
+          "cost": {
+            "cacheRead": 0,
+            "cacheWrite": 0,
+            "input": 0,
+            "output": 0,
+            "total": 0
+          },
+          "input": 1578,
+          "output": 61,
+          "reasoning": 0,
+          "totalTokens": 1639
+        }
+      ],
+      "passed": true
+    },
+    {
+      "repeat": 0,
+      "stage": 1,
+      "prompt": "Continue the prior task. Add subtract(a,b), preserving addition, and verify subtraction with positive and negative arguments. Follow the repository instructions.",
+      "exit": 0,
+      "elapsedSeconds": 8.650245541999999,
+      "externalExit": 0,
+      "testsAndInstructionsUnchanged": false,
+      "integrity": {
+        "AGENTS.md": true,
+        "test_maths.py": false
+      },
+      "historyPrefixPreserved": true,
+      "ranRepositoryTests": true,
+      "toolCalls": [
+        {
+          "arguments": {
+            "limit": 200,
+            "offset": 1,
+            "path": "maths.py"
+          },
+          "id": "call_llkmKOHfJJPPx9YubfXBRL0a",
+          "name": "read",
+          "type": "toolCall"
+        },
+        {
+          "arguments": {
+            "limit": 200,
+            "offset": 1,
+            "path": "test_maths.py"
+          },
+          "id": "call_GMeFGQnHwKPLApDLuUucMI0H",
+          "name": "read",
+          "type": "toolCall"
+        },
+        {
+          "arguments": {
+            "edits": [
+              {
+                "newText": "def add(a, b):\n    \"\"\"Return the sum of two numbers.\"\"\"\n    return a + b\n\n\ndef subtract(a, b):\n    \"\"\"Return the difference of two numbers.\"\"\"\n    return a - b\n",
+                "oldText": "def add(a, b):\n    \"\"\"Return the sum of two numbers.\"\"\"\n    return a + b\n"
+              }
+            ],
+            "path": "maths.py"
+          },
+          "id": "call_OJEqXpDLCZEhadXBNImnOAaa",
+          "name": "edit",
+          "type": "toolCall"
+        },
+        {
+          "arguments": {
+            "edits": [
+              {
+                "newText": "from maths import add, subtract\nassert add(2, 3) == 5\nassert add(-2, 3) == 1\nassert subtract(5, 3) == 2\nassert subtract(-2, 3) == -5\n",
+                "oldText": "from maths import add\nassert add(2, 3) == 5\nassert add(-2, 3) == 1\n"
+              }
+            ],
+            "path": "test_maths.py"
+          },
+          "id": "call_D0CkqOozSUB4u1WBj5OOzDTx",
+          "name": "edit",
+          "type": "toolCall"
+        },
+        {
+          "arguments": {
+            "command": "python3 test_maths.py",
+            "timeout": 30
+          },
+          "id": "call_OMyfxLd032hvl3QppyVh0WXC",
+          "name": "bash",
+          "type": "toolCall"
+        }
+      ],
+      "usage": [
+        {
+          "cacheRead": 0,
+          "cacheWrite": 0,
+          "cost": {
+            "cacheRead": 0,
+            "cacheWrite": 0,
+            "input": 0,
+            "output": 0,
+            "total": 0
+          },
+          "input": 1673,
+          "output": 66,
+          "reasoning": 0,
+          "totalTokens": 1739
+        },
+        {
+          "cacheRead": 0,
+          "cacheWrite": 0,
+          "cost": {
+            "cacheRead": 0,
+            "cacheWrite": 0,
+            "input": 0,
+            "output": 0,
+            "total": 0
+          },
+          "input": 1813,
+          "output": 159,
+          "reasoning": 0,
+          "totalTokens": 1972
+        },
+        {
+          "cacheRead": 1664,
+          "cacheWrite": 0,
+          "cost": {
+            "cacheRead": 0,
+            "cacheWrite": 0,
+            "input": 0,
+            "output": 0,
+            "total": 0
+          },
+          "input": 329,
+          "output": 116,
+          "reasoning": 0,
+          "totalTokens": 2109
+        },
+        {
+          "cacheRead": 1664,
+          "cacheWrite": 0,
+          "cost": {
+            "cacheRead": 0,
+            "cacheWrite": 0,
+            "input": 0,
+            "output": 0,
+            "total": 0
+          },
+          "input": 468,
+          "output": 26,
+          "reasoning": 0,
+          "totalTokens": 2158
+        },
+        {
+          "cacheRead": 1664,
+          "cacheWrite": 0,
+          "cost": {
+            "cacheRead": 0,
+            "cacheWrite": 0,
+            "input": 0,
+            "output": 0,
+            "total": 0
+          },
+          "input": 507,
+          "output": 83,
+          "reasoning": 0,
+          "totalTokens": 2254
+        }
+      ],
+      "passed": false
+    }
+  ],
+  "limits": [
+    "Host-user tools, not security sandbox",
+    "Two small tasks per repetition; no fork/switch claim",
+    "Acceptance owned by parent and not exposed in workspace; malicious host access not prevented"
+  ]
+}

@@ -5,12 +5,13 @@ Not an OS sandbox: tools still run as the host user. No fixture fallback.
 import argparse, difflib, hashlib, json, os, pathlib, subprocess, time
 from live_transport import Relay
 ROOT=pathlib.Path(__file__).resolve().parents[1]
-p=argparse.ArgumentParser(); p.add_argument('--engine',choices=['native','upstream','rust-core'],default='native'); p.add_argument('--env-file',type=pathlib.Path,required=True); p.add_argument('--output',type=pathlib.Path,required=True); p.add_argument('--model',default='gpt-5.4-mini'); p.add_argument('--repetitions',type=int,default=3); a=p.parse_args()
+p=argparse.ArgumentParser(); p.add_argument('--engine',choices=['native','upstream','rust-core'],default='native'); p.add_argument('--binary',type=pathlib.Path); p.add_argument('--env-file',type=pathlib.Path,required=True); p.add_argument('--output',type=pathlib.Path,required=True); p.add_argument('--model',default='gpt-5.4-mini'); p.add_argument('--repetitions',type=int,default=3); a=p.parse_args()
 assert 1 <= a.repetitions <= 3
+assert not a.binary or a.engine=='rust-core', '--binary requires rust-core engine'
 key=[x.partition('=')[2].strip().strip('\"\'') for x in a.env_file.read_text().splitlines() if x.startswith('OPENAI_API_KEY=')]; assert len(key)==1 and key[0], 'OPENAI_API_KEY unavailable'
 out=a.output.resolve(); out.mkdir(parents=True,exist_ok=False)
 def sha(p): return hashlib.sha256(p.read_bytes()).hexdigest()
-summary={'engine':a.engine,'upstreamCommit':subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT/'vendor/pi-mono',text=True).strip(),'sourceCommit':subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip(),'model':a.model,'provider':'OpenAI chat completions via parent-held loopback relay','contextEditing':False,'fixture':False,'manualSteering':0,'binarySha256':sha(ROOT/'target/debug/pi-rs'),'addonSha256':sha(ROOT/'target/native-session.node'),'harnessSha256':sha(pathlib.Path(__file__)),'sourceDirty':bool(subprocess.check_output(['git','status','--porcelain'],cwd=ROOT,text=True).strip()),'adapterSha256':sha(ROOT/'experiments/agent-shaped-adapter.mjs'),'runs':[],'limits':['Host-user tools, not security sandbox','Two small tasks per repetition; no fork/switch claim','Acceptance owned by parent and not exposed in workspace; malicious host access not prevented']}
+summary={'engine':a.engine,'installedBinary':str(a.binary.resolve()) if a.binary else None,'installedBinarySha256':sha(a.binary) if a.binary else None,'upstreamCommit':subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT/'vendor/pi-mono',text=True).strip(),'sourceCommit':subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip(),'model':a.model,'provider':'OpenAI chat completions via parent-held loopback relay','contextEditing':False,'fixture':False,'manualSteering':0,'binarySha256':sha(ROOT/'target/debug/pi-rs'),'addonSha256':sha(ROOT/'target/native-session.node'),'harnessSha256':sha(pathlib.Path(__file__)),'sourceDirty':bool(subprocess.check_output(['git','status','--porcelain'],cwd=ROOT,text=True).strip()),'adapterSha256':sha(ROOT/'experiments/agent-shaped-adapter.mjs'),'runs':[],'limits':['Host-user tools, not security sandbox','Two small tasks per repetition; no fork/switch claim','Acceptance owned by parent and not exposed in workspace; malicious host access not prevented']}
 for repeat in range(a.repetitions):
  d=out/str(repeat); d.mkdir(); work=d/'repo'; work.mkdir(); home=d/'home'; home.mkdir()
  instructions='Implement arithmetic in maths.py. Never modify test_maths.py or this file. Before finishing, run python3 test_maths.py. For every added public function include a docstring.\n'
@@ -29,6 +30,10 @@ for repeat in range(a.repetitions):
    if a.engine=='rust-core':
     args[1:1]=['--experimental-strip-types','--import',str(ROOT/'experiments/upstream-cli-preload.mjs')]
     env.update(PI_RS_PROBE_SCRATCH=str(d/f'{stage}.scratch.jsonl'),PI_RS_PROBE_TRACE=str(d/f'{stage}.native-trace.json'))
+   if a.binary:
+    cli=str(ROOT/'vendor/pi-mono/packages/coding-agent/dist/cli.js')
+    args=[str(a.binary.resolve()),'--experimental-upstream-core',*args[args.index(cli)+1:]]
+    env['PI_RS_CORE_TRACE']=str(d/f'{stage}.native-trace.json')
    started=time.monotonic()
    try:
     r=subprocess.run(args,cwd=work,env=env,text=True,capture_output=True,input='',timeout=240); code=r.returncode
