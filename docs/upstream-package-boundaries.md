@@ -1,5 +1,7 @@
 # Upstream Pi package boundaries
 
+> Distribution direction: the recommended end state is a Pi fork with the same package boundaries and a Rust-backed `agent` package. See [the fork strategy](fork-strategy.md).
+
 Reference: vendored Pi commit `9767ba275f3e9a5ee0f5c5342249b629ab1b2282` (MIT, Pi 0.85.1). The goal is ecosystem compatibility with maximum Rust ownership. “Keep upstream” means preserve the observable package/API contract first; it does not mean the implementation can never move to Rust.
 
 ## Classification

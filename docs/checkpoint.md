@@ -1,5 +1,9 @@
 # Current checkpoint
 
+## Product direction
+
+The preferred distribution strategy is now a Pi fork: preserve upstream package names and `coding-agent` entry points, replace `packages/agent` behind its public contract with Rust, and gradually replace other implementations behind compatibility tests. The current loader-based experimental path is migration scaffolding, not the desired released architecture. See [fork strategy](fork-strategy.md).
+
 ## Active review gate
 
 Latest candidate scopes adopt_context to a pending model request with exact request ID, returns the Rust-admitted view for actual provider use, and removes the stale persistent override. Rust invalid/stale/idle admission and unchanged history tests pass; nonempty/empty Agent replacement and retry fixtures pass. Full Session.compact/resume remains required before PR72 integration.
