@@ -1,5 +1,9 @@
 # Current checkpoint
 
+## Migration roadmap
+
+The concrete staged plan is [docs/rust-core-migration-roadmap.md](rust-core-migration-roadmap.md): baseline fork oracle, package-compatible Agent facade, Rust-owned session/context, provider boundary, Rust built-in tools/normal command, then removal of migration scaffolding. The active dependency is Stage 1: move the tested adapter into the fork package boundary without loader substitution.
+
 ## Product direction
 
 The preferred distribution strategy is now a Pi fork: preserve upstream package names and `coding-agent` entry points, replace `packages/agent` behind its public contract with Rust, and gradually replace other implementations behind compatibility tests. The current loader-based experimental path is migration scaffolding, not the desired released architecture. See [fork strategy](fork-strategy.md).
