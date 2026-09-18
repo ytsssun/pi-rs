@@ -6,6 +6,8 @@ import {join} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {spawn} from 'node:child_process';
 import {createServer} from 'node:http';
+const installedIndex=process.argv.indexOf('--binary');
+const installed=installedIndex>=0?process.argv[installedIndex+1]:undefined;
 const baseline = process.argv.includes('--upstream');
 const dir = mkdtempSync(join(tmpdir(), 'pi-cli-provider-'));
 const cli = fileURLToPath(new URL('../vendor/pi-mono/packages/coding-agent/dist/cli.js', import.meta.url));
@@ -54,7 +56,8 @@ try {
   const trace = join(dir, `trace-${stage}.json`);
   const args = ['--experimental-strip-types',...(!baseline?['--import',preload]:[]),cli,'--print','--mode','json','--no-extensions','--no-skills','--no-prompt-templates','--no-themes','--provider','fixture-http','--model','fixture-model','--session',session,'--thinking','off',stage?'Continue the previous edit.':'Edit subject.txt.'];
   const result = await new Promise((resolve, reject) => {
-   const child = spawn(process.execPath, args, {cwd:dir,env:{PATH:process.env.PATH,HOME:home,PI_RS_PROBE_SCRATCH:join(dir,`scratch-${stage}.jsonl`),PI_RS_PROBE_TRACE:trace}});
+   const launchArgs=installed?['--experimental-upstream-core',...args.slice(args.indexOf(cli)+1)]:args;
+   const child = spawn(installed??process.execPath, launchArgs, {cwd:dir,env:{PATH:process.env.PATH,HOME:home,PI_RS_PROBE_SCRATCH:join(dir,`scratch-${stage}.jsonl`),PI_RS_CORE_TRACE:trace,PI_RS_PROBE_TRACE:trace}});
    child.stdin.end(); // CLI reads piped stdin before executing the supplied prompt.
    let stdout = '', stderr = '';
    child.stdout.on('data', b => stdout += b); child.stderr.on('data', b => stderr += b);

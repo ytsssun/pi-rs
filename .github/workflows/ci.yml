@@ -48,7 +48,9 @@ jobs:
         run: |
           cargo build --locked --bin pi-rs
           python3 scripts/build-native-session.py
-          ./target/debug/pi-rs --experimental-upstream-core --help
+          cargo install --locked --path . --bin pi-rs --root "$RUNNER_TEMP/pi-rs-install" --debug --force
+          "$RUNNER_TEMP/pi-rs-install/bin/pi-rs" --experimental-upstream-core --help
+          node --experimental-strip-types experiments/upstream-cli-provider-probe.mjs --binary "$RUNNER_TEMP/pi-rs-install/bin/pi-rs"
       - name: Verify native session identity and timestamps
         run: node experiments/session-identity.mjs
       - name: Verify native CLI command acceptance
