@@ -32,6 +32,7 @@ pub struct PiRuntime {
     action_count: u32,
     max_actions: u32,
     retry_excluded: Vec<Value>,
+    context_override: Option<Vec<Value>>,
 }
 impl PiRuntime {
     pub fn is_waiting(&self) -> bool {
@@ -152,7 +153,7 @@ impl PiRuntime {
             self.turn_index += 1;
             self.waiting = Some(("model".into(), id.clone()));
             Ok(
-                json!({"type":"model","requestId":id,"contextEntries":store.snapshot()?["contextEntries"].as_array().context("missing context entries")?.iter().filter(|entry|!self.retry_excluded.contains(&entry["id"])).cloned().collect::<Vec<_>>()}),
+                json!({"type":"model","requestId":id,"contextEntries":store.snapshot()?["contextEntries"].as_array().context("missing context entries")?.iter().filter(|entry|!self.retry_excluded.contains(&entry["id"])).cloned().collect::<Vec<_>>(),"contextMessages":self.context_override}),
             )
         }
     }
@@ -234,6 +235,10 @@ impl PiRuntime {
                     .push_back(json!({"queueId":id,"message":message}));
             }
             return Ok(Value::Null);
+        }
+        if op == "adopt_context" {
+            self.context_override = Some(request["messages"].as_array().context("context messages required")?.clone());
+            return Ok(json!({"adopted":true}));
         }
         if op == "pending_custom" {
             return Ok(json!(self.custom_messages));
@@ -388,6 +393,7 @@ impl PiRuntime {
             return Ok(json!(messages));
         }
         if op == "begin" {
+            self.context_override = None;
             // Reject continuation before appending input or consuming queued messages.
             if request["driveStart"] != true
                 && self.action_count >= if self.max_actions == 0 { 32 } else { self.max_actions }

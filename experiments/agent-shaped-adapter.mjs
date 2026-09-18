@@ -60,9 +60,12 @@ export class RustAgentAdapter {
           const messageCount=this.state.messages.length;
           try{
           const runtimeMessages=action.contextEntries.flatMap(sessionEntryToContextMessages);
-          // Upstream Session may replace Agent.state.messages after compaction/branching.
-          // Adopt that model view without rewriting Rust's canonical scratch journal.
-          const contextMessages=(this.state.messages.length && JSON.stringify(this.state.messages)!==JSON.stringify(runtimeMessages))?this.state.messages:runtimeMessages;
+          // Rust explicitly owns adoption of upstream compaction/branch context views.
+          let contextMessages=action.contextMessages??runtimeMessages;
+          if(JSON.stringify(this.state.messages)!==JSON.stringify(contextMessages)){
+            this.step({event:'adopt_context',messages:this.state.messages});
+            contextMessages=this.state.messages;
+          }
           const context={systemPrompt:this.state.systemPrompt,messages:contextMessages,tools:this.state.tools};
           const refreshed=await (this.prepareNextTurnWithContext?this.prepareNextTurnWithContext({context,turnIndex:0},this.signal):this.prepareNextTurn?.(this.signal));
           // Reject unsupported compaction instead of silently diverging from Rust history.
