@@ -1,5 +1,9 @@
 # Current checkpoint
 
+## Active review gate
+
+PR72 (`058efca`) is not ready to merge despite green CI. Its JavaScript context selection passes the direct nonempty and empty state-replacement diagnostics, but does not implement the frozen Rust-owned context adoption contract. Full Session.compact, restored compaction and history invariants remain untested. The previous message calling this fixed was too broad. Preserve the candidate for comparison; replace its policy selection with a Rust admission/projection operation before integration. PR71 merge `fde5058` CI35307243243 succeeded.
+
 ## Current verified status
 
 The installed CLI is still the custom pi-rs path. The experimental Agent adapter runs unchanged upstream CLI/AgentSession with Rust scheduling and original providers/tools; it is not a complete replacement or the installed default.
