@@ -1,5 +1,14 @@
 # Current checkpoint
 
+## Fork migration in progress (2026-09-18)
+
+Canonical fork main is `46c9de402`; this checkout still contains the old independent history. `codex/pi-rs-migration` is an archival history branch, not a merge-ready fork PR. Old PR72 belongs to `ytsssun/pi-rs-archive`, not the canonical repository. All GitHub commands must explicitly target `--repo ytsssun/pi-rs`.
+
+Stage0 is now active before Stage1: worktree `/Users/stevensun/repos/pi-rs-fork`, branch `codex/rust-core-foundation`, based on fork main. Worker `fork_foundation` owns minimal Rust core/store/index import and tests, provenance, scoped CI, and a draft internal PR. Do not migrate the legacy CLI or overwrite upstream files. Coordinator must independently reproduce Rust tests and inspect exact-head CI before integration.
+
+Baseline drift: `git diff --stat 9767ba275f3e9a5ee0f5c5342249b629ab1b2282 46c9de402 -- packages/agent packages/coding-agent` reports 165 changed files. Prior pinned compatibility evidence does not validate this fork version. Stage1 must execute original/new Agent differential cases against the actual fork base. Binary remains pi-rs; earlier roadmap references to making pi the product command are superseded.
+
+
 ## Migration roadmap
 
 The concrete staged plan is [docs/rust-core-migration-roadmap.md](rust-core-migration-roadmap.md): baseline fork oracle, package-compatible Agent facade, Rust-owned session/context, provider boundary, Rust built-in tools/normal command, then removal of migration scaffolding. The active dependency is Stage 1: move the tested adapter into the fork package boundary without loader substitution.
