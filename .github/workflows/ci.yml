@@ -37,6 +37,7 @@ jobs:
       - name: Verify original provider stack and SDK option forwarding
         run: |
           node --experimental-strip-types experiments/agent-adapter-options.mjs
+          node --experimental-strip-types experiments/agent-image-content.mjs
           node --experimental-strip-types experiments/agent-adapter-failure.mjs
           node --experimental-strip-types experiments/agent-session-cancel.mjs
           node --experimental-strip-types experiments/agent-session-cancel.mjs --queue

@@ -26,7 +26,9 @@ Unchanged vendored todo.ts now passes an installed-entry comparison against orig
 
 Custom message-array admission now passes installed-entry upstream comparison using a synthetic test extension. Session_start queues nextTurn custom input, before_agent_start returns another custom input; Rust admits user then custom messages, preserving content/display/details and canonical custom_message entries over two processes. Initial native run failed at single-text-only input; adapter now delegates custom validation/admission to existing Rust begin. Todo extension and Session retry regressions pass. PR69 merged as 24b5c53 after exact-head CI.
 
-Next frozen milestone: verify images in user input through the unchanged upstream CLI/provider boundary. The current adapter explicitly rejects non-text content, which blocks normal image attachments even though upstream handles provider conversion. Use fixed image fixture and captured HTTP payload, then preserve canonical image content on resume; do not claim visual reasoning without a separate live test.
+Image content is now accepted in the experimental Agent seam when a text part is present. `agent-image-content.mjs` compares upstream/Rust contexts and preserves the exact base64/mime image block; Rust session state stores the resulting user message. This is deterministic content-preservation evidence only, not visual reasoning or live provider image evidence.
+
+Next frozen milestone: send this image content through the installed original provider stack and inspect the captured request/resume payload. Then run one controlled live image-capable model only if the provider wire is correct. Keep unsupported image-only prompts and compaction explicit.
 
 ## Limits and recovery
 

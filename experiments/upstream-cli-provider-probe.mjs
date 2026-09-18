@@ -8,6 +8,7 @@ import {spawn} from 'node:child_process';
 import {createServer} from 'node:http';
 const installedIndex=process.argv.indexOf('--binary');
 const installed=installedIndex>=0?process.argv[installedIndex+1]:undefined;
+const image=process.argv.includes('--image');
 const customMessages=process.argv.includes('--custom-messages');
 const todo=process.argv.includes('--todo');
 const todoExtension=fileURLToPath(new URL('../vendor/pi-mono/packages/coding-agent/examples/extensions/todo.ts',import.meta.url));
@@ -16,6 +17,7 @@ const dir = mkdtempSync(join(tmpdir(), 'pi-cli-provider-'));
 const cli = fileURLToPath(new URL('../vendor/pi-mono/packages/coding-agent/dist/cli.js', import.meta.url));
 const preload = fileURLToPath(new URL('./upstream-cli-preload.mjs', import.meta.url));
 const session = join(dir, 'canonical.jsonl');
+const imageData='data:image/png;base64,aGVsbG8=';
 const customExtension=join(dir,'custom-messages.mjs');
 if(customMessages)writeFileSync(customExtension,`export default function(pi){
  pi.on('session_start',()=>pi.sendMessage({customType:'queued-context',content:'queued custom context',display:false,details:{source:'session_start'}},{deliverAs:'nextTurn'}));
@@ -34,6 +36,7 @@ const server = createServer(async (req, res) => {
   const body = JSON.parse(Buffer.concat(chunks));
   requests.push({stage, body});
   writeFileSync(join(dir, 'requests.json'), JSON.stringify(requests, null, 2));
+  if(image){const wire=JSON.stringify(body.messages);assert.ok(wire.includes(imageData));}
   if(customMessages){const wire=JSON.stringify(body.messages);assert.ok(wire.includes('queued custom context'));assert.ok(wire.indexOf('queued custom context')<wire.indexOf('hook custom context'));}
   assert.equal(body.model, 'fixture-model');
   assert.equal(body.stream, true);
@@ -108,5 +111,5 @@ try {
    assert.ok(steps.some(s=>s.output==='tool'));
   }
  }
- console.log(JSON.stringify({status:'PASS',engine:baseline?'upstream':'rust',extension:todo?'unchanged upstream todo.ts':customMessages?'synthetic message hooks':null,scope:'Original CLI + upstream HTTP provider, deterministic SSE fixture, two processes; not live-model validation',requests:requests.length,canonicalMessages:8,dir}));
+ console.log(JSON.stringify({status:'PASS',engine:baseline?'upstream':'rust',extension:todo?'unchanged upstream todo.ts':customMessages?'synthetic message hooks':image?'image fixture':null,scope:'Original CLI + upstream HTTP provider, deterministic SSE fixture, two processes; not live-model validation',requests:requests.length,canonicalMessages:8,dir}));
 } finally { server.closeAllConnections(); await new Promise(resolve=>server.close(resolve)); }

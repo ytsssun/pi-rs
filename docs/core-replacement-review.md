@@ -118,3 +118,7 @@ The previously failing `agent-session-retry.mjs` now passes. Rust `continue_cont
 ### Extension message-array admission
 
 A synthetic test extension queues a nextTurn message at session_start and returns another from before_agent_start. The original CLI baseline passes, while the installed Rust adapter initially rejected the multi-message prompt. Adapter translation now passes trailing custom messages to existing Rust begin/nextTurn admission; Rust retains validation and persistence order. The installed comparison checks user/custom event ordering, custom content/display/details, model visibility and canonical resume across two processes. Todo and retry regressions pass. Synthetic coverage is distinct from unchanged upstream todo.ts coverage.
+
+### Image content seam
+
+`agent-image-content.mjs` compares an upstream Agent and Rust adapter on a user message containing text plus a PNG data block. Both stream contexts retain the exact image data/mime and user role; native state persists the message. This removes the adapter's prior blanket non-text rejection for mixed text/image content. It does not establish provider serialization, image-only prompts, compaction, visual-model behavior or live image compatibility.
