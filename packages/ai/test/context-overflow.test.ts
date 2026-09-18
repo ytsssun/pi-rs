@@ -562,8 +562,9 @@ describe("Context overflow error handling", () => {
 		}, 120000);
 
 		// Mistral backend
-		it("mistralai/mistral-large-2512 via OpenRouter - should detect overflow via isContextOverflow", async () => {
-			const model = getModel("openrouter", "mistralai/mistral-large-2512");
+		it("available Mistral Large via OpenRouter - should detect overflow via isContextOverflow", async () => {
+			const model = getModels("openrouter").find((candidate) => candidate.id.startsWith("mistralai/mistral-large"));
+			if (!model) throw new Error("No Mistral Large model in the pinned OpenRouter catalog");
 			const result = await testContextOverflow(model, process.env.OPENROUTER_API_KEY!);
 			logResult(result);
 
