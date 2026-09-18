@@ -2,6 +2,8 @@
 
 ## Fork migration in progress (2026-09-18)
 
+Coordinator independently reran the 13 foundation Rust tests successfully. CI attribution is under correction: build runs live model generation before check, so the earlier static pre-existing mismatch claim is not established. Worker fork_foundation is verifying offline build against committed catalogs while preserving every check/test gate. Do not merge PR1 yet. Stage1 bridge must exclude old Node-API provider/stream coupling; preserve fork SDK provider callbacks and target actual fork API.
+
 Canonical fork main is `46c9de402`; this checkout still contains the old independent history. `codex/pi-rs-migration` is an archival history branch, not a merge-ready fork PR. Old PR72 belongs to `ytsssun/pi-rs-archive`, not the canonical repository. All GitHub commands must explicitly target `--repo ytsssun/pi-rs`.
 
 Stage0 foundation PR #1 is open in the canonical fork: branch `codex/rust-core-foundation`, commit `34b2aaf63`, draft PR `ytsssun/pi-rs#1`. Its focused Rust CI `35322988839` passed: 13 deterministic tests and clippy. It deliberately does not wire TypeScript, CLI, providers or extensions. Fork-wide CI also reports pre-existing TypeScript catalog/test mismatches in `packages/ai` (`mistral-large-2512`, `glm-5.2`, `glm-5.1`, `glm-5v-turbo`) and is not a foundation regression; do not merge until the required fork checks are resolved or an explicit scoped policy exists. Local Node 22.18 is below fork requirement >=22.19.
