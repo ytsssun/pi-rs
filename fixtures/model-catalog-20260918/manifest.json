@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "capturedAt": "2026-09-18T11:24:52.432Z",
+  "responses": [
+    {
+      "url": "https://models.dev/api.json",
+      "file": "models-dev.json",
+      "sha256": "2be3870a9565afd8fd9d5ea14f1128316cbf35ef3fd9074b70861e700e3d4140"
+    },
+    {
+      "url": "https://openrouter.ai/api/v1/models",
+      "file": "openrouter.json",
+      "sha256": "d67efd46f6924ca3faf0da9de5597cc308f7d6ca9c89d2e574516be98fb16889"
+    },
+    {
+      "url": "https://ai-gateway.vercel.sh/v1/models",
+      "file": "ai-gateway.json",
+      "sha256": "3303c27e05a746263d1f23647fc53b69711e0d62bde2b473e1243981739d49a1"
+    },
+    {
+      "url": "https://integrate.api.nvidia.com/v1/models",
+      "file": "nvidia.json",
+      "sha256": "823c01b8f675e7e05935f56865186bb2e3971c2ac8b0118ca8a18e3c01615722"
+    }
+  ]
+}
