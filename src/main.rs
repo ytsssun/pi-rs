@@ -1,12 +1,19 @@
 //! Public CLI launcher for the Rust runtime and unchanged Pi JavaScript host.
 use anyhow::{bail, Context, Result};
-use std::{env, path::Path, process::Command};
+use std::{env, ffi::OsString, path::Path, process::Command};
+
+fn select_runtime(mut args: Vec<OsString>) -> (bool, Vec<OsString>) {
+    let upstream = args.first().is_some_and(|arg| arg == "--experimental-upstream-core");
+    if upstream { args.remove(0); }
+    (upstream, args)
+}
+
 
 fn main() -> Result<()> {
     // This is deliberately a source-checkout installation, not a standalone binary.
     // Absolute assets let callers run in their own repository without changing cwd.
     let root = Path::new(env!("CARGO_MANIFEST_DIR"));
-    let upstream = env::args_os().skip(1).any(|arg| arg == "--experimental-upstream-core");
+    let (upstream, args) = select_runtime(env::args_os().skip(1).collect());
     let entry = if upstream { root.join("bin/pi-rs-upstream.mjs") } else { root.join("bin/pi-rs.mjs") };
     let loader = root.join("vendor/pi-mono/node_modules/tsx/dist/loader.mjs");
     for asset in [&entry, &loader] {
@@ -17,7 +24,6 @@ fn main() -> Result<()> {
             );
         }
     }
-    let args: Vec<_> = env::args_os().skip(1).filter(|arg| arg != "--experimental-upstream-core").collect();
     let mut command = Command::new("node");
     command.arg("--import").arg(loader).arg(entry);
     if args.is_empty() {
@@ -38,5 +44,21 @@ fn main() -> Result<()> {
             .status()
             .context("could not launch Node.js; install Node.js and make node available on PATH")?;
         std::process::exit(status.code().unwrap_or(1));
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::select_runtime;
+    use std::ffi::OsString;
+    #[test]
+    fn runtime_selector_never_consumes_prompt_or_option_values() {
+        for input in [vec!["--", "--experimental-upstream-core"],vec!["--input", "--experimental-upstream-core"]] {
+            let args: Vec<OsString> = input.into_iter().map(OsString::from).collect();
+            assert_eq!(select_runtime(args.clone()), (false,args));
+        }
+        let (upstream,args) = select_runtime(["--experimental-upstream-core","--","--experimental-upstream-core"].into_iter().map(OsString::from).collect());
+        assert!(upstream);
+        assert_eq!(args, vec![OsString::from("--"),OsString::from("--experimental-upstream-core")]);
     }
 }
