@@ -17,7 +17,10 @@ const dir = mkdtempSync(join(tmpdir(), 'pi-cli-provider-'));
 const cli = fileURLToPath(new URL('../vendor/pi-mono/packages/coding-agent/dist/cli.js', import.meta.url));
 const preload = fileURLToPath(new URL('./upstream-cli-preload.mjs', import.meta.url));
 const session = join(dir, 'canonical.jsonl');
-const imageData='data:image/png;base64,aGVsbG8=';
+const png='iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAADElEQVR4nGP4z8AAAAMBAQDJ/pLvAAAAAElFTkSuQmCC';
+const imageData=`data:image/png;base64,${png}`;
+const imagePath=join(dir,'attachment.png');
+if(image)writeFileSync(imagePath,Buffer.from(png,'base64'));
 const customExtension=join(dir,'custom-messages.mjs');
 if(customMessages)writeFileSync(customExtension,`export default function(pi){
  pi.on('session_start',()=>pi.sendMessage({customType:'queued-context',content:'queued custom context',display:false,details:{source:'session_start'}},{deliverAs:'nextTurn'}));
@@ -59,7 +62,7 @@ await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
 const home = join(dir, 'home');
 const agentHome = join(home, '.pi', 'agent');
 mkdirSync(agentHome, {recursive:true});
-writeFileSync(join(agentHome, 'models.json'), JSON.stringify({providers:{'fixture-http':{baseUrl:`http://127.0.0.1:${server.address().port}/v1`,api:'openai-completions',apiKey:'fixture-not-a-secret',models:[{id:'fixture-model',name:'Fixture',reasoning:false,input:['text'],contextWindow:128000,maxTokens:1024}]}}}));
+writeFileSync(join(agentHome, 'models.json'), JSON.stringify({providers:{'fixture-http':{baseUrl:`http://127.0.0.1:${server.address().port}/v1`,api:'openai-completions',apiKey:'fixture-not-a-secret',models:[{id:'fixture-model',name:'Fixture',reasoning:false,input:image?['text','image']:['text'],contextWindow:128000,maxTokens:1024}]}}}));
 writeFileSync(join(dir, 'subject.txt'), 'before\n');
 let priorBytes;
 let priorMessages;
@@ -67,7 +70,7 @@ try {
  for (stage = 0; stage < 2; stage++) {
   stageCalls = 0;
   const trace = join(dir, `trace-${stage}.json`);
-  const args = ['--experimental-strip-types',...(!baseline?['--import',preload]:[]),cli,'--print','--mode','json','--no-extensions',...(todo?['--extension',todoExtension]:[]),...(customMessages?['--extension',customExtension]:[]),'--no-skills','--no-prompt-templates','--no-themes','--provider','fixture-http','--model','fixture-model','--session',session,'--thinking','off',stage?'Continue the previous edit.':'Edit subject.txt.'];
+  const args = ['--experimental-strip-types',...(!baseline?['--import',preload]:[]),cli,'--print','--mode','json','--no-extensions',...(todo?['--extension',todoExtension]:[]),...(customMessages?['--extension',customExtension]:[]),'--no-skills','--no-prompt-templates','--no-themes','--provider','fixture-http','--model','fixture-model','--session',session,'--thinking','off',...(image&&stage===0?['@'+imagePath]:[]),stage?'Continue the previous edit.':'Edit subject.txt.'];
   const result = await new Promise((resolve, reject) => {
    const launchArgs=installed?['--experimental-upstream-core',...args.slice(args.indexOf(cli)+1)]:args;
    const child = spawn(installed??process.execPath, launchArgs, {cwd:dir,env:{PATH:process.env.PATH,HOME:home,PI_RS_PROBE_SCRATCH:join(dir,`scratch-${stage}.jsonl`),PI_RS_CORE_TRACE:trace,PI_RS_PROBE_TRACE:trace}});
@@ -95,6 +98,7 @@ try {
   if(customMessages){const custom=entries.filter(e=>e.type==='custom_message');assert.deepEqual(custom.map(e=>[e.customType,e.content,e.display,e.details.source]),Array.from({length:stage+1},()=>[['queued-context','queued custom context',false,'session_start'],['hook-context','hook custom context',true,'before_agent_start']]).flat());}
   const messages = entries.filter(e=>e.type==='message').map(e=>e.message);
   assert.equal(messages.length, stage?8:4);
+  if(image){const images=messages.flatMap(m=>Array.isArray(m.content)?m.content.filter(c=>c.type==='image'):[]);assert.deepEqual(images,[{type:'image',data:png,mimeType:'image/png'}]);}
   if(todo){const result=messages.filter(m=>m.role==='toolResult').at(-1);assert.equal(result.toolName,'todo');assert.equal(result.isError,false);assert.deepEqual(result.details.todos,[{id:1,text:'preserved todo',done:stage===1}]);assert.equal(result.details.nextId,2);}
   assert.deepEqual(messages.slice(stage*4).map(m=>m.role), ['user','assistant','toolResult','assistant']);
   if(stage) {
