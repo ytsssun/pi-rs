@@ -2,6 +2,8 @@
 
 ## Fork migration in progress (2026-09-18)
 
+Catalog repair is now assigned to fork_foundation in a separate fork-main worktree/PR; all CI checks remain required. Independent Stage1 source audit found a concrete blocker: fork Agent derives systemPrompt from system messages, while old adapter does not. See [seam audit](fork-agent-seam-audit.md) for the bridge and system-message acceptance sequence. This is source evidence, not an executed conformance result.
+
 Coordinator independently reran the 13 foundation Rust tests successfully. Fork-wide CI attribution is now corrected: `npm run build` regenerates ignored provider catalogs from live sources, while fork tests/types expect different model IDs and API groupings (observed `deepseek-flash` vs `deepseek-v4-flash`, and `openai-responses` vs `openai-completions`). The earlier Node-version and static-pre-existing claims are superseded. A pinned catalog snapshot validates structurally but still exposes these fork-level drift issues. Do not weaken checks or mix catalog repair into PR1; keep PR1 focused on Rust foundation. Stage1 bridge must exclude old Node-API provider/stream coupling; preserve fork SDK provider callbacks and target actual fork API.
 
 Canonical fork main is `46c9de402`; this checkout still contains the old independent history. `codex/pi-rs-migration` is an archival history branch, not a merge-ready fork PR. Old PR72 belongs to `ytsssun/pi-rs-archive`, not the canonical repository. All GitHub commands must explicitly target `--repo ytsssun/pi-rs`.
