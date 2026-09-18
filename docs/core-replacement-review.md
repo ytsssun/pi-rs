@@ -110,3 +110,7 @@ This does not establish full cancellation semantics: the fixture calls abort the
 ### Scoped retry continuation
 
 The previously failing `agent-session-retry.mjs` now passes. Rust `continue_context` validates the settled state and an exact transcript prefix obtained by removing only the last error assistant. It retains the native journal and projects that failed entry out of subsequent model context; no extra user append. Existing queued continuation remains Rust-selected. The test checks original Session retry events, canonical versus active history, provider context omission and later reuse. A Rust guard test rejects unrelated transcript edits without journal mutation. This is a scoped process-local retry projection, not general compaction or context replacement support. Full Rust tests/clippy and original CLI provider regression passed locally.
+
+### Installed unchanged extension slice
+
+`upstream-cli-provider-probe.mjs --todo --binary PATH` loads vendored todo.ts unchanged through the installed experimental entry. Against the same fixture and original Pi baseline, add then new-process toggle preserves todo id/text/state and nextId via session_start reconstruction. Native action traces prove Rust dispatch; four requests and eight canonical messages retain prefix/event order. No upstream files changed. This covers registration, execution, result details and one session lifecycle callback, not /todos UI, branch restoration or all extensions.

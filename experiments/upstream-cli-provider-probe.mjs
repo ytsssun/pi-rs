@@ -8,6 +8,8 @@ import {spawn} from 'node:child_process';
 import {createServer} from 'node:http';
 const installedIndex=process.argv.indexOf('--binary');
 const installed=installedIndex>=0?process.argv[installedIndex+1]:undefined;
+const todo=process.argv.includes('--todo');
+const todoExtension=fileURLToPath(new URL('../vendor/pi-mono/packages/coding-agent/examples/extensions/todo.ts',import.meta.url));
 const baseline = process.argv.includes('--upstream');
 const dir = mkdtempSync(join(tmpdir(), 'pi-cli-provider-'));
 const cli = fileURLToPath(new URL('../vendor/pi-mono/packages/coding-agent/dist/cli.js', import.meta.url));
@@ -27,10 +29,10 @@ const server = createServer(async (req, res) => {
   writeFileSync(join(dir, 'requests.json'), JSON.stringify(requests, null, 2));
   assert.equal(body.model, 'fixture-model');
   assert.equal(body.stream, true);
-  assert.ok(body.tools.some(t => t.function.name === 'edit'));
+  assert.ok(body.tools.some(t => t.function.name === (todo?'todo':'edit')));
   assert.ok(++stageCalls <= 2, 'Unexpected provider retry or extra turn');
   const tool = stageCalls === 1;
-  const delta = tool ? {role:'assistant', tool_calls:[{index:0,id:`edit-${stage}`,type:'function',function:{name:'edit',arguments:JSON.stringify({path:'subject.txt',edits:[{oldText:stage ? 'after':'before',newText:stage ? 'resumed':'after'}]})}}]} : {role:'assistant',content:'fixture complete'};
+  const delta = tool ? {role:'assistant', tool_calls:[{index:0,id:`edit-${stage}`,type:'function',function:{name:todo?'todo':'edit',arguments:JSON.stringify(todo?(stage?{action:'toggle',id:1}:{action:'add',text:'preserved todo'}):{path:'subject.txt',edits:[{oldText:stage ? 'after':'before',newText:stage ? 'resumed':'after'}]})}}]} : {role:'assistant',content:'fixture complete'};
   res.writeHead(200, {'Content-Type':'text/event-stream'});
   const send = (choices, usage) => res.write(`data: ${JSON.stringify({id:`chat-${requests.length}`,object:'chat.completion.chunk',created:1,model:'fixture-model',choices,...(usage?{usage}:{})})}\n\n`);
   send([{index:0,delta,finish_reason:null}]);
@@ -54,7 +56,7 @@ try {
  for (stage = 0; stage < 2; stage++) {
   stageCalls = 0;
   const trace = join(dir, `trace-${stage}.json`);
-  const args = ['--experimental-strip-types',...(!baseline?['--import',preload]:[]),cli,'--print','--mode','json','--no-extensions','--no-skills','--no-prompt-templates','--no-themes','--provider','fixture-http','--model','fixture-model','--session',session,'--thinking','off',stage?'Continue the previous edit.':'Edit subject.txt.'];
+  const args = ['--experimental-strip-types',...(!baseline?['--import',preload]:[]),cli,'--print','--mode','json','--no-extensions',...(todo?['--extension',todoExtension]:[]),'--no-skills','--no-prompt-templates','--no-themes','--provider','fixture-http','--model','fixture-model','--session',session,'--thinking','off',stage?'Continue the previous edit.':'Edit subject.txt.'];
   const result = await new Promise((resolve, reject) => {
    const launchArgs=installed?['--experimental-upstream-core',...args.slice(args.indexOf(cli)+1)]:args;
    const child = spawn(installed??process.execPath, launchArgs, {cwd:dir,env:{PATH:process.env.PATH,HOME:home,PI_RS_PROBE_SCRATCH:join(dir,`scratch-${stage}.jsonl`),PI_RS_CORE_TRACE:trace,PI_RS_PROBE_TRACE:trace}});
@@ -76,10 +78,11 @@ try {
    'message_end','turn_end','agent_end','agent_settled']);
   assert.equal(events.find(e=>e.assistantMessageEvent?.type==='text_delta').assistantMessageEvent.delta,'fixture complete');
   assert.equal(events.filter(e=>e.type==='message_end').length,4,'Partials must not duplicate final messages');
-  assert.equal(readFileSync(join(dir,'subject.txt'),'utf8'), stage?'resumed\n':'after\n');
+  assert.equal(readFileSync(join(dir,'subject.txt'),'utf8'), todo?'before\n':stage?'resumed\n':'after\n');
   const bytes = readFileSync(session,'utf8');
   const messages = bytes.trim().split('\n').map(JSON.parse).filter(e=>e.type==='message').map(e=>e.message);
   assert.equal(messages.length, stage?8:4);
+  if(todo){const result=messages.filter(m=>m.role==='toolResult').at(-1);assert.equal(result.toolName,'todo');assert.equal(result.isError,false);assert.deepEqual(result.details.todos,[{id:1,text:'preserved todo',done:stage===1}]);assert.equal(result.details.nextId,2);}
   assert.deepEqual(messages.slice(stage*4).map(m=>m.role), ['user','assistant','toolResult','assistant']);
   if(stage) {
    assert.ok(bytes.startsWith(priorBytes),'Canonical bytes must retain original prefix');
@@ -95,5 +98,5 @@ try {
    assert.ok(steps.some(s=>s.output==='tool'));
   }
  }
- console.log(JSON.stringify({status:'PASS',engine:baseline?'upstream':'rust',scope:'Original CLI + upstream HTTP provider, deterministic SSE fixture, two processes; not live-model validation',requests:requests.length,canonicalMessages:8,dir}));
+ console.log(JSON.stringify({status:'PASS',engine:baseline?'upstream':'rust',extension:todo?'unchanged upstream todo.ts':null,scope:'Original CLI + upstream HTTP provider, deterministic SSE fixture, two processes; not live-model validation',requests:requests.length,canonicalMessages:8,dir}));
 } finally { server.closeAllConnections(); await new Promise(resolve=>server.close(resolve)); }
