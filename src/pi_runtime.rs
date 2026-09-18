@@ -32,7 +32,6 @@ pub struct PiRuntime {
     action_count: u32,
     max_actions: u32,
     retry_excluded: Vec<Value>,
-    context_override: Option<Vec<Value>>,
 }
 impl PiRuntime {
     pub fn is_waiting(&self) -> bool {
@@ -153,7 +152,7 @@ impl PiRuntime {
             self.turn_index += 1;
             self.waiting = Some(("model".into(), id.clone()));
             Ok(
-                json!({"type":"model","requestId":id,"contextEntries":store.snapshot()?["contextEntries"].as_array().context("missing context entries")?.iter().filter(|entry|!self.retry_excluded.contains(&entry["id"])).cloned().collect::<Vec<_>>(),"contextMessages":self.context_override}),
+                json!({"type":"model","requestId":id,"contextEntries":store.snapshot()?["contextEntries"].as_array().context("missing context entries")?.iter().filter(|entry|!self.retry_excluded.contains(&entry["id"])).cloned().collect::<Vec<_>>()}),
             )
         }
     }
@@ -237,8 +236,16 @@ impl PiRuntime {
             return Ok(Value::Null);
         }
         if op == "adopt_context" {
-            self.context_override = Some(request["messages"].as_array().context("context messages required")?.clone());
-            return Ok(json!({"adopted":true}));
+            let pending = self.waiting.as_ref().context("context adoption requires a pending model request")?;
+            if pending.0 != "model" || request["requestId"] != pending.1 {
+                bail!("context adoption requires the current model request id");
+            }
+            let messages = request["messages"].as_array().context("context messages required")?;
+            if messages.iter().any(|message| !message.is_object() || message["role"].as_str().is_none() || message.get("content").is_none()) {
+                bail!("context messages require role and content");
+            }
+            // A request-scoped model view, never a persistent override for later turns.
+            return Ok(json!({"requestId":pending.1,"messages":messages}));
         }
         if op == "pending_custom" {
             return Ok(json!(self.custom_messages));
@@ -393,7 +400,6 @@ impl PiRuntime {
             return Ok(json!(messages));
         }
         if op == "begin" {
-            self.context_override = None;
             // Reject continuation before appending input or consuming queued messages.
             if request["driveStart"] != true
                 && self.action_count >= if self.max_actions == 0 { 32 } else { self.max_actions }
