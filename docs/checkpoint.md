@@ -26,7 +26,9 @@ Unchanged vendored todo.ts now passes an installed-entry comparison against orig
 
 Custom message-array admission now passes installed-entry upstream comparison using a synthetic test extension. Session_start queues nextTurn custom input, before_agent_start returns another custom input; Rust admits user then custom messages, preserving content/display/details and canonical custom_message entries over two processes. Initial native run failed at single-text-only input; adapter now delegates custom validation/admission to existing Rust begin. Todo extension and Session retry regressions pass. PR69 merged as 24b5c53 after exact-head CI.
 
-Next frozen milestone: verify images in user input through the unchanged upstream CLI/provider boundary. The current adapter explicitly rejects non-text content, which blocks normal image attachments even though upstream handles provider conversion. Use fixed image fixture and captured HTTP payload, then preserve canonical image content on resume; do not claim visual reasoning without a separate live test.
+Image attachment wire/resume comparison now passes original Pi and installed Rust-core entry at base `11f19d1` plus harness changes. A valid one-pixel PNG enters through original `@file` handling; all four HTTP requests preserve its data URL, canonical history retains exactly one image, and a second process restores it without reattaching. Commands: `node --experimental-strip-types experiments/upstream-cli-provider-probe.mjs --image --upstream` and `--image --binary /tmp/pi-rs-installed-probe/bin/pi-rs`. Deterministic fixture only; visual reasoning remains unverified. The earlier adapter fixture used base64 for “hello”, not a valid PNG, and checked memory rather than disk persistence; that claim is superseded by this stronger test.
+
+Next: await exact-head CI for PR71 before integration, then test original Session compaction/context replacement against the Rust adapter. Image-only prompts remain unsupported. Do not treat this attachment test as full multimodal parity.
 
 ## Limits and recovery
 

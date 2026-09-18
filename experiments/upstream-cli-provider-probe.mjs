@@ -8,6 +8,7 @@ import {spawn} from 'node:child_process';
 import {createServer} from 'node:http';
 const installedIndex=process.argv.indexOf('--binary');
 const installed=installedIndex>=0?process.argv[installedIndex+1]:undefined;
+const image=process.argv.includes('--image');
 const customMessages=process.argv.includes('--custom-messages');
 const todo=process.argv.includes('--todo');
 const todoExtension=fileURLToPath(new URL('../vendor/pi-mono/packages/coding-agent/examples/extensions/todo.ts',import.meta.url));
@@ -16,6 +17,10 @@ const dir = mkdtempSync(join(tmpdir(), 'pi-cli-provider-'));
 const cli = fileURLToPath(new URL('../vendor/pi-mono/packages/coding-agent/dist/cli.js', import.meta.url));
 const preload = fileURLToPath(new URL('./upstream-cli-preload.mjs', import.meta.url));
 const session = join(dir, 'canonical.jsonl');
+const png='iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAADElEQVR4nGP4z8AAAAMBAQDJ/pLvAAAAAElFTkSuQmCC';
+const imageData=`data:image/png;base64,${png}`;
+const imagePath=join(dir,'attachment.png');
+if(image)writeFileSync(imagePath,Buffer.from(png,'base64'));
 const customExtension=join(dir,'custom-messages.mjs');
 if(customMessages)writeFileSync(customExtension,`export default function(pi){
  pi.on('session_start',()=>pi.sendMessage({customType:'queued-context',content:'queued custom context',display:false,details:{source:'session_start'}},{deliverAs:'nextTurn'}));
@@ -34,6 +39,7 @@ const server = createServer(async (req, res) => {
   const body = JSON.parse(Buffer.concat(chunks));
   requests.push({stage, body});
   writeFileSync(join(dir, 'requests.json'), JSON.stringify(requests, null, 2));
+  if(image){const wire=JSON.stringify(body.messages);assert.ok(wire.includes(imageData));}
   if(customMessages){const wire=JSON.stringify(body.messages);assert.ok(wire.includes('queued custom context'));assert.ok(wire.indexOf('queued custom context')<wire.indexOf('hook custom context'));}
   assert.equal(body.model, 'fixture-model');
   assert.equal(body.stream, true);
@@ -56,7 +62,7 @@ await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
 const home = join(dir, 'home');
 const agentHome = join(home, '.pi', 'agent');
 mkdirSync(agentHome, {recursive:true});
-writeFileSync(join(agentHome, 'models.json'), JSON.stringify({providers:{'fixture-http':{baseUrl:`http://127.0.0.1:${server.address().port}/v1`,api:'openai-completions',apiKey:'fixture-not-a-secret',models:[{id:'fixture-model',name:'Fixture',reasoning:false,input:['text'],contextWindow:128000,maxTokens:1024}]}}}));
+writeFileSync(join(agentHome, 'models.json'), JSON.stringify({providers:{'fixture-http':{baseUrl:`http://127.0.0.1:${server.address().port}/v1`,api:'openai-completions',apiKey:'fixture-not-a-secret',models:[{id:'fixture-model',name:'Fixture',reasoning:false,input:image?['text','image']:['text'],contextWindow:128000,maxTokens:1024}]}}}));
 writeFileSync(join(dir, 'subject.txt'), 'before\n');
 let priorBytes;
 let priorMessages;
@@ -64,7 +70,7 @@ try {
  for (stage = 0; stage < 2; stage++) {
   stageCalls = 0;
   const trace = join(dir, `trace-${stage}.json`);
-  const args = ['--experimental-strip-types',...(!baseline?['--import',preload]:[]),cli,'--print','--mode','json','--no-extensions',...(todo?['--extension',todoExtension]:[]),...(customMessages?['--extension',customExtension]:[]),'--no-skills','--no-prompt-templates','--no-themes','--provider','fixture-http','--model','fixture-model','--session',session,'--thinking','off',stage?'Continue the previous edit.':'Edit subject.txt.'];
+  const args = ['--experimental-strip-types',...(!baseline?['--import',preload]:[]),cli,'--print','--mode','json','--no-extensions',...(todo?['--extension',todoExtension]:[]),...(customMessages?['--extension',customExtension]:[]),'--no-skills','--no-prompt-templates','--no-themes','--provider','fixture-http','--model','fixture-model','--session',session,'--thinking','off',...(image&&stage===0?['@'+imagePath]:[]),stage?'Continue the previous edit.':'Edit subject.txt.'];
   const result = await new Promise((resolve, reject) => {
    const launchArgs=installed?['--experimental-upstream-core',...args.slice(args.indexOf(cli)+1)]:args;
    const child = spawn(installed??process.execPath, launchArgs, {cwd:dir,env:{PATH:process.env.PATH,HOME:home,PI_RS_PROBE_SCRATCH:join(dir,`scratch-${stage}.jsonl`),PI_RS_CORE_TRACE:trace,PI_RS_PROBE_TRACE:trace}});
@@ -92,6 +98,7 @@ try {
   if(customMessages){const custom=entries.filter(e=>e.type==='custom_message');assert.deepEqual(custom.map(e=>[e.customType,e.content,e.display,e.details.source]),Array.from({length:stage+1},()=>[['queued-context','queued custom context',false,'session_start'],['hook-context','hook custom context',true,'before_agent_start']]).flat());}
   const messages = entries.filter(e=>e.type==='message').map(e=>e.message);
   assert.equal(messages.length, stage?8:4);
+  if(image){const images=messages.flatMap(m=>Array.isArray(m.content)?m.content.filter(c=>c.type==='image'):[]);assert.deepEqual(images,[{type:'image',data:png,mimeType:'image/png'}]);}
   if(todo){const result=messages.filter(m=>m.role==='toolResult').at(-1);assert.equal(result.toolName,'todo');assert.equal(result.isError,false);assert.deepEqual(result.details.todos,[{id:1,text:'preserved todo',done:stage===1}]);assert.equal(result.details.nextId,2);}
   assert.deepEqual(messages.slice(stage*4).map(m=>m.role), ['user','assistant','toolResult','assistant']);
   if(stage) {
@@ -108,5 +115,5 @@ try {
    assert.ok(steps.some(s=>s.output==='tool'));
   }
  }
- console.log(JSON.stringify({status:'PASS',engine:baseline?'upstream':'rust',extension:todo?'unchanged upstream todo.ts':customMessages?'synthetic message hooks':null,scope:'Original CLI + upstream HTTP provider, deterministic SSE fixture, two processes; not live-model validation',requests:requests.length,canonicalMessages:8,dir}));
+ console.log(JSON.stringify({status:'PASS',engine:baseline?'upstream':'rust',extension:todo?'unchanged upstream todo.ts':customMessages?'synthetic message hooks':image?'image fixture':null,scope:'Original CLI + upstream HTTP provider, deterministic SSE fixture, two processes; not live-model validation',requests:requests.length,canonicalMessages:8,dir}));
 } finally { server.closeAllConnections(); await new Promise(resolve=>server.close(resolve)); }

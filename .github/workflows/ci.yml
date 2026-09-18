@@ -37,6 +37,7 @@ jobs:
       - name: Verify original provider stack and SDK option forwarding
         run: |
           node --experimental-strip-types experiments/agent-adapter-options.mjs
+          node --experimental-strip-types experiments/agent-image-content.mjs
           node --experimental-strip-types experiments/agent-adapter-failure.mjs
           node --experimental-strip-types experiments/agent-session-cancel.mjs
           node --experimental-strip-types experiments/agent-session-cancel.mjs --queue
@@ -53,6 +54,8 @@ jobs:
           node --experimental-strip-types experiments/upstream-cli-provider-probe.mjs --binary "$RUNNER_TEMP/pi-rs-install/bin/pi-rs"
           node --experimental-strip-types experiments/upstream-cli-provider-probe.mjs --todo --upstream
           node --experimental-strip-types experiments/upstream-cli-provider-probe.mjs --todo --binary "$RUNNER_TEMP/pi-rs-install/bin/pi-rs"
+          node --experimental-strip-types experiments/upstream-cli-provider-probe.mjs --image --upstream
+          node --experimental-strip-types experiments/upstream-cli-provider-probe.mjs --image --binary "$RUNNER_TEMP/pi-rs-install/bin/pi-rs"
           node --experimental-strip-types experiments/upstream-cli-provider-probe.mjs --custom-messages --upstream
           node --experimental-strip-types experiments/upstream-cli-provider-probe.mjs --custom-messages --binary "$RUNNER_TEMP/pi-rs-install/bin/pi-rs"
       - name: Verify native session identity and timestamps

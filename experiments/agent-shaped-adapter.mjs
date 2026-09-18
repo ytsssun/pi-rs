@@ -36,7 +36,8 @@ export class RustAgentAdapter {
   async run(messages,queuedContinuation=false){
     if(this.state.isStreaming)throw Error('Already running');
     const inputs=Array.isArray(messages)?messages:[messages];
-    if(!queuedContinuation&&(inputs.length===0||inputs[0].role!=='user'||inputs[0].content.some(c=>c.type!=='text')||inputs.slice(1).some(m=>m.role!=='custom')))throw Error('Unsupported: expected text user followed by custom messages');
+    const imageParts=inputs[0]?.content?.filter(c=>c.type==='image')??[];
+    if(!queuedContinuation&&(inputs.length===0||inputs[0].role!=='user'||inputs[0].content.some(c=>!['text','image'].includes(c.type))||inputs.slice(1).some(m=>m.role!=='custom')||inputs[0].content.some(c=>c.type==='image')&&!inputs[0].content.some(c=>c.type==='text')))throw Error('Unsupported: expected text user followed by custom messages');
     if(this.seen===0){for(const message of this.state.messages)this.store.appendMessage(message);this.seen=this.state.messages.length;}
     this.controller=new AbortController();this.state.errorMessage=undefined;
     this.state.isStreaming=true;
