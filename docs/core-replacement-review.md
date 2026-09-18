@@ -114,3 +114,7 @@ The previously failing `agent-session-retry.mjs` now passes. Rust `continue_cont
 ### Installed unchanged extension slice
 
 `upstream-cli-provider-probe.mjs --todo --binary PATH` loads vendored todo.ts unchanged through the installed experimental entry. Against the same fixture and original Pi baseline, add then new-process toggle preserves todo id/text/state and nextId via session_start reconstruction. Native action traces prove Rust dispatch; four requests and eight canonical messages retain prefix/event order. No upstream files changed. This covers registration, execution, result details and one session lifecycle callback, not /todos UI, branch restoration or all extensions.
+
+### Extension message-array admission
+
+A synthetic test extension queues a nextTurn message at session_start and returns another from before_agent_start. The original CLI baseline passes, while the installed Rust adapter initially rejected the multi-message prompt. Adapter translation now passes trailing custom messages to existing Rust begin/nextTurn admission; Rust retains validation and persistence order. The installed comparison checks user/custom event ordering, custom content/display/details, model visibility and canonical resume across two processes. Todo and retry regressions pass. Synthetic coverage is distinct from unchanged upstream todo.ts coverage.

@@ -36,13 +36,13 @@ export class RustAgentAdapter {
   async run(messages,queuedContinuation=false){
     if(this.state.isStreaming)throw Error('Already running');
     const inputs=Array.isArray(messages)?messages:[messages];
-    if(!queuedContinuation&&(inputs.length!==1||inputs[0].role!=='user'||inputs[0].content.some(c=>c.type!=='text')))throw Error('Unsupported: non-single-text prompt');
+    if(!queuedContinuation&&(inputs.length===0||inputs[0].role!=='user'||inputs[0].content.some(c=>c.type!=='text')||inputs.slice(1).some(m=>m.role!=='custom')))throw Error('Unsupported: expected text user followed by custom messages');
     if(this.seen===0){for(const message of this.state.messages)this.store.appendMessage(message);this.seen=this.state.messages.length;}
     this.controller=new AbortController();this.state.errorMessage=undefined;
     this.state.isStreaming=true;
     this.store.setQueueModes({steeringMode:this.steeringMode,followUpMode:this.followUpMode});
     try{
-      let action=queuedContinuation?this.step({event:'continue_context',messages:this.state.messages}).action:this.step({event:'begin',prompt:inputs[0].content,driveStart:true,maxActions:32,lifecycle:true});
+      let action=queuedContinuation?this.step({event:'continue_context',messages:this.state.messages}).action:this.step({event:'begin',prompt:inputs[0].content,nextTurnMessages:inputs.slice(1).map(({customType,content,display,details})=>({customType,content,display,details})),driveStart:true,maxActions:32,lifecycle:true});
       while(true){
         if(action.type==='lifecycle'){
           if(action.event.type!=='agent_start'&&action.event.type!=='turn_start')await this.syncMessages();
